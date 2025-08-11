@@ -18,8 +18,15 @@
             "group": "Get Started",
             "pages": [
               "overview",
-              "hub/hub-description",
+              "quickstart",
               "development"
+            ]
+          },
+          {
+            "group": "Hub Workflows & Automation",
+            "pages": [
+              "hub/introduction",
+              "hub/hub-description"
             ]
           },
           {
@@ -28,7 +35,12 @@
               "essentials/accounts",
               "essentials/security",
               "essentials/plans-and-pricing",
-              "essentials/compute-credits"
+              "essentials/compute-credits",
+              "essentials/code",
+              "essentials/images",
+              "essentials/settings",
+              "essentials/navigation",
+              "essentials/reusable-snippets"
             ]
           }
         ]
@@ -49,6 +61,12 @@
             }
           },
           {
+            "group": "Compute",
+            "openapi": {
+              "source": "api-reference/endpoint/compute/openapi.json"
+            }
+          },
+          {
             "group": "Hub Flows",
             "openapi": {
               "source": "api-reference/endpoint/hub-flows/openapi.json"
@@ -58,12 +76,6 @@
             "group": "Gateway",
             "openapi": {
               "source": "api-reference/endpoint/gateway/openapi.json"
-            }
-          },
-          {
-            "group": "Compute",
-            "openapi": {
-              "source": "api-reference/endpoint/compute/openapi.json"
             }
           },
           {
@@ -77,14 +89,7 @@
             "openapi": {
               "source": "api-reference/endpoint/trigger/openapi.json"
             }
-          },
-          {
-            "group": "Monitoring",
-            "openapi": {
-              "source": "api-reference/endpoint/monitoring/openapi.json"
-            }
           }
-
         ]    
       },
       {
@@ -101,6 +106,11 @@
     ],
     "global": {
       "anchors": [
+        {
+          "anchor": "Developer Portal",
+          "href": "https://app.microstrate.io/en/hub",
+          "icon": "code"
+        },
         {
           "anchor": "Community",
           "href": "https://microstrate.io/community",
@@ -128,18 +138,20 @@
     "links": [
       {
         "label": "Log in",
-        "href": "https://app.microstrate.io/en/login"
+        "href": "https://app.staging.microstrate.io/en/login"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Try for free",
-      "href": "https://app.microstrate.io/en/signup"
+      "href": "https://app.staging.microstrate.io/en/signup"
     }
   },
   "footer": {
     "socials": {
-      "linkedin": "https://linkedin.com/company/microstrate"
+      "x": "https://x.com/mintlify",
+      "github": "https://github.com/mintlify",
+      "linkedin": "https://linkedin.com/company/mintlify"
     }
   }
 }
