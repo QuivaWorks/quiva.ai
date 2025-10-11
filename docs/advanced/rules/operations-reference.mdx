@@ -8,7 +8,8 @@ description: "Complete reference for all available operators in the Rules engine
 This reference documents all available operators in the Rules engine, organized by category. Each operator includes syntax, parameters, and practical examples.
 
 <Tip>
-**Quick search tip:** Use `Ctrl+F` (or `Cmd+F` on Mac) to search for specific operators on this page.
+  **Quick search tip:** Use `Ctrl+F` (or `Cmd+F` on Mac) to search for specific
+  operators on this page.
 </Tip>
 
 ---
@@ -20,7 +21,7 @@ Perform arithmetic calculations and number formatting.
 ### Basic Arithmetic
 
 <AccordionGroup>
-  <Accordion title="+ / add - Addition" icon="plus">
+  <Accordion title="+ Addition" icon="plus">
     Add two or more numbers together.
     
     **Syntax:**
@@ -43,7 +44,7 @@ Perform arithmetic calculations and number formatting.
     ```
   </Accordion>
   
-  <Accordion title="- / subtract - Subtraction" icon="minus">
+  <Accordion title="- Subtraction" icon="minus">
     Subtract the second number from the first.
     
     **Syntax:**
@@ -66,7 +67,7 @@ Perform arithmetic calculations and number formatting.
     ```
   </Accordion>
   
-  <Accordion title="* / multiply - Multiplication" icon="xmark">
+  <Accordion title="* Multiplication" icon="xmark">
     Multiply two or more numbers.
     
     **Syntax:**
@@ -89,7 +90,7 @@ Perform arithmetic calculations and number formatting.
     ```
   </Accordion>
   
-  <Accordion title="/ / divide - Division" icon="divide">
+  <Accordion title="/ Division" icon="divide">
     Divide the first number by the second.
     
     **Syntax:**
@@ -112,7 +113,7 @@ Perform arithmetic calculations and number formatting.
     ```
   </Accordion>
   
-  <Accordion title="^ / power - Exponentiation" icon="superscript">
+  <Accordion title="^ Exponentiation" icon="superscript">
     Raise the first number to the power of the second.
     
     **Syntax:**
@@ -135,7 +136,7 @@ Perform arithmetic calculations and number formatting.
     ```
   </Accordion>
   
-  <Accordion title="% / modulo - Remainder" icon="percent">
+  <Accordion title="% Remainder" icon="percent">
     Get the remainder after division.
     
     **Syntax:**
@@ -498,7 +499,7 @@ For high-precision calculations that avoid floating-point errors.
 Compare values to make decisions.
 
 <AccordionGroup>
-  <Accordion title="= / equal - Equality" icon="equals">
+  <Accordion title="= - Equal" icon="equals">
     Check if two values are equal.
     
     **Syntax:**
@@ -521,7 +522,7 @@ Compare values to make decisions.
     ```
   </Accordion>
   
-  <Accordion title="!= / notEqual - Inequality" icon="not-equal">
+  <Accordion title="!= - Not equal" icon="not-equal">
     Check if two values are not equal.
     
     **Syntax:**
@@ -544,7 +545,7 @@ Compare values to make decisions.
     ```
   </Accordion>
   
-  <Accordion title="> / greaterThan - Greater than" icon="greater-than">
+  <Accordion title="> - Greater than" icon="greater-than">
     Check if first value is greater than second.
     
     **Syntax:**
@@ -567,7 +568,7 @@ Compare values to make decisions.
     ```
   </Accordion>
   
-  <Accordion title=">= / greaterThanOrEqual - Greater than or equal" icon="greater-than-equal">
+  <Accordion title=">= - Greater than or equal" icon="greater-than-equal">
     Check if first value is greater than or equal to second.
     
     **Syntax:**
@@ -590,7 +591,7 @@ Compare values to make decisions.
     ```
   </Accordion>
   
-  <Accordion title="< / lessThan - Less than" icon="less-than">
+  <Accordion title="< - Less than" icon="less-than">
     Check if first value is less than second.
     
     **Syntax:**
@@ -613,7 +614,7 @@ Compare values to make decisions.
     ```
   </Accordion>
   
-  <Accordion title="<= / lessThanOrEqual - Less than or equal" icon="less-than-equal">
+  <Accordion title="<= - Less than or equal" icon="less-than-equal">
     Check if first value is less than or equal to second.
     
     **Syntax:**
@@ -777,7 +778,7 @@ Combine conditions with boolean logic.
   </Accordion>
   
   <Accordion title="not - Logical NOT" icon="ban">
-    Invert a boolean value.
+    Invert a boolean value or an array of boolean values.
     
     **Syntax:**
     ```json
@@ -796,7 +797,19 @@ Combine conditions with boolean logic.
       }
     }
     // Returns opposite of isActive
+
+    {
+      "isInactive.value": {
+        "operator": "not",
+        "input": [
+            "@fact:isActive.value",
+            "@fact:isInactive.value"
+        ]
+      }
+    }
+    // Returns opposite of isActive and the opposite of isInactive as an array
     ```
+
   </Accordion>
   
   <Accordion title="empty - Check if empty" icon="square">
@@ -972,52 +985,6 @@ Manipulate and search text.
     ```
   </Accordion>
   
-  <Accordion title="startsWith - Check prefix" icon="arrow-right">
-    Check if string starts with a specific prefix.
-    
-    **Syntax:**
-    ```json
-    {
-      "operator": "startsWith",
-      "input": [string, prefix]
-    }
-    ```
-    
-    **Example:**
-    ```json
-    {
-      "isHttps.value": {
-        "operator": "startsWith",
-        "input": ["@fact:url.value", "https://"]
-      }
-    }
-    // True if URL starts with "https://"
-    ```
-  </Accordion>
-  
-  <Accordion title="endsWith - Check suffix" icon="arrow-left">
-    Check if string ends with a specific suffix.
-    
-    **Syntax:**
-    ```json
-    {
-      "operator": "endsWith",
-      "input": [string, suffix]
-    }
-    ```
-    
-    **Example:**
-    ```json
-    {
-      "isImage.value": {
-        "operator": "endsWith",
-        "input": ["@fact:filename.value", ".jpg"]
-      }
-    }
-    // True if filename ends with ".jpg"
-    ```
-  </Accordion>
-  
   <Accordion title="stringContains - Check if contains" icon="magnifying-glass">
     Check if string contains a substring.
     
@@ -1063,6 +1030,83 @@ Manipulate and search text.
     // True if comment doesn't contain "spam"
     ```
   </Accordion>
+
+  <Accordion title="regex - Pattern matching and extraction" icon="magnifying-glass">
+    Extract text using regular expression patterns. Returns the first captured group or the entire match if no groups are defined.
+
+    **Syntax:**
+    ```json    
+    {
+      "operator": "regex",
+      "input": [string, pattern]
+    }
+    ```
+
+    **Parameters:**
+    - `string` - The text to search
+    - `pattern` - Regular expression pattern (use `\\` to escape backslashes in JSON)
+
+    **Examples:**
+
+    Extract year from date:
+    ```json 
+    {
+        "year.value": {
+        "operator": "regex",
+        "input": ["02/03/2012", "(\\d{4})$"]
+        }
+    }
+    // Result: "2012"
+    ```
+
+    Extract email domain:
+    ```json 
+    {
+        "domain.value": {
+        "operator": "regex",
+        "input": ["user@example.com", "@(.+)$"]
+        }
+    }
+    // Result: "example.com"
+    ```
+
+    Extract phone area code:
+    ```json 
+    {
+        "areaCode.value": {
+        "operator": "regex",
+        "input": ["(555) 123-4567", "\\((\\d{3})\\)"]
+        }
+    }
+    // Result: "555"
+    ```
+
+    Validate and extract:
+    ```json 
+    {
+        "isValidEmail.value": {
+        "operator": "regex",
+        "input": ["@fact:email.value", "^[\\w.-]+@[\\w.-]+\\.\\w+$"]
+        }
+    }
+    // Returns the email if valid, null if invalid
+    ```
+    **Common patterns:**
+
+    - `\\d` - Any digit (0-9)
+    - `\\w` - Any word character (a-z, A-Z, 0-9, \_)
+    - `\\s` - Any whitespace
+    - `.` - Any character
+    - `+` - One or more
+    - `*` - Zero or more
+    - `^` - Start of string
+    - `$` - End of string
+    - `()` - Capture group
+
+    **Note:** Remember to escape backslashes in JSON strings (use `\\d` not `\d`)
+
+  </Accordion>
+
 </AccordionGroup>
 
 ---
@@ -1196,8 +1240,8 @@ Work with lists and collections.
     ```
   </Accordion>
   
-  <Accordion title="sort - Sort numbers" icon="arrow-down-1-9">
-    Sort an array of numbers in ascending order.
+  <Accordion title="sort - Sort numbers and strings" icon="arrow-down-1-9">
+    Sort an array of numbers in ascending order or sort an array of strings in alphabetical order
     
     **Syntax:**
     ```json
@@ -1207,7 +1251,7 @@ Work with lists and collections.
     }
     ```
     
-    **Example:**
+    **Example:** Sort numbers
     ```json
     {
       "sortedPrices.value": {
@@ -1217,24 +1261,11 @@ Work with lists and collections.
     }
     // Result: [19.99, 29.99, 49.99]
     ```
-  </Accordion>
-  
-  <Accordion title="sortString - Sort strings" icon="arrow-down-a-z">
-    Sort an array of strings alphabetically.
-    
-    **Syntax:**
-    ```json
-    {
-      "operator": "sortString",
-      "input": [array]
-    }
-    ```
-    
-    **Example:**
+    **Example:** Sort strings
     ```json
     {
       "sortedNames.value": {
-        "operator": "sortString",
+        "operator": "sort",
         "input": [["Charlie", "Alice", "Bob"]]
       }
     }
@@ -1766,20 +1797,29 @@ Special system-level operations.
 ## What's Next?
 
 <CardGroup cols={2}>
-  <Card title="Rule Patterns" icon="puzzle-piece" href="/flows/steps/rules/patterns">
+  <Card
+    title="Rule Patterns"
+    icon="puzzle-piece"
+    href="/advanced/rules/common-patterns"
+  >
     Learn common patterns for using these operators effectively
   </Card>
-  <Card title="Examples Library" icon="code" href="/flows/steps/rules/examples">
+  <Card title="Examples Library" icon="code" href="/advanced/rules/examples">
     See real-world examples using multiple operators together
   </Card>
-  <Card title="Core Concepts" icon="book" href="/flows/steps/rules/core-concepts">
+  <Card title="Core Concepts" icon="book" href="/advanced/rules/core-concepts">
     Understand how operators fit into the bigger picture
   </Card>
-  <Card title="Getting Started" icon="rocket" href="/flows/steps/rules/getting-started">
+  <Card
+    title="Getting Started"
+    icon="rocket"
+    href="/advanced/rules/getting-started"
+  >
     Build your first rule with step-by-step guidance
   </Card>
 </CardGroup>
 
 <Info>
-**Need Help?** Visit our [Help Center](https://microstrate.io/help.html) or join the [Community](/community) for support.
+  **Need Help?** Visit our [Help Center](https://microstrate.io/help.html) or
+  join the [Community](/community) for support.
 </Info>
