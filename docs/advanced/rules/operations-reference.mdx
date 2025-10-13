@@ -984,6 +984,52 @@ Manipulate and search text.
     // If csvLine="red,blue,green", result: ["red", "blue", "green"]
     ```
   </Accordion>
+
+  <Accordion title="startsWith - Check prefix" icon="arrow-right">
+    Check if string starts with a specific prefix.
+    
+    **Syntax:**
+    ```json
+    {
+      "operator": "startsWith",
+      "input": [string, prefix]
+    }
+    ```
+    
+    **Example:**
+    ```json
+    {
+      "isHttps.value": {
+        "operator": "startsWith",
+        "input": ["@fact:url.value", "https://"]
+      }
+    }
+    // True if URL starts with "https://"
+    ```
+  </Accordion>
+  
+  <Accordion title="endsWith - Check suffix" icon="arrow-left">
+    Check if string ends with a specific suffix.
+    
+    **Syntax:**
+    ```json
+    {
+      "operator": "endsWith",
+      "input": [string, suffix]
+    }
+    ```
+    
+    **Example:**
+    ```json
+    {
+      "isImage.value": {
+        "operator": "endsWith",
+        "input": ["@fact:filename.value", ".jpg"]
+      }
+    }
+    // True if filename ends with ".jpg"
+    ```
+  </Accordion>
   
   <Accordion title="stringContains - Check if contains" icon="magnifying-glass">
     Check if string contains a substring.
