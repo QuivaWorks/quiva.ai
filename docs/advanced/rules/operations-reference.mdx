@@ -867,7 +867,7 @@ Manipulate and search text.
 
 <AccordionGroup>
   <Accordion title="concat - Concatenate strings" icon="link">
-    Join multiple strings together.
+    Join multiple strings together. A space is included after the join automatically
     
     **Syntax:**
     ```json
@@ -882,7 +882,7 @@ Manipulate and search text.
     {
       "fullName.value": {
         "operator": "concat",
-        "input": ["@fact:firstName.value", " ", "@fact:lastName.value"]
+        "input": ["@fact:firstName.value", "@fact:lastName.value"]
       }
     }
     // If firstName="John", lastName="Smith", result: "John Smith"
