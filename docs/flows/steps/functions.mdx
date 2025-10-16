@@ -67,14 +67,14 @@ Decoded data
 
 **Examples**:
 
-✅ **Use Functions**: Publish events to stream for real-time analytics  
-❌ **Use HTTP instead**: Send to external webhook
+**Use Functions**: Publish events to stream for real-time analytics  
+**Use HTTP instead**: Send to external webhook (when external service required)
 
-✅ **Use Functions**: Store user preferences in KV storage  
-❌ **Pass in flow**: Temporary data that doesn't need persistence
+**Use Functions**: Store user preferences in KV storage  
+**Pass in flow**: Temporary data that doesn't need persistence
 
-✅ **Use Functions**: Decode Base64 encoded data  
-❌ **Use Eval instead**: Complex custom encoding algorithm
+**Use Functions**: Decode Base64 encoded data  
+**Use Eval instead**: Complex custom encoding algorithm (when custom logic needed)
 
 ---
 
@@ -253,17 +253,53 @@ Microstrate provides functions across multiple categories:
 ```json Base64 Encode
 {
   "function": "base64-encode",
-  "inputs": {
-    "text": "${data}"
-  }
+  "inputs": "${data}"
 }
 ```
 
 ```json Base64 Decode
 {
   "function": "base64-decode",
+  "inputs": "${http.body.data}"
+}
+```
+
+```json JSON to XML
+{
+  "function": "json-xml",
   "inputs": {
-    "encoded": "${http.body.data}"
+    "json": "${data}",
+    "options": {
+      "compact": true,
+      "spaces": 2
+    }
+  }
+}
+```
+
+```json XML to JSON
+{
+  "function": "xml-json",
+  "inputs": {
+    "xml": "${http.response}",
+    "options": {
+      "compact": true,
+      "trim": true
+    }
+  }
+}
+```
+
+```json Handlebars Template
+{
+  "function": "handlebars",
+  "inputs": {
+    "template": "Hello {{name}}, your order #{{order_id}} total is ${{total}}",
+    "variables": {
+      "name": "${customer.name}",
+      "order_id": "${order.id}",
+      "total": "${order.total}"
+    }
   }
 }
 ```
@@ -281,30 +317,6 @@ Microstrate provides functions across multiple categories:
 }
 ```
 
-```json JSON to XML
-{
-  "function": "JSON-XML",
-  "inputs": {
-    "json": "${data}",
-    "rootElement": "response"
-  }
-}
-```
-
-```json Handlebars Template
-{
-  "function": "Handlebars Template",
-  "inputs": {
-    "template": "Hello {{name}}, your order #{{order_id}} total is ${{total}}",
-    "data": {
-      "name": "${customer.name}",
-      "order_id": "${order.id}",
-      "total": "${order.total}"
-    }
-  }
-}
-```
-
 ```json Group By
 {
   "function": "group-by",
@@ -317,10 +329,13 @@ Microstrate provides functions across multiple categories:
 
 ```json JSON Path Mapping
 {
-  "function": "Mapping",
+  "function": "mapping",
   "inputs": {
     "data": "${complex_object}",
-    "path": "$.users[*].profile.email"
+    "path": {
+      "userName": "$.user.name",
+      "userEmail": "$.user.email"
+    }
   }
 }
 ```
@@ -340,7 +355,34 @@ Microstrate provides functions across multiple categories:
 {
   "function": "secret-key-get-node",
   "inputs": {
-    "key_name": "stripe_api_key"
+    "key": "stripe_api_key"
+  }
+}
+```
+
+```json Invoke Function
+{
+  "function": "function-invoke",
+  "inputs": {
+    "invocation_type": "RequestResponse",
+    "payload": {
+      "data": "${data_to_process}"
+    },
+    "subject": "data-processor-function"
+  }
+}
+```
+
+```json Upload via SFTP
+{
+  "function": "sftp",
+  "inputs": {
+    "host": "sftp.example.com",
+    "port": 22,
+    "username": "user",
+    "password": "${secret.sftp_password}",
+    "fileContents": "${report_data}",
+    "filePath": "/reports/daily-report.pdf"
   }
 }
 ```
@@ -456,13 +498,13 @@ For detailed documentation of all available functions with syntax, parameters, a
     HTTP Request: Receives JSON data
     ↓
     Functions: Convert to XML
-      Function: JSON-XML
+      Function: json-xml
       JSON: ${http.body}
-      RootElement: "data"
+      Options: {compact: true}
     ↓
     Functions: Encode for transmission
       Function: base64-encode
-      Text: ${xml_data}
+      Input: ${xml_data}
     ↓
     HTTP Request: Send to legacy system
     ```
@@ -500,9 +542,9 @@ For detailed documentation of all available functions with syntax, parameters, a
     Agent: Prepare email data
     ↓
     Functions: Render template
-      Function: Handlebars Template
+      Function: handlebars
       Template: "Hello {{name}}, your order {{order_id}}..."
-      Data: ${agent.output}
+      Variables: ${agent.output}
     ↓
     HTTP Request: Send email via SendGrid
     ```
@@ -554,6 +596,78 @@ For detailed documentation of all available functions with syntax, parameters, a
     
     **Use when**: Need to analyze streaming data
   </Accordion>
+
+  <Accordion title="SFTP File Delivery" icon="server">
+    Upload files to partner SFTP servers
+    
+    ```text
+    Agent: Generate report
+    ↓
+    Functions: Get SFTP credentials
+      Function: secret-key-get-node
+      Key: "partner_sftp_password"
+    ↓
+    Functions: Upload via SFTP
+      Function: sftp
+      Host: "partner.sftp.com"
+      FileContents: ${report_data}
+      FilePath: "/incoming/daily-report.pdf"
+      Password: ${secret.value}
+    ↓
+    HTTP Request: Notify partner of upload
+    ```
+    
+    **Use when**: Need to deliver files to partners/systems via SFTP
+  </Accordion>
+
+  <Accordion title="Function Orchestration" icon="diagram-project">
+    Chain multiple functions together
+    
+    ```text
+    Trigger: Receive webhook
+    ↓
+    Functions: Invoke validation function
+      Function: function-invoke
+      Type: RequestResponse
+      Subject: "webhook-validator"
+      Payload: ${webhook.data}
+    ↓
+    Functions: Invoke processor if valid
+      Function: function-invoke
+      Type: Async
+      Subject: "data-processor"
+      Payload: ${validated_data}
+    ↓
+    Response: Return success
+    ```
+    
+    **Use when**: Need modular function composition
+  </Accordion>
+
+  <Accordion title="SOAP API Integration" icon="cloud">
+    Work with XML-based SOAP APIs
+    
+    ```text
+    Agent: Build request data (JSON)
+    ↓
+    Functions: Convert to XML
+      Function: json-xml
+      JSON: ${agent.output}
+      Options: {compact: true}
+    ↓
+    HTTP Request: Call SOAP API
+      Body: ${xml_request}
+    ↓
+    Functions: Parse XML response
+      Function: xml-json
+      XML: ${http.response}
+      Options: {compact: true, trim: true}
+    ↓
+    Agent: Process JSON data
+    ```
+    
+    **Use when**: Integrating with SOAP/XML services
+  </Accordion>
 </AccordionGroup>
 
 ---
@@ -584,6 +698,14 @@ For detailed documentation of all available functions with syntax, parameters, a
   <Card title="Handle Errors" icon="shield-check">
     Check function results and handle errors appropriately.
   </Card>
+  
+  <Card title="Use Secrets for Credentials" icon="key">
+    Always use secret-key-get-node for passwords, API keys, and sensitive data.
+  </Card>
+  
+  <Card title="Modular Architecture" icon="boxes-stacked">
+    Use function-invoke to break complex logic into reusable functions.
+  </Card>
 </CardGroup>
 
 ---
@@ -595,6 +717,8 @@ For detailed documentation of all available functions with syntax, parameters, a
 - Need data transformation (encoding, merging, templates)
 - Want built-in, tested operations
 - Need to persist data across flows
+- Need to orchestrate multiple functions
+- Need to upload files via SFTP
 
 **Use Map when**:
 - Need to transform data structure
@@ -624,16 +748,19 @@ For detailed documentation of all available functions with syntax, parameters, a
     **Solutions**:
     - Check function documentation for exact name
     - Verify function exists: `publish-message-to-stream` not `publish-to-stream`
+    - Note: Some functions renamed (e.g., `JSON-XML` → `json-xml`)
   </Accordion>
 
   <Accordion title="Invalid parameters" icon="circle-exclamation">
     **Causes**:
     - Missing required parameter
     - Wrong parameter format
+    - Wrong parameter name
     
     **Solutions**:
-    - Review function documentation
-    - Check parameter names and types
+    - Review function documentation for exact parameter names
+    - Note parameter changes: `data` → `variables` (handlebars), `key_name` → `key` (secrets)
+    - Check that base64 functions take direct input, not wrapped in object
     - Verify variable references
   </Accordion>
 
@@ -655,8 +782,23 @@ For detailed documentation of all available functions with syntax, parameters, a
     
     **Solutions**:
     - Use `${step_name.result}`
+    - For base64-decode with JSON, result is auto-parsed
+    - For secret-key-get-node, check `${step_name.value}` or `${step_name.error}`
     - Check execution logs
     - Verify step name matches
+  </Accordion>
+
+  <Accordion title="SFTP connection timeout" icon="clock">
+    **Causes**:
+    - Wrong host or port
+    - Network issues
+    - Server not responding
+    
+    **Solutions**:
+    - Verify host and port are correct
+    - Check network connectivity
+    - Increase connectionTimeout if server is slow
+    - Verify credentials are correct
   </Accordion>
 </AccordionGroup>
 

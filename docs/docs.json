@@ -63,7 +63,18 @@
                   "flows/steps/eval",
                   "flows/steps/functions",
                   "flows/steps/nested-flows",
-                  "flows/steps/api-integrations"
+                  "flows/steps/api-integrations",
+                  {
+                    "group": "Functions",
+                    "icon": "book",
+                    "pages": [
+                      "flows/functions/overview",
+                      "flows/functions/utility",
+                      "flows/functions/key-value",
+                      "flows/functions/object-storage",
+                      "flows/functions/streams"
+                    ]
+                  }
                 ]
               },
               "flows/best-practices"

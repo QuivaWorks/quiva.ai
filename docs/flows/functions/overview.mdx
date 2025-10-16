@@ -95,9 +95,10 @@ Object storage handles large items like files, documents, and binary data. Use f
 Utility functions for common data operations like encoding, merging, grouping, and formatting.
 
 ### Encoding & Formatting
-- `base64-encode` - Encode to base64 format
-- `base64-decode` - Decode from base64 format
-- `JSON-XML` - Transform JSON to XML
+- `base64-encode` - Encode text or objects to base64 format
+- `base64-decode` - Decode base64 data (auto-parses JSON)
+- `json-xml` - Transform JSON to XML format
+- `xml-json` - Transform XML to JSON format
 
 ### Data Operations
 - `deep-merge-objects` - Deeply merge objects recursively
@@ -106,12 +107,16 @@ Utility functions for common data operations like encoding, merging, grouping, a
 - `set-operations` - Perform set operations (diff, union, intersection)
 
 ### Templates & Mapping
-- `Handlebars Template` - Use Handlebars for dynamic templates
-- `Mapping` - JSON path mappings to restructure data
+- `handlebars` - Use Handlebars for dynamic templates
+- `mapping` - JSON path mappings to restructure data
+
+### Platform & Integration
+- `secret-key-get-node` - Retrieve secret keys securely
+- `function-invoke` - Invoke other Microstrate functions programmatically
+- `sftp` - Upload files to SFTP servers
 
 ### Specialized
-- `multiply-large-numbers` - Multiply very large numbers
-- `secret-key-get-node` - Retrieve secret keys
+- `multiply-large-numbers` - Multiply very large numbers with precision
 
 ---
 
@@ -159,6 +164,36 @@ Utility functions for common data operations like encoding, merging, grouping, a
     
     **Example**: Base64 encode files, merge user profiles, group orders by customer.
   </Accordion>
+  
+  <Accordion title="System Integration">
+    Use **Integration Functions** when you need:
+    - Convert between JSON and XML
+    - Upload files via SFTP
+    - Parse SOAP API responses
+    - Integrate with legacy systems
+    
+    **Example**: Convert JSON to XML for SOAP APIs, upload reports to partner SFTP servers, parse XML responses.
+  </Accordion>
+  
+  <Accordion title="Function Orchestration">
+    Use **function-invoke** when you need:
+    - Break complex logic into reusable functions
+    - Chain multiple functions together
+    - Create modular architectures
+    - Trigger background tasks
+    
+    **Example**: Validate data in one function, process in another, create reusable components.
+  </Accordion>
+  
+  <Accordion title="Security & Secrets">
+    Use **secret-key-get-node** when you need:
+    - Access API keys securely
+    - Retrieve database credentials
+    - Get OAuth tokens
+    - Never hardcode sensitive data
+    
+    **Example**: Get Stripe API key, retrieve SFTP password, access third-party tokens.
+  </Accordion>
 </AccordionGroup>
 
 ---
@@ -168,12 +203,13 @@ Utility functions for common data operations like encoding, merging, grouping, a
 <AccordionGroup>
   <Accordion title="A-G">
     - `aggregate-stream-items` - Aggregate stream items by key and time
-    - `base64-decode` - Decode from base64
-    - `base64-encode` - Encode to base64
+    - `base64-decode` - Decode from base64 (auto-parses JSON)
+    - `base64-encode` - Encode text or objects to base64
     - `create-key-value-bucket` - Create KV bucket
     - `create-object-store-bucket` - Create object bucket
     - `create-stream` - Create new stream
     - `deep-merge-objects` - Deeply merge objects
+    - `function-invoke` - Invoke other Microstrate functions
     - `get-item-from-stream` - Get stream item
     - `get-kv-bucket-item` - Get KV item
     - `get-object-from-bucket` - Get object
@@ -181,16 +217,16 @@ Utility functions for common data operations like encoding, merging, grouping, a
   </Accordion>
   
   <Accordion title="H-M">
-    - `Handlebars Template` - Dynamic templates with Handlebars
-    - `JSON-XML` - Transform JSON to XML
+    - `handlebars` - Dynamic templates with Handlebars
+    - `json-xml` - Transform JSON to XML
     - `list-key-value-buckets` - List KV buckets
     - `list-kv-bucket-items` - List items in KV bucket
     - `list-object-keys` - List objects by keys
     - `list-object-store-buckets` - List object buckets
     - `list-streams` - List all streams
-    - `Mapping` - JSON path data mapping
+    - `mapping` - JSON path data mapping
     - `merge-arrays` - Merge arrays
-    - `multiply-large-numbers` - Multiply large numbers
+    - `multiply-large-numbers` - Multiply large numbers with precision
   </Accordion>
   
   <Accordion title="P-Z">
@@ -201,8 +237,45 @@ Utility functions for common data operations like encoding, merging, grouping, a
     - `search-stream-items` - Search stream by key/time
     - `secret-key-get-node` - Retrieve secret key
     - `set-operations` - Set diff, union, intersection
+    - `sftp` - Upload files to SFTP servers
+    - `xml-json` - Transform XML to JSON
   </Accordion>
 </AccordionGroup>
+
+---
+
+## Function Count by Category
+
+<CardGroup cols={2}>
+  <Card title="Stream Functions" icon="stream">
+    **7 functions** for real-time data streaming
+  </Card>
+  
+  <Card title="Key-Value Storage" icon="database">
+    **5 functions** for fast KV operations
+  </Card>
+  
+  <Card title="Object Storage" icon="box">
+    **5 functions** for large file storage
+  </Card>
+  
+  <Card title="Data Utilities" icon="shuffle">
+    **14 functions** for transformation and integration
+  </Card>
+</CardGroup>
+
+---
+
+## Recently Added Functions
+
+<Note>
+**New Functions Available**:
+- `xml-json` - Parse XML responses from SOAP APIs and legacy systems
+- `function-invoke` - Build modular architectures with function orchestration
+- `sftp` - Upload files to partner SFTP servers with secure authentication
+
+See the [Data Transformation Utilities](/flows/functions/utilities) documentation for details.
+</Note>
 
 ---
 

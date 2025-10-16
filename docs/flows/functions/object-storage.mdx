@@ -1,15 +1,15 @@
 ---
 title: 'Object Storage Functions'
-description: 'Store and manage large files, documents, and binary data'
+description: 'Store and manage data in distributed object storage buckets'
 icon: 'box'
 ---
 
 # Object Storage Functions
 
-Object storage handles large items like files, documents, media, and binary data. Use object storage for document management, media storage, file uploads, backups, and any data too large for Key-Value storage.
+Object storage provides a distributed key-value store for managing data across your flows. Built on a replicated storage backend, it's designed for reliable data persistence with configurable storage options.
 
 <Info>
-**What is Object Storage?** Object storage is designed for large files and binary data. Unlike Key-Value storage (optimized for small, fast lookups), object storage is optimized for storing and retrieving files of any size - from documents to videos.
+**What is Object Storage?** Object storage is a key-value store optimized for distributed data management. Each bucket acts as a namespace for storing values by unique keys, with options for compression, replication, and automatic expiration.
 </Info>
 
 ---
@@ -17,131 +17,150 @@ Object storage handles large items like files, documents, media, and binary data
 ## Function List
 
 <CardGroup cols={2}>
-  <Card title="create-object-store-bucket" icon="plus" href="#create-object-store-bucket">
-    Create a new object bucket
+  <Card title="obs-bucket-create" icon="plus" href="#obs-bucket-create">
+    Create a new storage bucket
   </Card>
   
-  <Card title="put-object-by-key" icon="upload" href="#put-object-by-key">
-    Upload an object to bucket
+  <Card title="obs-bucket-list" icon="list" href="#obs-bucket-list">
+    List all storage buckets
   </Card>
   
-  <Card title="get-object-from-bucket" icon="download" href="#get-object-from-bucket">
-    Retrieve an object by key
+  <Card title="obs-key-put" icon="upload" href="#obs-key-put">
+    Store a value by key
   </Card>
   
-  <Card title="list-object-store-buckets" icon="list" href="#list-object-store-buckets">
-    List all object buckets
+  <Card title="obs-key-get" icon="download" href="#obs-key-get">
+    Retrieve a value by key
   </Card>
   
-  <Card title="list-object-keys" icon="table" href="#list-object-keys">
-    List objects in a bucket
+  <Card title="obs-key-list" icon="table" href="#obs-key-list">
+    List keys in a bucket
   </Card>
 </CardGroup>
 
 ---
 
-## create-object-store-bucket
+## obs-bucket-create
 
-Create a new object storage bucket in your account. Buckets are containers for related objects (files, documents, media).
+Create a new object storage bucket to organize and store your data. Buckets provide isolated namespaces with configurable storage, replication, and lifecycle settings.
 
 ### Parameters
 
-<ParamField path="bucket_name" type="string" required>
-  Name of the bucket to create. Must be unique within your account.
+<ParamField path="bucket" type="string" required>
+  Name of the bucket to create. Must be unique and can only contain alphanumeric characters, dashes, and underscores.
   
   **Naming conventions:**
-  - Use lowercase with hyphens: customer-documents, product-images
-  - Be descriptive: invoice-pdfs not bucket1
-  - Include purpose: user-uploads, report-archives
-  - Consider organization: client-acme-files, 2025-invoices
-</ParamField>
-
-<ParamField path="public_access" type="boolean" default="false">
-  Whether objects in this bucket are publicly accessible via URL.
-  
-  Set to false (default) for private access requiring authentication. Set to true for public access where objects are accessible via direct URL.
-  
-  <Warning>
-  **Security**: Only set to true for intentionally public content like product images. Keep customer documents, invoices, and sensitive data private.
-  </Warning>
-</ParamField>
-
-<ParamField path="versioning" type="boolean" default="false">
-  Enable versioning to keep multiple versions of each object.
-  
-  **Use cases:**
-  - Document management (track revisions)
-  - Compliance (maintain audit trail)
-  - Accidental deletion protection
-</ParamField>
-
-<ParamField path="lifecycle_days" type="number">
-  Automatically delete objects older than this many days. Useful for temporary storage.
-  
-  **Common lifecycle values:**
-  - 7 for temporary uploads with weekly cleanup
-  - 30 for monthly reports and short-term storage
-  - 90 for quarterly archives
-  - 365 for annual retention
-  - Leave empty for permanent storage with no auto-deletion
+  - Use lowercase with hyphens or underscores: `customer-data`, `session_cache`
+  - Be descriptive: `user-profiles` not `bucket1`
+  - Include purpose: `temp-uploads`, `config-store`
 </ParamField>
 
 <ParamField path="description" type="string">
   Optional description of the bucket's purpose.
 </ParamField>
 
+<ParamField path="storage" type="string" default="file">
+  Storage backend type. Options:
+  - `file` - Persistent file storage (default, recommended for durability)
+  - `memory` - In-memory storage (faster but not persistent across restarts)
+</ParamField>
+
+<ParamField path="num_replicas" type="integer" default="1">
+  Number of data replicas to maintain across the cluster. Range: 1-5.
+  
+  **Replication guidelines:**
+  - 1 replica: Development or non-critical data
+  - 3 replicas: Production data requiring high availability
+  - 5 replicas: Mission-critical data with maximum redundancy
+</ParamField>
+
+<ParamField path="max_bytes" type="integer" default="-1">
+  Maximum size in bytes for the bucket. Default is -1 (unlimited).
+  
+  **Size planning:**
+  - Set limits for temporary storage to prevent unbounded growth
+  - Leave unlimited for primary data stores
+  - Consider setting based on available storage capacity
+</ParamField>
+
+<ParamField path="ttl" type="integer">
+  Time-to-live in nanoseconds for keys in this bucket. Keys automatically expire after this duration. By default, keys do not expire.
+  
+  **Common TTL values:**
+  - 3600000000000 (1 hour) for session data
+  - 86400000000000 (24 hours) for temporary cache
+  - 604800000000000 (7 days) for short-term storage
+</ParamField>
+
+<ParamField path="compression" type="boolean" default="false">
+  Enable stream compression to reduce storage space. Useful for text-heavy data or JSON objects.
+</ParamField>
+
+<ParamField path="metadata" type="object">
+  Custom metadata key-value pairs to associate with the bucket.
+</ParamField>
+
+<ParamField path="placement" type="object">
+  Cluster placement configuration for advanced deployment scenarios.
+  
+  **Properties:**
+  - `cluster` (string): Target cluster name
+  - `tags` (array): Array of placement tags
+</ParamField>
+
 ### Response
 
 ```json
 {
-  "success": true,
-  "bucket_name": "customer-documents",
-  "bucket_id": "bucket_abc123",
-  "public_access": false,
-  "versioning": true,
-  "lifecycle_days": 365,
-  "created_at": "2025-10-16T10:30:00Z",
-  "region": "us-east-1"
+  "status_code": 200,
+  "body": {
+    "message": "Bucket created successfully",
+    "error": null
+  }
 }
 ```
 
 ### Example Usage
 
 <CodeGroup>
-```json Customer Documents
+```json User Data Store
 {
-  "function": "create-object-store-bucket",
+  "function": "obs-bucket-create",
   "params": {
-    "bucket_name": "customer-documents",
-    "public_access": false,
-    "versioning": true,
-    "lifecycle_days": 2555,
-    "description": "Store customer contracts and invoices"
+    "bucket": "user-profiles",
+    "description": "Store user profile data",
+    "storage": "file",
+    "num_replicas": 3,
+    "compression": true
   }
 }
 ```
 
-```json Product Images
+```json Temporary Cache
 {
-  "function": "create-object-store-bucket",
+  "function": "obs-bucket-create",
   "params": {
-    "bucket_name": "product-images",
-    "public_access": true,
-    "versioning": false,
-    "description": "Public product images for website"
+    "bucket": "session-cache",
+    "description": "Temporary session storage",
+    "storage": "memory",
+    "ttl": 3600000000000,
+    "max_bytes": 1073741824
   }
 }
 ```
 
-```json Temporary Uploads
+```json Configuration Store
 {
-  "function": "create-object-store-bucket",
+  "function": "obs-bucket-create",
   "params": {
-    "bucket_name": "temp-uploads",
-    "public_access": false,
-    "versioning": false,
-    "lifecycle_days": 7,
-    "description": "Temporary file uploads, auto-delete after 7 days"
+    "bucket": "app-config",
+    "description": "Application configuration data",
+    "storage": "file",
+    "num_replicas": 3,
+    "metadata": {
+      "environment": "production",
+      "team": "platform"
+    }
   }
 }
 ```
@@ -150,162 +169,188 @@ Create a new object storage bucket in your account. Buckets are containers for r
 ### Common Use Cases
 
 <AccordionGroup>
-  <Accordion title="Document Management" icon="file-invoice">
-    Store customer documents, contracts, invoices
+  <Accordion title="User Data Storage" icon="users">
+    Store user profiles, preferences, and state
     
     ```
-    Create Bucket: customer-documents
-    Private access (sensitive data)
-    Versioning enabled (track changes)
-    7-year retention (compliance)
+    Bucket: user-profiles
+    Storage: file (persistent)
+    Replicas: 3 (high availability)
+    Compression: enabled (for JSON data)
     ```
   </Accordion>
   
-  <Accordion title="Media Library" icon="images">
-    Store product images, videos, marketing assets
+  <Accordion title="Session Management" icon="clock">
+    Store temporary session data with auto-expiration
     
     ```
-    Create Bucket: media-library
-    Public access (serve directly to web)
-    No versioning (latest version only)
-    Permanent storage
+    Bucket: user-sessions
+    Storage: memory (fast access)
+    TTL: 1 hour
+    Replicas: 1 (temporary data)
     ```
   </Accordion>
   
-  <Accordion title="User Uploads" icon="cloud-arrow-up">
-    Handle file uploads from users
+  <Accordion title="Configuration Cache" icon="gears">
+    Store application configuration and settings
     
     ```
-    Create Bucket: user-uploads
-    Private access (user data)
-    Versioning optional
-    90-day lifecycle (temporary storage)
+    Bucket: config-store
+    Storage: file (persistent)
+    Replicas: 3 (important data)
+    No TTL (permanent storage)
     ```
   </Accordion>
   
-  <Accordion title="Backup Storage" icon="floppy-disk">
-    Store system backups and archives
+  <Accordion title="Workflow State" icon="diagram-project">
+    Store state data for long-running workflows
     
     ```
-    Create Bucket: system-backups
-    Private access (sensitive)
-    Versioning enabled (multiple backups)
-    30-365 day retention
+    Bucket: workflow-state
+    Storage: file (must persist)
+    Replicas: 3 (critical data)
+    Compression: enabled
     ```
   </Accordion>
 </AccordionGroup>
 
 ---
 
-## put-object-by-key
+## obs-bucket-list
 
-Upload an object (file, document, binary data) to an object storage bucket.
+List all object storage buckets in your account with their metadata and statistics.
 
 ### Parameters
 
-<ParamField path="bucket_name" type="string" required>
-  Name of the bucket to store the object in. Bucket must exist.
+This function takes no parameters.
+
+### Response
+
+```json
+{
+  "status_code": 200,
+  "body": {
+    "body": {
+      "results_total": 3,
+      "results": [
+        {
+          "name": "user-profiles",
+          "description": "Store user profile data",
+          "created": 1729000000000,
+          "entryTotal": 1523,
+          "metadata": {
+            "environment": "production"
+          }
+        }
+      ]
+    },
+    "metadata": {}
+  }
+}
+```
+
+**Response fields:**
+- `results_total` - Total number of buckets
+- `results` - Array of bucket objects:
+  - `name` - Bucket name
+  - `description` - Bucket description
+  - `created` - Creation timestamp (milliseconds)
+  - `entryTotal` - Number of keys in bucket
+  - `metadata` - Custom metadata
+
+### Example Usage
+
+```json
+{
+  "function": "obs-bucket-list",
+  "params": {}
+}
+```
+
+---
+
+## obs-key-put
+
+Store a value in an object storage bucket by key. Values can be strings or JSON objects.
+
+### Parameters
+
+<ParamField path="bucket" type="string" required>
+  Name of the bucket to store the value in. Bucket must already exist.
 </ParamField>
 
-<ParamField path="key" type="string" required>
-  Unique key (path) for the object. This is like a file path in the bucket.
+<ParamField path="name" type="string" required>
+  Unique key name for the value. This is the identifier used to retrieve the value.
   
-  **Key strategies:**
-  - User files: users/userId/document.pdf
-  - Date-based: invoices/2025/10/invoice-001.pdf
-  - Type-based: images/products/widget-001.jpg
-  - UUID-based: uploads/uuid.pdf (guaranteed unique)
-  
-  **Best practices:**
-  - Use forward slashes for hierarchy
-  - Include file extension: .pdf, .jpg, .docx
-  - Make keys descriptive: customer-123/contract.pdf not file1.pdf
+  **Key naming strategies:**
+  - User data: `user:${userId}:profile`
+  - Hierarchical: `config/app/database/connection`
+  - Timestamped: `events/2025-10-16/event-123`
+  - UUID-based: Use UUIDs for guaranteed uniqueness
 </ParamField>
 
-<ParamField path="data" type="string|buffer" required>
-  The object data to store. Can be base64-encoded string for binary files, plain text for text files, or JSON string for structured data.
+<ParamField path="value" type="string | object" required>
+  The value to store. Can be:
+  - A string value (will be stored as-is)
+  - A JSON object (will be automatically serialized)
   
   <Info>
-  **Large files**: For files from triggers or HTTP requests, pass through the file data directly using variable mapping
+  Objects are automatically converted to JSON strings during storage. When retrieving, use the `json` flag to parse back to objects.
   </Info>
 </ParamField>
 
-<ParamField path="content_type" type="string">
-  MIME type of the object. Important for proper handling and display.
-  
-  **Common types:**
-  - application/pdf for PDF documents
-  - image/jpeg, image/png for images
-  - text/plain for text files
-  - application/json for JSON data
-  - video/mp4 for videos
-</ParamField>
-
-<ParamField path="metadata" type="object">
-  Optional metadata to associate with the object.
-  
-  **Useful metadata:**
-  - uploaded_by: User ID who uploaded
-  - original_filename: Original file name
-  - file_size: Size in bytes
-  - customer_id: Associated customer
-  - tags: Classification tags
-</ParamField>
-
-<ParamField path="public_url" type="boolean" default="false">
-  Generate a public URL for this object (only works if bucket has public access enabled).
-</ParamField>
-
 ### Response
 
 ```json
 {
-  "success": true,
-  "bucket_name": "customer-documents",
-  "key": "users/123/contract.pdf",
-  "object_id": "obj_xyz789",
-  "size_bytes": 245678,
-  "content_type": "application/pdf",
-  "version_id": "v1",
-  "created_at": "2025-10-16T10:30:00Z",
-  "public_url": null,
-  "download_url": "https://storage.microstrate.com/signed/abc123...",
-  "expires_in": 3600
+  "status_code": 200,
+  "body": {
+    "message": "Value stored successfully",
+    "error": null
+  }
 }
 ```
 
 ### Example Usage
 
 <CodeGroup>
-```json Upload PDF Document
+```json Store User Profile
 {
-  "function": "put-object-by-key",
+  "function": "obs-key-put",
   "params": {
-    "bucket_name": "customer-documents",
-    "key": "customers/${$.customer_id}/invoice-${$.invoice_id}.pdf",
-    "data": "${$.agent.generated_pdf}",
-    "content_type": "application/pdf",
-    "metadata": {
-      "customer_id": "${$.customer_id}",
-      "invoice_id": "${$.invoice_id}",
-      "generated_by": "invoice-agent"
+    "bucket": "user-profiles",
+    "name": "user:${$.user_id}",
+    "value": {
+      "email": "${$.email}",
+      "name": "${$.name}",
+      "created": "${$.timestamp}"
     }
   }
 }
 ```
 
-```json Upload User File
+```json Store Configuration
 {
-  "function": "put-object-by-key",
+  "function": "obs-key-put",
   "params": {
-    "bucket_name": "user-uploads",
-    "key": "uploads/${$.user_id}/${$.file.name}",
-    "data": "${$.trigger.file_data}",
-    "content_type": "${$.trigger.file_type}",
-    "metadata": {
-      "uploaded_by": "${$.user_id}",
-      "original_filename": "${$.file.name}"
+    "bucket": "app-config",
+    "name": "database/connection",
+    "value": {
+      "host": "db.example.com",
+      "port": 5432,
+      "database": "production"
     }
+  }
+}
+```
+
+```json Store Simple Value
+{
+  "function": "obs-key-put",
+  "params": {
+    "bucket": "counters",
+    "name": "page-views-${$.date}",
+    "value": "${$.count}"
   }
 }
 ```
@@ -314,85 +359,121 @@ Upload an object (file, document, binary data) to an object storage bucket.
 ### Common Patterns
 
 <AccordionGroup>
-  <Accordion title="User File Uploads" icon="cloud-arrow-up">
-    Handle file uploads from users through forms
+  <Accordion title="User State Management" icon="user">
+    Store and update user state across flows
     
     ```
-    Trigger: Form submission with file
-    Functions: Store uploaded file
-    Bucket: user-uploads
-    Key: uploads/userId/filename
+    Store: User profile data, preferences, progress
+    Key pattern: user:{userId}:profile
+    Value: JSON object with user data
+    Retrieve: At start of user flows
     ```
   </Accordion>
   
-  <Accordion title="Generated Documents" icon="file-export">
-    Store agent-generated documents
+  <Accordion title="Workflow Checkpoints" icon="flag-checkered">
+    Save workflow state for resumption or recovery
     
     ```
-    Agent: Generate PDF report
-    Functions: Store PDF
-    Bucket: generated-reports
-    Key: reports/date/userId-report.pdf
+    Store: Current step, variables, progress
+    Key pattern: workflow:{workflowId}:state
+    Value: Object with complete state
+    Update: After each major step
+    ```
+  </Accordion>
+  
+  <Accordion title="Data Aggregation" icon="chart-line">
+    Accumulate data over time
+    
+    ```
+    Store: Counters, metrics, aggregated data
+    Key pattern: metrics:{date}:{metric-name}
+    Value: Numeric or aggregated object
+    Update: Periodically or on events
     ```
   </Accordion>
 </AccordionGroup>
 
 ---
 
-## get-object-from-bucket
+## obs-key-get
 
-Retrieve an object (file) from an object storage bucket.
+Retrieve a value from an object storage bucket by its key.
 
 ### Parameters
 
-<ParamField path="bucket_name" type="string" required>
-  Name of the bucket containing the object.
+<ParamField path="bucket" type="string" required>
+  Name of the bucket containing the key.
 </ParamField>
 
-<ParamField path="key" type="string" required>
-  The key (path) of the object to retrieve.
+<ParamField path="name" type="string" required>
+  The key name of the value to retrieve.
 </ParamField>
 
-<ParamField path="return_format" type="string" default="url">
-  How to return the object data. Options are url for signed download URL (default, best for large files), base64 for base64-encoded data inline, or text for text files only.
+<ParamField path="json" type="boolean" default="false">
+  Parse the stored value as JSON and return as an object. Use `true` when retrieving values that were stored as objects.
+  
+  **When to use:**
+  - Set to `true` when the value is a JSON object
+  - Set to `false` (or omit) when the value is a plain string
 </ParamField>
 
 ### Response
 
 ```json
 {
-  "success": true,
-  "bucket_name": "customer-documents",
-  "key": "users/123/contract.pdf",
-  "object_id": "obj_xyz789",
-  "size_bytes": 245678,
-  "content_type": "application/pdf",
-  "download_url": "https://storage.microstrate.com/signed/abc123...",
-  "expires_in": 3600
-}
-```
-
-### Example Usage
-
-<CodeGroup>
-```json Get Download URL
-{
-  "function": "get-object-from-bucket",
-  "params": {
-    "bucket_name": "customer-documents",
-    "key": "customers/${$.customer_id}/invoice.pdf",
-    "return_format": "url"
+  "status_code": 200,
+  "body": {
+    "body": {
+      "name": "user:123",
+      "value": {
+        "email": "user@example.com",
+        "name": "John Doe"
+      }
+    },
+    "metadata": {
+      "Bucket": "user-profiles"
+    }
   }
 }
 ```
 
-```json Get File Data
+**Response fields:**
+- `body.body.name` - The key name
+- `body.body.value` - The stored value (string or parsed object based on `json` parameter)
+- `body.metadata.Bucket` - The bucket name
+
+### Example Usage
+
+<CodeGroup>
+```json Get User Profile (JSON)
 {
-  "function": "get-object-from-bucket",
+  "function": "obs-key-get",
   "params": {
-    "bucket_name": "user-uploads",
-    "key": "uploads/${$.user_id}/${$.filename}",
-    "return_format": "base64"
+    "bucket": "user-profiles",
+    "name": "user:${$.user_id}",
+    "json": true
+  }
+}
+```
+
+```json Get Simple Value
+{
+  "function": "obs-key-get",
+  "params": {
+    "bucket": "counters",
+    "name": "page-views-${$.date}",
+    "json": false
+  }
+}
+```
+
+```json Get Configuration
+{
+  "function": "obs-key-get",
+  "params": {
+    "bucket": "app-config",
+    "name": "database/connection",
+    "json": true
   }
 }
 ```
@@ -401,148 +482,123 @@ Retrieve an object (file) from an object storage bucket.
 ### Common Patterns
 
 <AccordionGroup>
-  <Accordion title="Provide Download Link" icon="link">
-    Generate secure download link for user
+  <Accordion title="Load User Context" icon="user-circle">
+    Retrieve user data at the start of a flow
     
     ```
-    Trigger: User requests file
-    Functions: Get file with url format
-    Returns: Signed URL (expires in 1 hour)
-    Agent: Send link via email or chat
+    Trigger: User action
+    Function: Get user profile with json=true
+    Use: Access user data in subsequent steps
+    Store in: Flow variables for easy access
     ```
   </Accordion>
   
-  <Accordion title="Process Downloaded File" icon="gears">
-    Download file for processing by agent
+  <Accordion title="Resume Workflow" icon="play">
+    Load saved state to continue a workflow
     
     ```
-    Functions: Get file data with base64 format
-    Agent: Analyze document content
-    Return: Analysis results
+    Trigger: Resume event
+    Function: Get workflow state with json=true
+    Parse: Extract step, variables, progress
+    Continue: From saved checkpoint
+    ```
+  </Accordion>
+  
+  <Accordion title="Configuration Loading" icon="sliders">
+    Load application settings and configuration
+    
+    ```
+    Trigger: App initialization
+    Function: Get config with json=true
+    Apply: Use settings throughout flow
+    Cache: In memory for performance
     ```
   </Accordion>
 </AccordionGroup>
 
 ---
 
-## list-object-store-buckets
+## obs-key-list
 
-List all object storage buckets in your account with their metadata.
+List all keys in an object storage bucket with pagination support.
 
 ### Parameters
 
-<ParamField path="limit" type="number" default="100">
-  Maximum number of buckets to return (range 1 to 1000).
+<ParamField path="bucket" type="string" required>
+  Name of the bucket to list keys from.
 </ParamField>
 
-<ParamField path="offset" type="number" default="0">
-  Pagination offset for listing buckets.
+<ParamField path="last_sequence" type="integer">
+  Starting sequence number for pagination. Returns keys after this sequence. Omit or use 0 for the first page.
+  
+  Use the `modified` value from the last result in the previous page to continue pagination.
+</ParamField>
+
+<ParamField path="limit" type="integer">
+  Maximum number of keys to return per page. Controls result set size for pagination.
 </ParamField>
 
 ### Response
 
 ```json
 {
-  "success": true,
-  "buckets": [
-    {
-      "bucket_id": "bucket_abc123",
-      "bucket_name": "customer-documents",
-      "public_access": false,
-      "versioning": true,
-      "object_count": 1523,
-      "total_size_bytes": 45823410340,
-      "created_at": "2025-09-01T10:00:00Z"
-    }
-  ],
-  "count": 1,
-  "total": 1,
-  "has_more": false
-}
-```
-
-### Example Usage
-
-```json
-{
-  "function": "list-object-store-buckets",
-  "params": {
-    "limit": 50
+  "status_code": 200,
+  "body": {
+    "body": {
+      "results_total": 1523,
+      "results": [
+        {
+          "name": "user:123",
+          "buid": "abc123def456",
+          "size": 2048,
+          "chunks": 1,
+          "modified": 1729080000000
+        }
+      ]
+    },
+    "metadata": {}
   }
 }
 ```
 
----
-
-## list-object-keys
-
-List all objects (files) in a bucket by their keys.
-
-### Parameters
-
-<ParamField path="bucket_name" type="string" required>
-  Name of the bucket to list objects from.
-</ParamField>
-
-<ParamField path="prefix" type="string">
-  Optional key prefix to filter results. Only returns keys starting with this prefix.
-  
-  **Examples:**
-  - users/123/ for all files for user 123
-  - invoices/2025/ for all 2025 invoices
-  - images/products/ for all product images
-</ParamField>
-
-<ParamField path="limit" type="number" default="100">
-  Maximum number of objects to return (range 1 to 1000).
-</ParamField>
-
-<ParamField path="offset" type="number" default="0">
-  Pagination offset for listing objects.
-</ParamField>
-
-### Response
-
-```json
-{
-  "success": true,
-  "bucket_name": "customer-documents",
-  "objects": [
-    {
-      "key": "customers/123/contract.pdf",
-      "object_id": "obj_abc123",
-      "size_bytes": 245678,
-      "content_type": "application/pdf",
-      "created_at": "2025-10-16T10:30:00Z",
-      "version_id": "v1"
-    }
-  ],
-  "count": 1,
-  "total": 1523,
-  "has_more": true
-}
-```
+**Response fields:**
+- `results_total` - Total number of keys in bucket
+- `results` - Array of key objects:
+  - `name` - Key name
+  - `buid` - Unique identifier
+  - `size` - Size in bytes
+  - `chunks` - Number of chunks
+  - `modified` - Last modified timestamp (milliseconds) - use for `last_sequence` in next page
 
 ### Example Usage
 
 <CodeGroup>
-```json List All Objects
+```json List All Keys (First Page)
 {
-  "function": "list-object-keys",
+  "function": "obs-key-list",
   "params": {
-    "bucket_name": "customer-documents",
+    "bucket": "user-profiles",
     "limit": 100
   }
 }
 ```
 
-```json List with Prefix Filter
+```json List Keys (Next Page)
 {
-  "function": "list-object-keys",
+  "function": "obs-key-list",
   "params": {
-    "bucket_name": "customer-documents",
-    "prefix": "customers/${$.customer_id}/",
-    "limit": 50
+    "bucket": "user-profiles",
+    "last_sequence": 1729080000000,
+    "limit": 100
+  }
+}
+```
+
+```json List All Keys (No Limit)
+{
+  "function": "obs-key-list",
+  "params": {
+    "bucket": "app-config"
   }
 }
 ```
@@ -551,22 +607,36 @@ List all objects (files) in a bucket by their keys.
 ### Common Patterns
 
 <AccordionGroup>
-  <Accordion title="User File Browser" icon="folder-open">
-    Show user their uploaded files
+  <Accordion title="Batch Processing" icon="layer-group">
+    Process all keys in a bucket sequentially
     
     ```
-    List objects with prefix: users/userId/
-    Display file names, sizes, dates
-    Provide download links
+    1. List keys with limit (e.g., 100)
+    2. Process each key in the batch
+    3. Use last result's modified for next page
+    4. Repeat until all keys processed
     ```
   </Accordion>
   
-  <Accordion title="Batch Processing" icon="layer-group">
-    Process multiple files in sequence
+  <Accordion title="Data Audit" icon="clipboard-check">
+    Audit or report on stored data
     
     ```
-    List objects with prefix: inbox/
-    For each file: Get, process, move to processed folder
+    List all keys in bucket
+    Gather statistics: count, total size
+    Identify patterns in key names
+    Generate audit report
+    ```
+  </Accordion>
+  
+  <Accordion title="Cleanup Operations" icon="broom">
+    Find and remove old or unused keys
+    
+    ```
+    List keys in bucket
+    Check modified timestamp
+    Delete keys older than threshold
+    Track cleanup metrics
     ```
   </Accordion>
 </AccordionGroup>
@@ -576,30 +646,42 @@ List all objects (files) in a bucket by their keys.
 ## Best Practices
 
 <CardGroup cols={2}>
-  <Card title="Use Hierarchical Keys" icon="folder-tree">
-    Organize with slashes for easy filtering
+  <Card title="Use Descriptive Keys" icon="tag">
+    Use clear, hierarchical key naming patterns
   </Card>
   
-  <Card title="Set Content Types" icon="file-lines">
-    Always specify content_type for proper handling
+  <Card title="Enable Replication" icon="copy">
+    Use 3+ replicas for production data
   </Card>
   
-  <Card title="Include Metadata" icon="tags">
-    Add metadata for searching and organization
+  <Card title="Set TTL for Temp Data" icon="clock">
+    Auto-expire temporary data to save storage
   </Card>
   
-  <Card title="Use Private Buckets" icon="lock">
-    Keep buckets private by default for security
+  <Card title="Use JSON Flag" icon="brackets-curly">
+    Set json=true when retrieving objects
   </Card>
   
-  <Card title="Enable Versioning" icon="clock-rotate-left">
-    Turn on versioning for critical documents
+  <Card title="Compress Text Data" icon="file-zipper">
+    Enable compression for JSON/text buckets
   </Card>
   
-  <Card title="Set Lifecycle Rules" icon="calendar-days">
-    Auto-delete temporary files to reduce costs
+  <Card title="Paginate Large Lists" icon="list-ol">
+    Use limit and last_sequence for large datasets
   </Card>
 </CardGroup>
+
+---
+
+## Storage Types Comparison
+
+| Feature | File Storage | Memory Storage |
+|---------|--------------|----------------|
+| Persistence | Survives restarts | Lost on restart |
+| Speed | Moderate | Very fast |
+| Capacity | Large | Limited by RAM |
+| Use Case | Production data | Temporary cache |
+| Cost | Storage-based | RAM-based |
 
 ---
 
