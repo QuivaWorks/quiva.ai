@@ -867,7 +867,7 @@ Manipulate and search text.
 
 <AccordionGroup>
   <Accordion title="concat - Concatenate strings" icon="link">
-    Join multiple strings together.
+    Join multiple strings together. A space is included after the join automatically
     
     **Syntax:**
     ```json
@@ -882,7 +882,7 @@ Manipulate and search text.
     {
       "fullName.value": {
         "operator": "concat",
-        "input": ["@fact:firstName.value", " ", "@fact:lastName.value"]
+        "input": ["@fact:firstName.value", "@fact:lastName.value"]
       }
     }
     // If firstName="John", lastName="Smith", result: "John Smith"
@@ -982,6 +982,52 @@ Manipulate and search text.
       }
     }
     // If csvLine="red,blue,green", result: ["red", "blue", "green"]
+    ```
+  </Accordion>
+
+  <Accordion title="startsWith - Check prefix" icon="arrow-right">
+    Check if string starts with a specific prefix.
+    
+    **Syntax:**
+    ```json
+    {
+      "operator": "startsWith",
+      "input": [string, prefix]
+    }
+    ```
+    
+    **Example:**
+    ```json
+    {
+      "isHttps.value": {
+        "operator": "startsWith",
+        "input": ["@fact:url.value", "https://"]
+      }
+    }
+    // True if URL starts with "https://"
+    ```
+  </Accordion>
+  
+  <Accordion title="endsWith - Check suffix" icon="arrow-left">
+    Check if string ends with a specific suffix.
+    
+    **Syntax:**
+    ```json
+    {
+      "operator": "endsWith",
+      "input": [string, suffix]
+    }
+    ```
+    
+    **Example:**
+    ```json
+    {
+      "isImage.value": {
+        "operator": "endsWith",
+        "input": ["@fact:filename.value", ".jpg"]
+      }
+    }
+    // True if filename ends with ".jpg"
     ```
   </Accordion>
   
@@ -1820,6 +1866,6 @@ Special system-level operations.
 </CardGroup>
 
 <Info>
-  **Need Help?** Visit our [Help Center](https://microstrate.io/help.html) or
+  **Need Help?** Visit our [Help Center](https://microstrate.ai/help.html) or
   join the [Community](/community) for support.
 </Info>

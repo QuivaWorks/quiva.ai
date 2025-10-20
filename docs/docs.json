@@ -17,50 +17,122 @@
           {
             "group": "Get Started",
             "pages": [
-              "welcome-to-microstrate/overview",
-              "welcome-to-microstrate/quick-start",
-              "hub/hub-description",
-              "welcome-to-microstrate/development"
+              "get-started/overview",
+              "get-started/getting-started",
+              "get-started/core-concepts",
+              "get-started/plans-and-pricing"
             ]
           },
           {
-            "group": "Getting Started",
+            "group": "Flows",
             "pages": [
-              "essentials/getting-started",
-              "essentials/plans-and-pricing"
+              "flows/overview",
+              {
+                "group": "Triggers",
+                "icon": "bolt",
+                "pages": [
+                  "flows/triggers/overview",
+                  "flows/triggers/embed-triggers",
+                  "flows/triggers/http-request",
+                  "flows/triggers/webhook",
+                  "flows/triggers/schedule",
+                  "flows/triggers/upload",
+                  "flows/triggers/email",
+                  "flows/triggers/stream-triggers"
+                ]
+              },
+              {
+                "group": "Steps",
+                "icon": "list-check",
+                "pages": [
+                  "flows/steps/overview",
+                  "flows/steps/agents",
+                  "flows/steps/human-in-the-loop",
+                  "flows/steps/delay",
+                  "flows/steps/condition",
+                  "flows/steps/http-request",
+                  "flows/steps/map",
+                  "flows/steps/rules",
+                  "flows/steps/eval",
+                  "flows/steps/functions",
+                  "flows/steps/nested-flows",
+                  "flows/steps/api-integrations",
+                  {
+                    "group": "Functions",
+                    "icon": "book",
+                    "pages": [
+                      "flows/functions/overview",
+                      "flows/functions/utility",
+                      "flows/functions/key-value",
+                      "flows/functions/object-storage",
+                      "flows/functions/streams"
+                    ]
+                  }
+                ]
+              },
+              "flows/best-practices"
+            ]
+          },
+          {
+            "group": "Agents",
+            "pages": [
+              "agents/overview",
+              "agents/creating-first-agent",
+              {
+                "group": "Configuration",
+                "icon": "sliders",
+                "pages": [
+                  "agents/configuration/information-settings",
+                  "agents/configuration/provider-settings",
+                  "agents/configuration/context-settings"
+                ]
+              },
+              "agents/tools-and-connectors",
+              "agents/prompt-engineering",
+              "agents/best-practices"
             ]
           },
           {
             "group": "Account Management",
             "pages": [
-              "essentials/account/creating-account",
-              "essentials/account/account-settings",
-              "essentials/account/billing-subscriptions",
-              "essentials/account/closing-account"
+              {
+                "icon":"id-card",
+                "group": "Account Management",
+                "pages": [
+                  "essentials/account/creating-account",
+                  "essentials/account/account-settings",
+                  "essentials/account/billing-subscriptions",
+                  "essentials/account/closing-account"
+                ]
+              },
+              {
+                "icon":"people-group",
+                "group": "User Management",
+                "pages": [
+                  "essentials/users/user-management",
+                  "essentials/users/roles-permissions",
+                  "essentials/users/user-settings"
+                ]
+              },
+              {
+                
+                "icon": "lock",
+                "group": "Security",
+                "pages": [
+                  "essentials/security/overview",
+                  "essentials/security/authentication",
+                  "essentials/security/api-keys",
+                  "essentials/security/sessions",
+                  "essentials/security/incident-response"
+                ]
+              }
             ]
           },
-          {
-            "group": "User Management",
-            "pages": [
-              "essentials/users/user-management",
-              "essentials/users/roles-permissions",
-              "essentials/users/user-settings"
-            ]
-          },
-          {
-            "group": "Security",
-            "pages": [
-              "essentials/security/overview",
-              "essentials/security/authentication",
-              "essentials/security/api-keys",
-              "essentials/security/sessions",
-              "essentials/security/incident-response"
-            ]
-          },
+
           {
             "group": "Advanced",
             "pages": [
-              "advanced/overview",
+              "get-started/development",
               {
                 "group": "Variable Mapping",
                 "icon": "arrow-right-arrow-left",
@@ -76,16 +148,6 @@
                 ]
               },
               {
-                "group": "Steps",
-                "icon": "list-check",
-                "pages": [
-                  "advanced/steps/overview",
-                  "advanced/steps/conditional-logic",
-                  "advanced/steps/error-handling",
-                  "advanced/steps/parallel-execution"
-                ]
-              },
-              {
                 "group": "Rules",
                 "icon": "gavel",
                 "pages": [
@@ -97,24 +159,6 @@
                   "advanced/rules/examples",
                   "advanced/rules/advanced-techniques",
                   "advanced/rules/technical-reference"
-                ]
-              },
-              {
-                "group": "Data Transformation",
-                "icon": "wand-magic-sparkles",
-                "pages": [
-                  "advanced/data-transformation/overview",
-                  "advanced/data-transformation/filters",
-                  "advanced/data-transformation/aggregations"
-                ]
-              },
-              {
-                "group": "Integrations",
-                "icon": "plug",
-                "pages": [
-                  "advanced/integrations/custom-mcp-servers",
-                  "advanced/integrations/webhooks",
-                  "advanced/integrations/api-connections"
                 ]
               }
             ]
@@ -188,12 +232,12 @@
       "anchors": [
         {
           "anchor": "Community",
-          "href": "https://microstrate.io/community",
+          "href": "https://microstrate.ai/community",
           "icon": "slack"
         },
         {
           "anchor": "Support",
-          "href": "https://microstrate.io/support",
+          "href": "https://microstrate.ai/support",
           "icon": "headset"
         }
       ]
@@ -213,13 +257,13 @@
     "links": [
       {
         "label": "Log in",
-        "href": "https://app.microstrate.io/en/login"
+        "href": "https://app.microstrate.ai/en/login"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Try for free",
-      "href": "https://app.microstrate.io/en/signup"
+      "href": "https://app.microstrate.ai/en/signup"
     }
   },
   "footer": {

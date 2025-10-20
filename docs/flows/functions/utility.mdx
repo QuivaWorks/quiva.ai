@@ -1,0 +1,1478 @@
+---
+title: 'Data Transformation Utilities'
+description: 'Transform, format, and manipulate data in your flows'
+icon: 'shuffle'
+---
+
+# Data Transformation Utilities
+
+Utility functions for common data operations like encoding, merging, grouping, and formatting. These functions help you transform data between steps in your flows.
+
+<Info>
+**Quick Data Transformation**: These utilities handle common data manipulation tasks without needing custom code. Use them for encoding, merging objects, formatting templates, and more.
+</Info>
+
+---
+
+## Function List
+
+<CardGroup cols={3}>
+  <Card title="base64-encode" icon="lock" href="#base64-encode">
+    Encode to base64
+  </Card>
+  
+  <Card title="base64-decode" icon="unlock" href="#base64-decode">
+    Decode from base64
+  </Card>
+  
+  <Card title="json-xml" icon="code" href="#json-xml">
+    Convert JSON to XML
+  </Card>
+  
+  <Card title="xml-json" icon="code-compare" href="#xml-json">
+    Convert XML to JSON
+  </Card>
+  
+  <Card title="Handlebars Template" icon="file-code" href="#handlebars-template">
+    Dynamic templates
+  </Card>
+  
+  <Card title="Mapping" icon="route" href="#mapping">
+    JSON path data mapping
+  </Card>
+  
+  <Card title="secret-key-get-node" icon="key" href="#secret-key-get-node">
+    Retrieve secret keys
+  </Card>
+  
+  <Card title="function-invoke" icon="function" href="#function-invoke">
+    Invoke other functions
+  </Card>
+  
+  <Card title="sftp" icon="server" href="#sftp">
+    Upload files via SFTP
+  </Card>
+  
+</CardGroup>
+
+---
+
+## base64-encode
+
+Encode text or objects to base64 format. Automatically handles both string and object inputs, converting objects to JSON before encoding.
+
+### Parameters
+
+Takes a single input value directly (not wrapped in a params object):
+
+<ParamField path="input" type="string | object" required>
+  The data to encode. Can be:
+  - **String**: Encoded directly to base64
+  - **Object**: Automatically converted to JSON string, then encoded to base64
+</ParamField>
+
+### Response
+
+Returns the base64-encoded string directly (not wrapped in an object).
+
+```text
+"Y29uc29sZS5sb2coImhlbGxvIHdvcmxkISIpOw=="
+```
+
+### Example Usage
+
+<CodeGroup>
+```json Encode Text
+{
+  "function": "base64-encode",
+  "params": "Hello World!"
+}
+```
+
+```json Encode Object
+{
+  "function": "base64-encode",
+  "params": {
+    "name": "John Doe",
+    "email": "john@example.com"
+  }
+}
+```
+
+```text In Flow
+HTTP Request: Get file content
+↓
+Functions: Encode for transmission
+  Function: base64-encode
+  Input: (http_request.response)
+↓
+HTTP Request: Send encoded data
+```
+</CodeGroup>
+
+### Common Use Cases
+
+<AccordionGroup>
+  <Accordion title="Encode Files for API" icon="paper-plane">
+    Encode files before sending to APIs
+    
+    ```
+    Get file from storage
+    Encode to base64
+    Send in HTTP request body
+    API receives and decodes
+    ```
+  </Accordion>
+  
+  <Accordion title="Store Binary Data" icon="database">
+    Store binary content as text
+    
+    ```
+    Receive binary file
+    Encode to base64
+    Store in database or KV storage
+    Decode when retrieved
+    ```
+  </Accordion>
+  
+  <Accordion title="Embed Data in Formats" icon="code">
+    Create data URLs or embed in JSON
+    
+    ```
+    Get image file
+    Encode to base64
+    Create data URL with encoded content
+    Use in HTML or email
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+**Auto-Stringify**: Objects are automatically converted to JSON before encoding. No need to manually stringify objects.
+</Info>
+
+---
+
+## base64-decode
+
+Decode base64-encoded data. Automatically detects and parses JSON objects in the decoded output.
+
+### Parameters
+
+Takes a single input value directly:
+
+<ParamField path="input" type="string" required>
+  The base64-encoded string to decode.
+</ParamField>
+
+### Response
+
+Returns decoded data directly (not wrapped in an object). The return type depends on the decoded content:
+- **Object**: If the decoded string is valid JSON, returns the parsed object
+- **String**: If the decoded string is plain text, returns the string
+
+```json
+// Example 1: Decodes to plain text
+"Hello World!"
+
+// Example 2: Decodes to object (auto-parsed JSON)
+{
+  "name": "John Doe",
+  "email": "john@example.com"
+}
+```
+
+### Example Usage
+
+<CodeGroup>
+```json Decode Text
+{
+  "function": "base64-decode",
+  "params": "SGVsbG8gV29ybGQh"
+}
+```
+
+```json Decode Object (Auto-Parse)
+{
+  "function": "base64-decode",
+  "params": "eyJuYW1lIjoiSm9obiBEb2UifQ=="
+}
+```
+
+```text In Flow
+Trigger: Receive base64-encoded data
+↓
+Functions: Decode data
+  Function: base64-decode
+  Input: (trigger.encoded_data)
+↓
+Agent: Process decoded content
+  (automatically parsed if JSON)
+```
+</CodeGroup>
+
+### Common Patterns
+
+<AccordionGroup>
+  <Accordion title="Receive Encoded Files" icon="inbox">
+    Decode files received from APIs
+    
+    ```
+    HTTP Request: Receive base64 file
+    Decode from base64
+    Store or process decoded file
+    ```
+  </Accordion>
+  
+  <Accordion title="Retrieve Stored Data" icon="download">
+    Decode stored base64 data
+    
+    ```
+    Get base64 string from storage
+    Decode to original format
+    Use decoded content
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+**Auto-Detection**: This function automatically detects if the decoded string is valid JSON and parses it into an object. You don't need to specify the output format or manually parse JSON.
+</Info>
+
+---
+
+## json-xml
+
+Transform JSON data to XML format. Useful for integrating with systems that require XML.
+
+### Parameters
+
+<ParamField path="json" type="object | string | Buffer" required>
+  The JSON data to convert to XML. Can be:
+  - **Object**: Converted directly to XML
+  - **String**: Parsed as JSON first, then converted
+  - **Buffer**: Converted to string, parsed as JSON, then converted
+</ParamField>
+
+<ParamField path="options" type="object">
+  XML conversion options:
+  
+  <Expandable title="View all options">
+    - `useXmlJs` (boolean): Use xml-js library instead of custom converter
+    - `compact` (boolean, default: false): Produce compact XML format
+    - `spaces` (number, default: 0): Number of spaces for indentation
+    - `fullTagEmptyElement` (boolean): Use full tags instead of self-closing tags
+    - `indentCdata` (boolean): Indent CDATA sections
+    - `indentAttributes` (boolean): Print attributes on multiple lines
+    - `ignoreDeclaration` (boolean): Omit XML declaration
+    - `ignoreInstruction` (boolean): Omit processing instructions
+    - `ignoreAttributes` (boolean): Omit element attributes
+    - `ignoreComment` (boolean): Omit comments
+    - `ignoreCdata` (boolean): Omit CDATA sections
+    - `ignoreDoctype` (boolean): Omit DOCTYPE declaration
+    - `ignoreText` (boolean): Omit text content
+  </Expandable>
+</ParamField>
+
+### Response
+
+Returns XML as a string with XML declaration.
+
+```xml
+<?xml version="1.0"?><root><name>John</name><age>30</age></root>
+```
+
+### Example Usage
+
+<CodeGroup>
+```json Convert JSON to XML
+{
+  "function": "json-xml",
+  "params": {
+    "json": {
+      "customer": {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "orders": [
+          {"id": "001", "total": 150},
+          {"id": "002", "total": 200}
+        ]
+      }
+    },
+    "options": {
+      "compact": true,
+      "spaces": 2
+    }
+  }
+}
+```
+
+```json Compact Format
+{
+  "function": "json-xml",
+  "params": {
+    "json": {
+      "QuestionAnswer": [
+        {
+          "QuestionCd": "MOTOR_NCB",
+          "Explanation": "1000"
+        }
+      ]
+    },
+    "options": {
+      "compact": true
+    }
+  }
+}
+```
+
+```text In Flow
+Agent: Generate order data (JSON)
+↓
+Functions: Convert to XML
+  Function: json-xml
+  JSON: (agent.order_data)
+  Options: {compact: true}
+↓
+HTTP Request: Send XML to SOAP API
+```
+</CodeGroup>
+
+### Common Use Cases
+
+<AccordionGroup>
+  <Accordion title="Legacy System Integration" icon="server">
+    Send data to XML-only systems
+    
+    ```
+    Collect data in JSON format
+    Convert to XML
+    Send to SOAP API or legacy system
+    ```
+  </Accordion>
+  
+  <Accordion title="XML File Generation" icon="file-code">
+    Generate XML files for export
+    
+    ```
+    Build data structure in JSON
+    Convert to XML with proper formatting
+    Store as .xml file
+    ```
+  </Accordion>
+  
+  <Accordion title="ACORD Formats" icon="file-contract">
+    Generate insurance industry standard formats
+    
+    ```
+    Build ACORD data structure
+    Convert to XML with compact option
+    Submit to insurance systems
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+**XML Declaration**: The output always includes XML version declaration at the beginning. Use ignoreDeclaration option set to true to omit it.
+</Note>
+
+---
+
+## xml-json
+
+Convert XML to JSON format. This is the reverse operation of json-xml, useful for parsing XML responses from APIs.
+
+### Parameters
+
+<ParamField path="xml" type="string" required>
+  The XML string to convert to JSON.
+</ParamField>
+
+<ParamField path="options" type="object">
+  XML parsing options:
+  
+  <Expandable title="View all options">
+    - `useXmlJs` (boolean): Use xml-js library instead of custom parser
+    - `compact` (boolean, default: false): Produce compact JSON format
+    - `trim` (boolean): Trim whitespace from text content
+    - `sanitize` (boolean): Replace special characters with HTML entities
+    - `nativeType` (boolean): Convert numeric/boolean strings to native types
+    - `nativeTypeAttributes` (boolean): Convert attribute values to native types
+    - `addParent` (boolean): Add parent property to each element
+    - `alwaysArray` (boolean | array): Force elements to be arrays
+    - `alwaysChildren` (boolean): Always generate elements property
+    - `instructionHasAttributes` (boolean): Parse processing instructions as attributes
+    - `captureSpacesBetweenElements` (boolean): Capture whitespace between elements
+    - `ignoreDeclaration` (boolean): Skip XML declaration
+    - `ignoreInstruction` (boolean): Skip processing instructions
+    - `ignoreAttributes` (boolean): Skip element attributes
+    - `ignoreText` (boolean): Skip text content
+    - `ignoreComment` (boolean): Skip comments
+    - `ignoreCdata` (boolean): Skip CDATA sections
+    - `ignoreDoctype` (boolean): Skip DOCTYPE declaration
+  </Expandable>
+</ParamField>
+
+### Response
+
+Returns a JSON string (you may need to parse it in subsequent steps).
+
+```json
+"{\"Response\":{\"Result\":{\"Status\":\"Success\"}}}"
+```
+
+### Example Usage
+
+<CodeGroup>
+```json Parse XML Response
+{
+  "function": "xml-json",
+  "params": {
+    "xml": "<?xml version=\"1.0\"?><Response><Status>Success</Status></Response>",
+    "options": {
+      "compact": true,
+      "ignoreDeclaration": true
+    }
+  }
+}
+```
+
+```json Parse SOAP Response
+{
+  "function": "xml-json",
+  "params": {
+    "xml": "(http_request.response)",
+    "options": {
+      "compact": true,
+      "trim": true,
+      "nativeType": true
+    }
+  }
+}
+```
+
+```text In Flow
+HTTP Request: Call SOAP API
+↓
+Functions: Parse XML response
+  Function: xml-json
+  XML: (http_request.response)
+  Options: {compact: true, trim: true}
+↓
+Agent: Process JSON data
+```
+</CodeGroup>
+
+### Common Use Cases
+
+<AccordionGroup>
+  <Accordion title="Parse SOAP Responses" icon="cloud">
+    Convert SOAP API responses to JSON
+    
+    ```
+    Call SOAP API endpoint
+    Receive XML response
+    Convert to JSON
+    Process as structured data
+    ```
+  </Accordion>
+  
+  <Accordion title="Legacy System Integration" icon="server">
+    Parse XML from legacy systems
+    
+    ```
+    Receive XML from legacy system
+    Convert to JSON
+    Process with modern tools
+    ```
+  </Accordion>
+  
+  <Accordion title="XML File Processing" icon="file-lines">
+    Process XML files
+    
+    ```
+    Read XML file
+    Parse to JSON
+    Transform and process data
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+**Return Type**: This function returns a JSON string, not a parsed object. You may need to use JSON.parse() or another step to convert the string to an object for further processing.
+</Warning>
+
+---
+
+## Handlebars Template
+
+Use Handlebars templating engine to create dynamic templates with variables that are replaced at runtime.
+
+### Parameters
+
+<ParamField path="template" type="string" required>
+  The Handlebars template string with variables in double curly braces.
+</ParamField>
+
+<ParamField path="variables" type="object" required>
+  The data object containing values to replace in the template.
+</ParamField>
+
+### Response
+
+Returns the rendered template as a string.
+
+```text
+"Hello John Doe, your order #12345 has been confirmed!"
+```
+
+### Example Usage
+
+<CodeGroup>
+```json Email Template
+{
+  "function": "handlebars",
+  "params": {
+    "template": "Hello {{customer.name}}, order {{order.id}} confirmed!",
+    "variables": {
+      "customer": {
+        "name": "John Doe"
+      },
+      "order": {
+        "id": "12345"
+      }
+    }
+  }
+}
+```
+
+```json Conditional Template
+{
+  "function": "handlebars",
+  "params": {
+    "template": "{{#if premium}}Premium{{else}}Standard{{/if}} customer {{name}}",
+    "variables": {
+      "name": "John",
+      "premium": true
+    }
+  }
+}
+```
+
+```text In Flow
+Agent: Gather customer data
+↓
+Functions: Generate personalized email
+  Function: handlebars
+  Template: Email body with {{variables}}
+  Variables: (agent.customer_data)
+↓
+HTTP Request: Send email
+```
+</CodeGroup>
+
+### Template Features
+
+<AccordionGroup>
+  <Accordion title="Variables" icon="brackets-curly">
+    Insert dynamic values
+    
+    ```handlebars
+    Hello {{name}}, you have {{count}} new messages.
+    ```
+  </Accordion>
+  
+  <Accordion title="Nested Properties" icon="sitemap">
+    Access nested object properties
+    
+    ```handlebars
+    {{user.profile.firstName}} {{user.profile.lastName}}
+    Email: {{user.contact.email}}
+    ```
+  </Accordion>
+  
+  <Accordion title="Conditionals" icon="code-branch">
+    Show content based on conditions
+    
+    ```handlebars
+    {{#if isPremium}}
+      Thank you for being a premium member!
+    {{else}}
+      Upgrade to premium for more features.
+    {{/if}}
+    ```
+  </Accordion>
+  
+  <Accordion title="Loops" icon="arrows-rotate">
+    Iterate over arrays
+    
+    ```handlebars
+    Your orders:
+    {{#each orders}}
+      - Order {{this.id}}
+    {{/each}}
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Common Use Cases
+
+<AccordionGroup>
+  <Accordion title="Email Generation" icon="envelope">
+    Create personalized emails
+    
+    ```
+    Email template with variables
+    + Customer data
+    = Personalized email content
+    ```
+  </Accordion>
+  
+  <Accordion title="Report Generation" icon="file-chart-column">
+    Generate dynamic reports
+    
+    ```
+    Report template
+    + Data from multiple sources
+    = Formatted report
+    ```
+  </Accordion>
+  
+  <Accordion title="Notification Messages" icon="bell">
+    Create dynamic notifications
+    
+    ```
+    Message template
+    + Event data
+    = Personalized notification
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Mapping
+
+Use JSONPath expressions to select, transform, and map data into new structures. Powerful for data transformation and restructuring with support for filters, array operations, and conditional selection.
+
+### Parameters
+
+<ParamField path="data" type="object" required>
+  The source data object to query and transform.
+</ParamField>
+
+<ParamField path="path" type="string | array | object" required>
+  JSONPath expression(s) defining how to map the data:
+  
+  - **String**: Single JSONPath query
+  - **Array**: For array transformations with mapping
+  - **Object**: Map of output keys to JSONPath expressions
+</ParamField>
+
+<ParamField path="lookupData" type="object">
+  Optional lookup data accessible as variables in path expressions for filtering and conditional selection.
+</ParamField>
+
+### Response
+
+Returns the mapped/extracted data in the specified structure.
+
+```json
+{
+  "customerName": "John Doe",
+  "orderTotal": 150.00,
+  "itemCount": 3
+}
+```
+
+### Path Syntax
+
+<AccordionGroup>
+  <Accordion title="Basic Property Access" icon="arrow-pointer">
+    Access properties using JSONPath
+    
+    ```javascript
+    "$.user.name"           // Get user.name
+    "$.order.total"         // Get order.total
+    "$.items[0].price"      // Get first item price
+    "$"                     // Get root object
+    ```
+  </Accordion>
+  
+  <Accordion title="String Concatenation" icon="plus">
+    Combine values using pipe delimiter
+    
+    ```javascript
+    "$.firstName|' '|$.lastName"  // Join with space
+    // Result: "John Doe"
+    
+    "$.street|', '|$.city"        // Join with comma
+    // Result: "123 Main St, San Francisco"
+    ```
+  </Accordion>
+  
+  <Accordion title="Array Mapping" icon="list">
+    Transform arrays with custom mapping
+    
+    ```javascript
+    [
+      "$.items",                          // Source array path
+      { id: "$.id", name: "$.name" },    // Mapping for each item
+      { merge: false }                    // Options
+    ]
+    ```
+  </Accordion>
+  
+  <Accordion title="Object Mapping" icon="object-group">
+    Create new object structure
+    
+    ```javascript
+    {
+      userName: "$.user.name",
+      userEmail: "$.user.email",
+      orderTotal: "$.order.total"
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Filters with Lookup Data" icon="filter">
+    Filter using external variables
+    
+    ```javascript
+    // In path:
+    "$.items[?(@.id === targetId)]"
+    
+    // In lookupData:
+    { targetId: "abc123" }
+    
+    // Result: Item where id equals abc123
+    ```
+  </Accordion>
+  
+  <Accordion title="Deep Property Search" icon="magnifying-glass">
+    Search recursively through nested structures
+    
+    ```javascript
+    "$..price.duty"         // Find duty in any price object
+    "$..covers..limits"     // Find all limits in any covers
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Example Usage
+
+<CodeGroup>
+```json Simple Object Mapping
+{
+  "function": "mapping",
+  "params": {
+    "data": {
+      "user": {
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "order": {
+        "total": 150.00,
+        "items": [1, 2, 3]
+      }
+    },
+    "path": {
+      "customerName": "$.user.firstName|' '|$.user.lastName",
+      "orderTotal": "$.order.total",
+      "itemCount": "$.order.items.length"
+    }
+  }
+}
+```
+
+```json Array Transformation
+{
+  "function": "mapping",
+  "params": {
+    "data": {
+      "products": [
+        {"id": "p1", "name": "Phone", "price": 599},
+        {"id": "p2", "name": "Laptop", "price": 1299}
+      ]
+    },
+    "path": [
+      "$.products",
+      {
+        "productId": "$.id",
+        "productName": "$.name",
+        "productPrice": "$.price"
+      },
+      { "merge": false }
+    ]
+  }
+}
+```
+
+```json Filter with Lookup
+{
+  "function": "mapping",
+  "params": {
+    "data": {
+      "orders": [
+        {"id": "001", "status": "completed"},
+        {"id": "002", "status": "pending"}
+      ]
+    },
+    "path": "$.orders[?(@.status === targetStatus)]",
+    "lookupData": {
+      "targetStatus": "completed"
+    }
+  }
+}
+```
+
+```text In Flow
+HTTP Request: Get complex API response
+↓
+Functions: Extract and restructure data
+  Function: mapping
+  Data: (http_request.response)
+  Path: {custom mapping definition}
+↓
+Agent: Use clean, structured data
+```
+</CodeGroup>
+
+### Common Use Cases
+
+<AccordionGroup>
+  <Accordion title="API Response Transformation" icon="rotate">
+    Transform API responses to your format
+    
+    ```
+    External API format (complex)
+    → Map to internal format (simplified)
+    → Use in your system
+    ```
+  </Accordion>
+  
+  <Accordion title="Data Extraction" icon="magnifying-glass">
+    Extract specific fields from complex objects
+    
+    ```
+    Large nested object
+    → Extract only needed fields
+    → Simplified object for processing
+    ```
+  </Accordion>
+  
+  <Accordion title="Format Conversion" icon="repeat">
+    Convert between data formats
+    
+    ```
+    Source format A
+    → Map fields to format B
+    → Compatible with target system
+    ```
+  </Accordion>
+  
+  <Accordion title="Conditional Data Selection" icon="filter">
+    Select data based on conditions
+    
+    ```
+    Large dataset
+    → Filter by criteria using lookupData
+    → Only matching records
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+**JSONPath Plus**: This function uses the jsonpath-plus library with full support for complex queries, filters, recursive descent, and array operations.
+</Info>
+
+---
+
+## secret-key-get-node
+
+Retrieve secret values stored in Microstrate's secret manager. Use this to securely access API keys, tokens, and other sensitive configuration.
+
+### Parameters
+
+<ParamField path="key" type="string" required>
+  The name/identifier of the secret to retrieve.
+</ParamField>
+
+### Response
+
+Returns an object with either a value property (on success) or an error property (if not found).
+
+```json
+// Success
+{
+  "value": "sk_live_abc123..."
+}
+
+// Not Found
+{
+  "error": "stripe_api_key not found"
+}
+```
+
+### Example Usage
+
+<CodeGroup>
+```json Get API Key
+{
+  "function": "secret-key-get-node",
+  "params": {
+    "key": "stripe_api_key"
+  }
+}
+```
+
+```json Get Database Password
+{
+  "function": "secret-key-get-node",
+  "params": {
+    "key": "postgres_password"
+  }
+}
+```
+
+```text In Flow
+Functions: Get API key from secrets
+  Function: secret-key-get-node
+  Key: "external_api_key"
+↓
+HTTP Request: Call external API
+  Authorization: Bearer (functions.value)
+↓
+Process API response
+```
+</CodeGroup>
+
+### Error Handling
+
+Always check for the error property in the response to handle missing keys gracefully:
+
+```javascript
+// In your flow logic
+if (response.error) {
+  // Key not found
+  console.log(response.error);
+} else {
+  // Use response.value
+  const apiKey = response.value;
+}
+```
+
+### Common Use Cases
+
+<AccordionGroup>
+  <Accordion title="API Authentication" icon="key">
+    Securely access API keys for external services
+    
+    ```
+    Get secret API key
+    Use in HTTP request headers
+    Keep key secure, never in code
+    ```
+  </Accordion>
+  
+  <Accordion title="Database Connections" icon="database">
+    Retrieve database credentials
+    
+    ```
+    Get database password
+    Connect to database
+    Execute queries securely
+    ```
+  </Accordion>
+  
+  <Accordion title="Third-Party Services" icon="plug">
+    Access service tokens
+    
+    ```
+    Get OAuth token
+    Get webhook secret
+    Use for integrations
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+**Security Best Practice**: Never hardcode secrets in flows. Always use the secret manager and retrieve secrets at runtime using this function. Secrets are stored in the microstrate-secrets KV bucket.
+</Warning>
+
+---
+
+## function-invoke
+
+Invoke other Microstrate functions programmatically from within your flow. Useful for orchestrating complex workflows and modular function composition.
+
+### Parameters
+
+<ParamField path="invocation_type" type="string" required>
+  Type of invocation:
+  - `"Async"`: Fire and forget (returns immediately, doesn't wait for result)
+  - `"RequestResponse"`: Synchronous (waits for function to complete and returns result)
+</ParamField>
+
+<ParamField path="payload" type="object" required>
+  Input data to pass to the invoked function. Structure depends on the target function's requirements.
+</ParamField>
+
+<ParamField path="subject" type="string" required>
+  The identifier/name of the function to invoke.
+</ParamField>
+
+### Response
+
+Returns an object. Structure depends on the invoked function and invocation type.
+
+```json
+// For RequestResponse
+{
+  "result": "...",
+  "status": "success"
+}
+
+// For Async
+{
+  "invoked": true,
+  "function": "function-name"
+}
+```
+
+### Example Usage
+
+<CodeGroup>
+```json Synchronous Invocation
+{
+  "function": "function-invoke",
+  "params": {
+    "invocation_type": "RequestResponse",
+    "payload": {
+      "data": "process this",
+      "options": {
+        "validate": true
+      }
+    },
+    "subject": "data-processor-function"
+  }
+}
+```
+
+```json Async Invocation
+{
+  "function": "function-invoke",
+  "params": {
+    "invocation_type": "Async",
+    "payload": {
+      "notification": "send email",
+      "recipient": "user@example.com"
+    },
+    "subject": "email-sender-function"
+  }
+}
+```
+
+```text In Flow
+HTTP Request: Receive webhook
+↓
+Functions: Invoke data processor
+  Function: function-invoke
+  Type: RequestResponse
+  Payload: (webhook.data)
+  Subject: "webhook-processor"
+↓
+Functions: Async notification
+  Function: function-invoke
+  Type: Async
+  Subject: "notification-sender"
+```
+</CodeGroup>
+
+### Invocation Types
+
+<AccordionGroup>
+  <Accordion title="RequestResponse (Synchronous)" icon="reply">
+    Wait for function completion and get result
+    
+    ```
+    Invoke function
+    Wait for execution
+    Receive result
+    Continue with result
+    ```
+    
+    **Use when**: You need the result to continue processing
+  </Accordion>
+  
+  <Accordion title="Async (Fire and Forget)" icon="paper-plane">
+    Invoke function without waiting
+    
+    ```
+    Invoke function
+    Return immediately
+    Function runs in background
+    Continue without waiting
+    ```
+    
+    **Use when**: Result not needed, or for triggering side effects
+  </Accordion>
+</AccordionGroup>
+
+### Common Use Cases
+
+<AccordionGroup>
+  <Accordion title="Function Orchestration" icon="diagram-project">
+    Chain multiple functions together
+    
+    ```
+    Main flow receives request
+    → Invoke validation function
+    → Invoke processing function
+    → Invoke notification function
+    ```
+  </Accordion>
+  
+  <Accordion title="Modular Architecture" icon="boxes-stacked">
+    Break complex logic into reusable functions
+    
+    ```
+    Create specialized functions
+    Invoke them as needed
+    Reuse across multiple flows
+    ```
+  </Accordion>
+  
+  <Accordion title="Background Tasks" icon="clock">
+    Trigger long-running operations
+    
+    ```
+    Receive request
+    Invoke async background function
+    Return immediate response
+    Background task completes later
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+**Implementation**: Uses Microstrate SDK func.invoke() method. Ensures proper function calling within the platform's execution environment.
+</Info>
+
+---
+
+## sftp
+
+Upload files to SFTP servers securely. Supports both password and key-based authentication with configurable timeouts.
+
+### Parameters
+
+<ParamField path="host" type="string" required>
+  SFTP server hostname or IP address.
+</ParamField>
+
+<ParamField path="port" type="number" required>
+  SFTP server port number (typically 22).
+</ParamField>
+
+<ParamField path="username" type="string" required>
+  Username for authentication.
+</ParamField>
+
+<ParamField path="fileContents" type="string" required>
+  The file contents to upload (as a string).
+</ParamField>
+
+<ParamField path="filePath" type="string" required>
+  Remote file path where the file should be uploaded.
+</ParamField>
+
+<ParamField path="privateKey" type="string">
+  SSH private key for key-based authentication. Alternative to password authentication.
+</ParamField>
+
+<ParamField path="password" type="string">
+  Password for password-based authentication. Alternative to key-based authentication.
+</ParamField>
+
+<ParamField path="algorithms" type="object">
+  SSH algorithm configuration. Specify allowed server host key algorithms.
+  
+  ```json
+  {
+    "serverHostKey": ["ssh-rsa", "ssh-ed25519"]
+  }
+  ```
+</ParamField>
+
+<ParamField path="connectionTimeout" type="number" default="10000">
+  Connection timeout in milliseconds. Default is 10 seconds.
+</ParamField>
+
+<ParamField path="transferTimeout" type="number" default="30000">
+  File transfer timeout in milliseconds. Default is 30 seconds.
+</ParamField>
+
+### Response
+
+Returns a success message string on completion, or throws an error on failure.
+
+```text
+"File uploaded successfully"
+```
+
+### Example Usage
+
+<CodeGroup>
+```json Password Authentication
+{
+  "function": "sftp",
+  "params": {
+    "host": "sftp.example.com",
+    "port": 22,
+    "username": "ftpuser",
+    "password": "secure_password",
+    "fileContents": "Invoice data here...",
+    "filePath": "/invoices/2025/invoice_001.txt"
+  }
+}
+```
+
+```json Key-Based Authentication
+{
+  "function": "sftp",
+  "params": {
+    "host": "secure-sftp.example.com",
+    "port": 22,
+    "username": "deploy",
+    "privateKey": "-----BEGIN RSA PRIVATE KEY-----...",
+    "fileContents": "(file_data)",
+    "filePath": "/production/app.zip",
+    "connectionTimeout": 15000,
+    "transferTimeout": 60000
+  }
+}
+```
+
+```json With Custom Timeouts
+{
+  "function": "sftp",
+  "params": {
+    "host": "sftp.company.com",
+    "port": 2222,
+    "username": "backup",
+    "password": "backup_pass",
+    "fileContents": "(backup_data)",
+    "filePath": "/backups/daily/backup.sql",
+    "connectionTimeout": 20000,
+    "transferTimeout": 120000,
+    "algorithms": {
+      "serverHostKey": ["ssh-rsa"]
+    }
+  }
+}
+```
+
+```text In Flow
+Agent: Generate report file
+↓
+Functions: Upload to SFTP
+  Function: sftp
+  Host: sftp.example.com
+  FileContents: (agent.report)
+  FilePath: /reports/daily/report.pdf
+↓
+Functions: Send notification
+  Message: "Report uploaded successfully"
+```
+</CodeGroup>
+
+### Timeout Errors
+
+The function provides specific error messages for timeout scenarios:
+
+<AccordionGroup>
+  <Accordion title="Connection Timeout" icon="plug-circle-xmark">
+    If server takes too long to accept connection:
+    
+    ```
+    Error: "Server took too long to connect. 
+            Make sure the host and the port are correct."
+    ```
+    
+    **Solutions**: 
+    - Verify host and port are correct
+    - Check network connectivity
+    - Increase connectionTimeout if server is slow
+  </Accordion>
+  
+  <Accordion title="Transfer Timeout" icon="hourglass-end">
+    If file upload takes too long:
+    
+    ```
+    Error: "File took too long to send."
+    ```
+    
+    **Solutions**:
+    - Increase transferTimeout for large files
+    - Check network bandwidth
+    - Verify server is accepting uploads
+  </Accordion>
+</AccordionGroup>
+
+### Authentication Methods
+
+<AccordionGroup>
+  <Accordion title="Password Authentication" icon="lock">
+    Use username and password
+    
+    ```json
+    {
+      "username": "user",
+      "password": "secure_password"
+    }
+    ```
+    
+    **When to use**: Simple setups, testing
+  </Accordion>
+  
+  <Accordion title="Key-Based Authentication" icon="key">
+    Use SSH private key
+    
+    ```json
+    {
+      "username": "user",
+      "privateKey": "-----BEGIN RSA PRIVATE KEY-----..."
+    }
+    ```
+    
+    **When to use**: Production environments, automated systems, enhanced security
+  </Accordion>
+</AccordionGroup>
+
+### Common Use Cases
+
+<AccordionGroup>
+  <Accordion title="File Delivery" icon="truck">
+    Deliver files to partners or systems
+    
+    ```
+    Generate report/export
+    Upload via SFTP
+    Partner retrieves file
+    ```
+  </Accordion>
+  
+  <Accordion title="Backup Systems" icon="floppy-disk">
+    Send backups to remote storage
+    
+    ```
+    Create backup
+    Upload to SFTP backup server
+    Verify upload success
+    ```
+  </Accordion>
+  
+  <Accordion title="Data Integration" icon="arrows-turn-to-dots">
+    Exchange data with external systems
+    
+    ```
+    Export data from your system
+    Upload to partner's SFTP
+    Partner processes file
+    ```
+  </Accordion>
+  
+  <Accordion title="Automated Deployments" icon="rocket">
+    Deploy files to remote servers
+    
+    ```
+    Build application files
+    Upload to production SFTP
+    Trigger deployment process
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+**Connection Management**: The SFTP connection is automatically closed after the upload completes or if an error occurs. No manual cleanup required.
+</Warning>
+
+<Note>
+**Large Files**: For large files, increase the transferTimeout parameter appropriately. As a guideline, allow approximately 1 second per MB plus overhead.
+</Note>
+
+---
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Auto-Detection Benefits" icon="wand-magic-sparkles">
+    base64-decode automatically parses JSON - leverage this for cleaner flows
+  </Card>
+  
+  <Card title="Always Handle Errors" icon="shield-check">
+    Check for error properties in responses, especially with secret-key-get-node
+  </Card>
+  
+  <Card title="Template Dynamic Content" icon="file-code">
+    Use Handlebars for emails, notifications, and reports with the variables parameter
+  </Card>
+  
+  <Card title="Restructure with Mapping" icon="diagram-project">
+    Use Mapping with JSONPath for powerful data transformations
+  </Card>
+  
+  <Card title="Secure SFTP Uploads" icon="lock">
+    Prefer key-based authentication over passwords for production SFTP
+  </Card>
+  
+  <Card title="Store Secrets Securely" icon="key">
+    Always use secret manager for sensitive data - never hardcode secrets
+  </Card>
+  
+  <Card title="Function Orchestration" icon="diagram-next">
+    Use function-invoke for modular, reusable flow architectures
+  </Card>
+  
+  <Card title="Set Appropriate Timeouts" icon="clock">
+    Configure SFTP timeouts based on file sizes and network conditions
+  </Card>
+</CardGroup>
+
+---
+
+## Migration Notes
+
+If you're updating existing flows that use these functions, note these breaking changes:
+
+<Warning>
+**Breaking Changes:**
+- **base64-encode**: Remove encoding parameter - pass data directly
+- **base64-decode**: Remove output_encoding parameter - auto-detection enabled
+- **handlebars**: Rename data parameter to variables
+- **json-xml**: Restructure to use json and options object instead of separate parameters
+- **secret-key-get-node**: Rename key_name to key, expect simplified response structure
+</Warning>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Stream Functions" icon="water" href="/flows/functions/streams">
+    Real-time event processing
+  </Card>
+  
+  <Card title="Key-Value Storage" icon="database" href="/flows/functions/key-value">
+    Fast key-based storage
+  </Card>
+  
+  <Card title="Object Storage" icon="box" href="/flows/functions/object-storage">
+    Store large files
+  </Card>
+  
+  <Card title="Functions Step" icon="function" href="/flows/steps/functions">
+    Using Functions in flows
+  </Card>
+</CardGroup>
