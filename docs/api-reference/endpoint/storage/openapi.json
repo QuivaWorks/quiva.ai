@@ -67,6 +67,46 @@
       }
     },
     "schemas": {
+      "UpsertKVEntriesRequest": {
+        "type": "object",
+        "required": [
+          "bucket",
+          "items"
+        ],
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "Name of the bucket where key-value pairs are stored"
+          },
+          "items": {
+            "type": "array",
+            "description": "List of key-value entries to upsert",
+            "items": {
+              "$ref": "#/components/schemas/KVItem"
+            }
+          }
+        }
+      },
+      "KVItem": {
+        "type": "object",
+        "required": [
+          "key",
+          "value"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Key of the entry"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of the value (e.g., string, int, json, etc.)"
+          },
+          "value": {
+            "description": "Value of the entry"
+          }
+        }
+      },
       "StorageType": {
         "type": "string",
         "enum": [
@@ -416,7 +456,29 @@
       "KVEntryValue": {
         "type": "object",
         "description": "Value to store in KV entry",
-        "additionalProperties": true
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "description": "Number of messages to keep",
+            "minimum": 0
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of the value",
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "object"
+            ]
+          },
+          "old_key": {
+            "type": "string",
+            "description": "The key to replace if replace is rquired"
+          }
+        }
       },
       "Metadata": {
         "type": "object",
@@ -1584,6 +1646,11 @@
       }
     },
     "/storage/kv/{bucket}/entries": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/bucketName"
+        }
+      ],
       "get": {
         "tags": [
           "KV Entries"
@@ -1594,9 +1661,6 @@
         "x-resource-type": "service",
         "x-resource": "microstrate.storage.get.kv-entries",
         "parameters": [
-          {
-            "$ref": "#/components/parameters/bucketName"
-          },
           {
             "name": "limit",
             "in": "query",
@@ -1659,9 +1723,68 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
+      },
+      "put": {
+        "tags": [
+          "KV Entries"
+        ],
+        "summary": "Create or update multiple KV entries",
+        "description": "Creates or updates multiple key-value entries in the specified bucket",
+        "operationId": "putKVEntries",
+        "x-resource-type": "service",
+        "x-resource": "microstrate.storage.put.kv-entries",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertKVEntriesRequest"
+              },
+              "example": {
+                "bucket": "my-bucket",
+                "items": [
+                  {
+                    "key": "u1234",
+                    "type": "string",
+                    "value": {
+                      "name": "John Doe",
+                      "email": "john@example.com",
+                      "age": 30
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
       }
     },
     "/storage/kv/{bucket}/entries/{key}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/bucketName"
+        },
+        {
+          "$ref": "#/components/parameters/entryKey"
+        }
+      ],
       "get": {
         "tags": [
           "KV Entries"
@@ -1671,14 +1794,6 @@
         "operationId": "getKVEntry",
         "x-resource-type": "service",
         "x-resource": "microstrate.storage.get.kv-entry",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/bucketName"
-          },
-          {
-            "$ref": "#/components/parameters/entryKey"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successfully retrieved entry",
@@ -1726,14 +1841,6 @@
         "operationId": "putKVEntry",
         "x-resource-type": "service",
         "x-resource": "microstrate.storage.put.kv-entry",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/bucketName"
-          },
-          {
-            "$ref": "#/components/parameters/entryKey"
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1742,9 +1849,13 @@
                 "$ref": "#/components/schemas/KVEntryValue"
               },
               "example": {
-                "name": "John Doe",
-                "email": "john@example.com",
-                "age": 30
+                "old_key": "U2312323",
+                "type": "string",
+                "value": {
+                  "name": "John Doe",
+                  "email": "john@example.com",
+                  "age": 30
+                }
               }
             }
           }
@@ -1776,14 +1887,6 @@
         "operationId": "deleteKVEntry",
         "x-resource-type": "service",
         "x-resource": "microstrate.storage.delete.kv-entry",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/bucketName"
-          },
-          {
-            "$ref": "#/components/parameters/entryKey"
-          }
-        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/SuccessResponse"
