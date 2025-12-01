@@ -1,7 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "quiva.ai Gateway",
+    "title": "Qiva Account Management API",
+    "x-gateway-name": "API Gateway",
     "description": "API for managing accounts, users, authentication, and payments in the quiva.ai platform",
     "version": "1.0.0",
     "contact": {

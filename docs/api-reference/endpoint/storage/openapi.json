@@ -1,7 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "quiva.ai Gateway",
+    "title": "Qiva Storage Management API",
+    "x-gateway-name": "API Gateway",
     "description": "A comprehensive interface for managing key-value stores, object stores, streams, and search indexing",
     "contact": {
       "name": "quiva.ai Support",

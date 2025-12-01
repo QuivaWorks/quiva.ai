@@ -1,7 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "quiva.ai Gateway",
+    "title": "Qiva Gateway Management API",
+    "x-gateway-name": "API Gateway",
     "description": "quiva.ai Gateway API for managing gateway infrastructure and routing API requests.",
     "version": "1.0.0",
     "contact": {

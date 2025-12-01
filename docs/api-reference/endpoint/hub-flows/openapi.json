@@ -1,8 +1,9 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "quiva.ai Gateway",
-    "description": "API for managing collections, nodes, and workflows in quiva.ai Hub",
+    "title": "Qiva Hub API",
+    "x-gateway-name": "API Gateway",
+    "description": "API for managing collections, nodes, agents, and workflows in quiva.ai Hub",
     "version": "0.1.0",
     "contact": {
       "name": "quiva.ai Support"
