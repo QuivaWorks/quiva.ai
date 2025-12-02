@@ -40,7 +40,8 @@
                         "name": "page_size",
                         "in": "query",
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "default": 100
                         },
                         "description": "Number of items per page"
                     },
@@ -4343,7 +4344,7 @@
             "DownloadProductType": {
                 "properties": {
                     "collection_subject": {
-                        "description": "Target collection to download into",
+                        "description": "Target collection to download into. Required only for flow and node products.",
                         "type": "string"
                     },
                     "product_id": {
@@ -4379,23 +4380,8 @@
                     }
                 },
                 "required": [
-                    "product_id",
-                    "collection_subject"
+                    "product_id"
                 ],
-                "type": "object"
-            },
-            "ErrorResponse": {
-                "properties": {
-                    "error": {
-                        "type": "string"
-                    },
-                    "message": {
-                        "type": "string"
-                    },
-                    "status_code": {
-                        "type": "integer"
-                    }
-                },
                 "type": "object"
             },
             "GenerateMCPRequest": {
