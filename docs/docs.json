@@ -193,12 +193,6 @@
             }
           },
           {
-            "group": "Compute",
-            "openapi": {
-              "source": "api-reference/endpoint/compute/openapi.json"
-            }
-          },
-          {
             "group": "Storage",
             "openapi": {
               "source": "api-reference/endpoint/storage/openapi.json"
