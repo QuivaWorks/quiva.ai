@@ -14,7 +14,8 @@ View your current plan and resource usage:
 
 1. Navigate to **Account Management → Billing and Plans**
 2. See your current plan details including:
-   - Plan name and pricing
+   - Plan name and per-user pricing
+   - Number of active users
    - Billing cycle (monthly or annual)
    - Next billing date
    - Current usage vs. limits
@@ -26,30 +27,43 @@ Your usage is tracked in real-time. Monitor your consumption to avoid hitting pl
 ### Understanding Your Limits
 
 <CardGroup cols={2}>
-  <Card title="Flows" icon="arrows-rotate">
-    Number of workflow executions per month
+  <Card title="Credits" icon="coins">
+    AI operations consumed per request
     
-    [What counts as a flow? →](/get-started/plans-and-pricing#flows)
+    Refreshes monthly, purchase additional credits anytime
+    
+    [What are credits? →](/get-started/plans-and-pricing#credits)
   </Card>
   
   <Card title="Storage" icon="database">
-    Total data stored for agents, flows, and history
-  </Card>
-  
-  <Card title="Agents" icon="robot">
-    Number of AI agents you can create
-  </Card>
-  
-  <Card title="Compute Hours" icon="microchip">
-    Processing power for workflow executions
+    Total data stored per user for agents, flows, and history
     
-    [About compute hours →](/get-started/plans-and-pricing#compute-hours)
+    Scales with your team size
+  </Card>
+  
+  <Card title="Users" icon="users">
+    Number of active users in your account
+    
+    Free plan: Max 3 users
+    Paid plans: Unlimited users
+  </Card>
+  
+  <Card title="Message Retention" icon="clock">
+    How long conversation history is preserved
+    
+    Free: 30 days | Pro: 1 year | Team: Unlimited
   </Card>
   
   <Card title="Concurrent Executions" icon="layer-group">
-    How many flows can run simultaneously
+    How many operations can run simultaneously
     
-    [About concurrency →](/get-started/plans-and-pricing#concurrent-executions)
+    [About concurrency →](/get-started/plans-and-pricing#concurrent-executions-rate-limits)
+  </Card>
+  
+  <Card title="Rate Limits" icon="gauge">
+    Requests per minute your account can process
+    
+    Scales with plan tier
   </Card>
 </CardGroup>
 
@@ -69,7 +83,7 @@ Upgrade at any time for immediate access to higher limits:
   </Step>
   
   <Step title="Select Plan">
-    Choose from Starter, Pro, Team, or Enterprise
+    Choose from Pro, Team, or Enterprise
     
     [Compare plans →](/get-started/plans-and-pricing)
   </Step>
@@ -84,6 +98,7 @@ Upgrade at any time for immediate access to higher limits:
 - You're charged a prorated amount for the current billing period
 - Your billing cycle remains the same
 - All existing resources and data are preserved
+- All users gain access to new plan features
 
 ### Downgrading Your Plan
 
@@ -114,7 +129,7 @@ Downgrades take effect at the end of your current billing period:
 - If over new limits, some functionality may be restricted
 
 <Warning>
-**Before downgrading:** Ensure your current usage fits within the new plan limits. If you exceed limits after downgrading, flows may be queued or overage charges may apply.
+**Before downgrading:** Ensure your current usage fits within the new plan limits. If you have more than 3 users, you cannot downgrade to the Free plan until you reduce your user count.
 </Warning>
 
 ### Switching Between Monthly and Annual
@@ -123,14 +138,14 @@ Save 20% by switching to annual billing:
 
 **Monthly to Annual:**
 - Switch takes effect immediately
-- You're charged for the full year upfront
+- You're charged for the full year upfront based on current user count
 - 20% discount applied automatically
 - Billing cycle changes to annual
 
-**Example savings:**
-- Starter: \$300/year → \$240/year (save \$60)
-- Pro: \$1,500/year → \$1,200/year (save \$300)
-- Team: \$7,500/year → \$6,000/year (save \$1,500)
+**Example savings with 10 users:**
+- Pro Monthly: $19/user × 10 users = $190/month × 12 = $2,280/year
+- Pro Annual: $15/user × 10 users = $150/month × 12 = $1,800/year
+- **Save $480/year (20%)**
 
 **Annual to Monthly:**
 - Change takes effect at the end of your annual period
@@ -188,7 +203,8 @@ Access all past invoices:
 
 Each invoice includes:
 - Invoice date and number
-- Plan and billing period
+- Plan tier and billing period
+- Number of users and per-user rate
 - Itemized charges (base plan, overages, add-ons)
 - Total amount charged
 
@@ -196,7 +212,7 @@ Each invoice includes:
 
 <Steps>
   <Step title="Access Billing History">
-    Go to the Billing and Plans section, click on the "Billing" menu item and you will be redirected to a stripe page to manage your subscrption.
+    Go to the Billing and Plans section, click on the "Billing" menu item and you will be redirected to a Stripe page to manage your subscription.
   </Step>
   
   <Step title="Select Invoice">
@@ -219,45 +235,71 @@ Need invoices sent to multiple email addresses? Contact support to add additiona
 <Tabs>
   <Tab title="Monthly Billing">
     **Pricing:**
-    - Starter: \$25/month
-    - Pro: \$125/month
-    - Team: \$625/month
+    - Pro: $19/user/month
+    - Team: $39/user/month
     
     **Details:**
     - Charged on the same day each month
     - Based on your signup or upgrade date
     - Usage resets on billing date
-    - Example: Signed up Jan 15 → billed on 15th of each month
+    - User count determines total monthly charge
+    - Example: Signed up Jan 15 with 10 users → billed on 15th of each month for current user count
   </Tab>
   
   <Tab title="Annual Billing (Save 20%)">
     **Pricing:**
-    - Starter: \$20/month (\$240/year)
-    - Pro: \$100/month (\$1,200/year)
-    - Team: \$500/month (\$6,000/year)
+    - Pro: $15/user/month ($180/user/year)
+    - Team: $31/user/month ($372/user/year)
     
     **Details:**
     - Charged once per year upfront
     - Save 20% compared to monthly billing
-    - Usage limits are monthly (still reset monthly)
-    - Example: Signed up Jan 15 → next charge Jan 15 next year
+    - Billed based on current user count
+    - User additions/removals prorated throughout the year
+    - Example: Signed up Jan 15 with 10 users → next charge Jan 15 next year
   </Tab>
 </Tabs>
 
-### Prorated Charges
+### Per-User Pricing
 
-When you upgrade mid-cycle, you're charged a prorated amount:
+Your bill is calculated based on the number of active users in your account:
 
 **How it works:**
-1. Credit for unused time on old plan
-2. Charge for remaining time on new plan
+- Each user has their own allocation of credits and storage
+- Total bill = (number of users) × (per-user rate)
+- Add users anytime - charges are prorated
+- Remove users anytime - credits applied at next billing
+
+**Example (Pro Plan, Monthly):**
+- 5 users × $19/user = $95/month
+- Add 3 users mid-cycle → prorated charge for remaining days
+- Total at next billing: 8 users × $19/user = $152/month
+
+**Free Plan:**
+- Maximum 3 users
+- No per-user charges
+- 500 credits shared across all users
+
+### Prorated Charges
+
+When you make changes mid-cycle, charges are prorated:
+
+**How it works:**
+1. Credit for unused time on old plan/user count
+2. Charge for remaining time on new plan/user count
 3. Net difference is charged immediately
 
-**Example:**
-- Current plan: Starter (\$20/month annual billing)
-- Upgrade on day 15 of 30-day cycle
-- New plan: Pro (\$100/month annual billing)
-- Prorated charge ≈ \$40 (half the difference for remaining days)
+**Example - Plan Upgrade:**
+- Current: Pro plan with 5 users ($19/user = $95/month)
+- Upgrade on day 15 of 30-day cycle to Team plan
+- New rate: $39/user × 5 users = $195/month
+- Prorated charge ≈ $50 (half the difference for remaining days)
+
+**Example - Adding Users:**
+- Current: Pro plan with 10 users ($19/user = $190/month)
+- Add 5 users on day 10 of 30-day cycle
+- Prorated charge for 5 users for 20 remaining days ≈ $63
+- Next full billing: 15 users × $19/user = $285/month
 
 ### What You're Charged For
 
@@ -265,35 +307,56 @@ Your bill includes:
 
 <AccordionGroup>
   <Accordion title="Base Plan Price" icon="tag">
-    Monthly or annual subscription fee for your chosen plan:
+    Per-user subscription fee for your chosen plan:
     
     **Monthly:**
-    - Starter: \$25/month
-    - Pro: \$125/month
-    - Team: \$625/month
+    - Pro: $19/user/month
+    - Team: $39/user/month
     
     **Annual (20% off):**
-    - Starter: \$20/month (\$240/year)
-    - Pro: \$100/month (\$1,200/year)
-    - Team: \$500/month (\$6,000/year)
+    - Pro: $15/user/month ($180/user/year)
+    - Team: $31/user/month ($372/user/year)
     
-    Free plan is always $0.
+    Free plan is always $0 (max 3 users).
+    
+    Your total monthly charge = (number of active users) × (per-user rate)
   </Accordion>
   
-  <Accordion title="Overage Charges" icon="chart-line">
-    **On Paid Plans only** (Starter, Pro, Team):
+  <Accordion title="Additional Credits" icon="coins">
+    **On Pro & Team Plans:**
     
-    If you exceed your plan's included resources:
-    - **Storage:** \$1 per GB per month
-    - **Compute Hours:** \$3 per compute hour
+    Each user receives included credits monthly:
+    - Pro: 1,000 credits/user/month
+    - Team: 1,500 credits/user/month
+    
+    Purchase additional credits anytime:
+    - Pro: $8 per 1,000 credits
+    - Team: $7 per 1,000 credits
+    
+    Purchased credits never expire and roll over to the next month.
     
     **On Free Plan:**
+    - 500 credits total per account (shared across all users)
+    - Cannot purchase additional credits
+    - Must upgrade to continue when depleted
+    
+    [What are credits? →](/get-started/plans-and-pricing#credits)
+  </Accordion>
+  
+  <Accordion title="Storage Overage Charges" icon="database">
+    **On Paid Plans only:**
+    
+    Each user receives included storage:
+    - Pro: 5GB/user
+    - Team: 25GB/user
+    
+    If you exceed your per-user allocation:
+    - Overage charges: **$1 per GB per month per user**
+    
+    **On Free Plan:**
+    - 1GB total account storage
     - No overage charges available
-    - Must upgrade to continue when limits are reached
-    
-    We notify you as you approach limits so you can upgrade before incurring overages.
-    
-    [What happens at limits →](/get-started/plans-and-pricing#what-happens-at-plan-limits)
+    - Must upgrade to continue when limit is reached
   </Accordion>
   
   <Accordion title="Premium Marketplace Items" icon="store">
@@ -323,50 +386,78 @@ Your bill includes:
 Different limits have different behaviors:
 
 <Tabs>
-  <Tab title="Flows Exceeded">
+  <Tab title="Credits Exceeded">
     **On Free Plan:**
-    - You must upgrade to continue running flows
-    - Flows are not queued or saved
+    - You must upgrade to continue using AI features
+    - 500 credits shared across all users (max 3)
     
     **On Paid Plans:**
-    - Additional flows are added to an error queue
-    - Queued flows can be replayed next month when limits reset
-    - Or upgrade immediately to process queued flows
+    - Each user gets monthly credits (Pro: 1,000/user, Team: 1,500/user)
+    - Purchase additional credits at discounted rates
+    - Purchased credits never expire and roll over
+    - Or upgrade to Team for more included credits and lower purchase price
     
-    No additional charges for exceeding flow limits.
+    No workflows are queued for credit limits - you must purchase credits or upgrade to continue.
   </Tab>
   
   <Tab title="Storage Exceeded">
     **On Free Plan:**
+    - 1GB total account storage
     - You must upgrade to continue adding data
     
     **On Paid Plans:**
-    - Overage charges apply: **$1 per GB per month**
-    - Upgrade to a higher plan for better value at scale
+    - Storage scales per user (Pro: 5GB/user, Team: 25GB/user)
+    - Overage charges apply: **$1 per GB per month per user**
+    - Or upgrade to a higher plan for more storage per user
   </Tab>
   
-  <Tab title="Compute Hours Exceeded">
+  <Tab title="User Limit Exceeded">
     **On Free Plan:**
-    - You must upgrade to continue running compute-intensive workflows
+    - Maximum 3 users allowed
+    - Cannot add additional users without upgrading
     
     **On Paid Plans:**
-    - Overage charges apply: **$3 per compute hour**
-    - Upgrade to a higher plan for better value at scale
+    - Unlimited users
+    - Billing automatically adjusts based on user count
+    - Each additional user increases monthly bill by per-user rate
   </Tab>
   
   <Tab title="Concurrent Executions Exceeded">
-    **Request/Response Flows:**
+    **All Plans:**
+    
+    **Request/Response Workflows:**
     - Return a 429 rate limit error
     - Retry after a brief delay
     
-    **Async Flows:**
+    **Async Workflows:**
     - Automatically queued
     - Processed when capacity becomes available
+    
+    **Concurrency Limits:**
+    - Free: 2 concurrent executions
+    - Pro: 20 concurrent executions
+    - Team: 50 concurrent executions
+    - Enterprise: Custom
     
     **Solution:**
     Upgrade to a plan with higher concurrency for peak workloads.
     
     No overage charges for concurrency limits.
+  </Tab>
+  
+  <Tab title="Rate Limits Exceeded">
+    **Requests per Minute:**
+    - Free: 10 requests/minute
+    - Pro: 100 requests/minute
+    - Team: 300 requests/minute
+    - Enterprise: Custom
+    
+    **When exceeded:**
+    - Requests return 429 rate limit error
+    - Implement exponential backoff in your integrations
+    - Or upgrade for higher throughput
+    
+    No overage charges for rate limits.
   </Tab>
 </Tabs>
 
@@ -374,12 +465,69 @@ Different limits have different behaviors:
 Monitor your usage in the billing dashboard to avoid unexpected charges or service interruptions.
 </Info>
 
+## Managing Users
+
+### Adding Users
+
+<Steps>
+  <Step title="Navigate to User Management">
+    Go to **Account Management → Users**
+  </Step>
+  
+  <Step title="Invite User">
+    Click "Invite User" and enter email address
+  </Step>
+  
+  <Step title="Assign Role">
+    Choose appropriate role and permissions
+  </Step>
+  
+  <Step title="Send Invitation">
+    User receives email invitation to join
+  </Step>
+</Steps>
+
+**Billing Impact:**
+- **Free Plan:** Can add up to 3 users total (no additional charge)
+- **Paid Plans:** Each additional user increases your bill by the per-user rate
+- Prorated charges apply for mid-cycle additions
+
+**Example (Pro Plan, Monthly):**
+- Current: 10 users × $19/user = $190/month
+- Add 2 users mid-cycle → prorated charge for remaining days
+- Next billing: 12 users × $19/user = $228/month
+
+### Removing Users
+
+<Steps>
+  <Step title="Navigate to User Management">
+    Go to **Account Management → Users**
+  </Step>
+  
+  <Step title="Select User">
+    Find the user you want to remove
+  </Step>
+  
+  <Step title="Remove User">
+    Click "Remove" or "Deactivate"
+  </Step>
+  
+  <Step title="Confirm">
+    Confirm the removal
+  </Step>
+</Steps>
+
+**Billing Impact:**
+- Credits are applied at your next billing cycle
+- No immediate refund for mid-cycle removals
+- Next billing reflects reduced user count
+
 ## Managing Subscriptions
 
 ### Cancelling Your Subscription
 
 <Warning>
-Cancelling converts your account to the Free plan at the end of your billing period. Your data is retained but access may be limited based on Free plan limits.
+Cancelling converts your account to the Free plan at the end of your billing period. Your data is retained but access may be limited based on Free plan limits (max 3 users, 500 total credits, 1GB storage).
 </Warning>
 
 To cancel your subscription:
@@ -402,11 +550,12 @@ To cancel your subscription:
 - Subscription continues until end of current billing period
 - No further charges after current period
 - Account converts to Free plan with these limits:
-  - 3 agents (Discovery Agent included)
-  - 200 flows/month
-  - 1GB storage
-  - 1 compute hour/month
-  - 5 concurrent executions
+  - Maximum 3 users (remove additional users before cancellation takes effect)
+  - 500 credits total per account
+  - 1GB account storage
+  - 30 days message retention
+  - 2 concurrent executions
+  - 10 requests/minute
 - Resources exceeding Free limits may be restricted
 - Data is retained (not deleted)
 
@@ -420,7 +569,7 @@ Reactivate at any time:
 
 1. Navigate to **Account Management → Billing and Plans**
 2. Click "Upgrade" or "Reactivate"
-3. Select your plan (Starter, Pro, or Team)
+3. Select your plan (Pro or Team)
 4. Choose monthly or annual billing
 5. Enter payment information
 6. Subscription reactivates immediately
@@ -444,14 +593,16 @@ Reactivate at any time:
   
   <Accordion title="Unexpected charge">
     **Check these items:**
+    - Did you add users mid-cycle? (prorated charges)
     - Did you upgrade mid-cycle? (prorated charges)
     - Annual renewal? (charged once per year)
-    - Overage charges for storage or compute hours?
+    - Storage overage charges?
+    - Additional credit purchases?
     - Premium marketplace items purchased?
     - Team member made changes?
     
     **Review your invoice:**
-    - All charges are itemized
+    - All charges are itemized by user count and usage
     - Check billing history for details
     
     **If still unclear:**
@@ -460,19 +611,42 @@ Reactivate at any time:
   
   <Accordion title="Understanding overage charges">
     **How overages work:**
-    - Only on paid plans (Starter, Pro, Team)
+    - Only on paid plans (Pro, Team)
     - Charged only for what you use beyond your plan
-    - Storage: \$1/GB/month
-    - Compute: \$3/hour
+    - Storage: $1/GB/month per user beyond included storage
     
-    **Avoiding overages:**
+    **Credits:**
+    - Not considered "overage"
+    - Purchase additional credits at your plan's rate as needed
+    - Pro: $8/1,000 credits
+    - Team: $7/1,000 credits
+    
+    **Avoiding storage overages:**
     - Monitor usage in billing dashboard
     - Set up usage alerts
-    - Upgrade to a plan with higher limits for better value
+    - Upgrade to a plan with higher per-user storage
+    - Remove unused data or users
     
     **On Free plan:**
     - No overage charges
     - Must upgrade when limits reached
+  </Accordion>
+  
+  <Accordion title="Per-user billing questions">
+    **How is my bill calculated?**
+    - Total bill = (number of active users) × (per-user rate)
+    - Each user gets their own allocation of credits and storage
+    
+    **What counts as an active user?**
+    - Any user with access to your account
+    - Includes all roles (Root, Admin, Billing, Developer, Monitor)
+    - Free plan: Maximum 3 users
+    - Paid plans: Unlimited users
+    
+    **How do user changes affect billing?**
+    - Adding users: Prorated charge for remainder of billing period
+    - Removing users: Credit applied at next billing cycle
+    - All changes reflected in next invoice
   </Accordion>
   
   <Accordion title="Can't access billing">
@@ -509,7 +683,7 @@ Reactivate at any time:
 
 ## Enterprise Billing
 
-Enterprise plans start at $2,000 and offer custom billing options:
+Enterprise plans start at $100/user/month and offer custom billing options:
 
 <CardGroup cols={2}>
   <Card title="Custom Terms" icon="file-contract">
@@ -528,12 +702,12 @@ Enterprise plans start at $2,000 and offer custom billing options:
     Commit to annual with custom pricing
   </Card>
   
-  <Card title="Custom Resources" icon="sliders">
-    Tailored allocations for agents, flows, storage, and compute
+  <Card title="Volume Discounts" icon="percent">
+    Savings for larger teams and longer commitments
   </Card>
   
-  <Card title="Regional Deployment" icon="globe">
-    Choose data processing regions (EU, US, Australia)
+  <Card title="Custom Resources" icon="sliders">
+    Tailored allocations for users, credits, storage, and compute
   </Card>
 </CardGroup>
 
@@ -566,18 +740,18 @@ Invoices automatically include all applicable tax information for your records.
 
 ## Plan Comparison Quick Reference
 
-| Plan | Monthly | Annual | Agents | Flows/Month | Storage | Compute/Month |
-|------|---------|--------|--------|-------------|---------|---------------|
-| **Free** | $0 | $0 | 3 | 200 | 1GB | 1 hour |
-| **Starter** | $25 | \$20 (\$240/year) | 10 | 2,500 | 5GB | 10 hours |
-| **Pro** | $125 | \$100 (\$1,200/year) | 50 | 10,000 | 25GB | 50 hours |
-| **Team** | $625 | \$500 (\$6,000/year) | Unlimited | 40,000 | 125GB | 250 hours |
-| **Enterprise** | Custom (from \$2,000) | Custom | Custom | Custom | Custom | Custom |
+| Plan | Monthly | Annual (20% off) | Max Users | Credits/User | Storage/User | Retention |
+|------|---------|------------------|-----------|--------------|--------------|-----------|
+| **Free** | $0 | $0 | 3 | 500 total | 1GB total | 30 days |
+| **Pro** | $19/user | $15/user ($180/year) | Unlimited | 1,000/month | 5GB | 1 year |
+| **Team** | $39/user | $31/user ($372/year) | Unlimited | 1,500/month | 25GB | Unlimited |
+| **Enterprise** | Custom (from $100/user) | Custom | Unlimited | Custom | Custom | Custom |
 
-**All plans include:**
-- Unlimited users
-- Premium marketplace access (paid plans)
-- $10 Gemini credits (paid plans)
+**Additional features:**
+- **Free:** Community support
+- **Pro:** Email support, purchase credits at $8/1K
+- **Team:** Priority email support, purchase credits at $7/1K, bring your own LLM keys
+- **Enterprise:** Dedicated support, SLA, white-label, on-premise, custom regions
 
 [See full comparison →](/get-started/plans-and-pricing)
 
