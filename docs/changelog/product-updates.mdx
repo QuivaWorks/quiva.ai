@@ -4,76 +4,251 @@ description: "Updates, improvements and bug fixes"
 ---
 <Update label="February 2026" description="v1.0.5" tags={["Image", "UI", "Integrations", "Models"]}>
 # QuivaWorks v1.0.5 Release Notes
+
 <Note>
 **Release Date:** February 6, 2026  
 **Version:** v1.0.5  
 **Release Type:** Patch Release  
 </Note>
+
 ## Overview
-This patch release focuses on enhancing your Assistant experience with improved session persistence, expanded marketplace capabilities, better mobile support, and more reliable integrations. We've streamlined the assistant marketplace with new project management and research tools, improved your ability to maintain conversations across sessions, and made critical improvements to authentication and integration management.
-## ✨ New Features & Enhancements
-### Assistant Session Persistence ⭐ **Major Enhancement**
-Your Assistant conversations are now automatically saved and can be restored anytime:
-- ✅ **Resume Conversations** - Close the app and come back later to continue exactly where you left off
-- ✅ **Multiple Chat Tabs** - Keep multiple conversations with the same Assistant open simultaneously and switch between them
-- ✅ **Recent Sessions** - Quick access to your recently used chats without scrolling through history
-- ✅ **Automatic Prompt Saving** - Your input is automatically saved, so you won't lose what you were typing
-- ✅ **Works Across Devices** - Your sessions sync to the backend, so you can access them from any device
-- ✅ **Mobile-Optimized** - Responsive design ensures session management works smoothly on phones and tablets
-### New Assistants in the Marketplace 🤖
-We've expanded the marketplace with powerful new assistants to help you manage projects, track research, and stay informed:
-- ✅ **GitHub Release Manager** - Automate your release process with semantic versioning, commit analysis, and professional release notes generation
-- ✅ **GitHub Issues Manager** - Streamline issue tracking, prioritization, and workflow management directly from QuivaWorks
-- ✅ **Incident Report Manager** - Document, track, and manage incident reports with structured workflows and team collaboration
-- ✅ **Company News Tracker** - Research companies of interest with automated news aggregation for portfolio tracking, reputation management, and competitive intelligence
-**Easier Downloads:** The experience of downloading assistants into your account has been improved, making them ready to use immediately without additional configuration.
-### Mobile View Enhancements 📱
-The mobile experience has been significantly improved with better navigation, responsive layouts, and iOS-specific fixes:
-- ✅ **Collapsible Sidebar** - The sidebar now intelligently collapses on mobile devices, giving you more screen space for your conversations. Tap the hamburger menu to reveal it
-- ✅ **Improved Touch Interaction** - Fixed font sizing and keyboard behavior to prevent unwanted zoom on iOS devices, making typing smoother and more natural
-- ✅ **Responsive Tab Management** - Chat tabs now display as a dropdown menu on mobile instead of a horizontal list, saving precious screen space
-- ✅ **Better Tool Output Display** - Large tool outputs (like JSON data or tables) are now collapsible with "Show More/Less" buttons, keeping conversations clean and readable
-- ✅ **Optimized Prompt Input** - The message input area now expands properly on all mobile devices, giving you more room to type longer messages
-- ✅ **Cleaner Navigation** - The main navigation now clearly labels "Chat" and includes a "New Chat" button for quick access to starting fresh conversations
-- ✅ **Dynamic Viewport Handling** - Fixed iOS-specific issues with viewport height and body positioning to ensure the interface adapts properly when the keyboard appears
-- ✅ **Icon-Only Headers** - Text labels are hidden on mobile to maximize space, with icons providing clear visual cues for each action
-### Vision Tool Improvements
-The vision tool now includes intelligent content type validation to ensure you're using the right tool for the right file type:
-- ✅ **Better Error Messages** - If you accidentally try to analyze a PDF, Word document, or spreadsheet with the vision tool, you'll now get a helpful message suggesting you use the knowledge search tool instead
-- ✅ **Faster Analysis** - The system now validates file types before processing, preventing wasted time on unsupported formats
-- ✅ **Memory Optimization** - Fixed a memory leak in the vision cache that could cause performance degradation over time
-### Integration & OAuth Improvements 🔗
-Integrations are now more reliable and easier to manage with improved authentication configuration and connection management:
-#### OAuth Connection Management
-- ✅ **Edit Redirect URLs** - You can now modify the redirect URL field when configuring OAuth integrations, giving you more flexibility in setting up third-party connections
-- ✅ **Delete Integrations Reliably** - Fixed critical bugs that were preventing users from successfully deleting OAuth connections. You can now cleanly remove integrations from your account
-- ✅ **Delete Confirmation Warning** - When deleting an integration connection that multiple Assistants are using, you'll now see a warning: "If other assistants are using this connection, they will no longer be able to use it and will need to be updated." This prevents accidental disruption to your workflows
-#### Better Integration Discovery
-- ✅ **Visible Auth URLs** - Integration authentication URLs (auth_url and token_url) are now displayed in your account settings when available, making it easier to understand what's required for setup
-- ✅ **Cleaner Connection Cards** - Integration connections now display with an "Active" indicator badge and icon-based controls, making it immediately clear which integrations are connected and working
-#### Improved Integration Stability
-- ✅ **Flexible Authentication Types** - The system now supports a wider range of authentication methods (API Key, Basic Auth, Bearer Token, OAuth) with better detection and handling
-- ✅ **Better Error Handling** - Fixed underlying issues with connection deletion and authentication configuration that were causing integration failures
-- ✅ **Personal vs. Shared Connections** - Clear distinction between personal integrations (only you can use) and shared integrations (your entire team can use)
+
+We're excited to announce **QuivaWorks v1.0.5**, a focused patch release that enhances your Assistant experience with improved session persistence, expanded marketplace capabilities, better mobile support, and more reliable integrations. This release includes 40+ improvements spanning Assistant sessions, marketplace assistants, mobile optimization, and integration management.
+
+<Tip>
+Support has been removed for OpenAI and Gemini models due to performance. Upgrading configuration is required for existing assistants using these models.
+</Tip>
+
+---
+
+## 🎯 Key Highlights
+
+### Assistant Session Persistence
+Your Assistant conversations are now automatically saved and can be restored anytime. Resume conversations across devices, manage multiple chat tabs simultaneously, and never lose your work.
+
+### Expanded Marketplace
+New project management and research assistants join the marketplace, including GitHub Release Manager, Issues Manager, Incident Report Manager, and Company News Tracker.
+
+### Mobile-First Enhancements
+Significantly improved mobile experience with collapsible sidebars, responsive layouts, better touch interactions, and iOS-specific fixes for a seamless experience on any device.
+
+### Reliable Integrations
+OAuth connection management has been overhauled with the ability to edit redirect URLs, reliably delete integrations, and better authentication handling across all connection types.
+
+---
+
+## ✨ What's New
+
+### Assistant Sessions
+- **Resume Conversations** - Close the app and continue exactly where you left off
+- **Multiple Chat Tabs** - Keep multiple conversations with the same Assistant open simultaneously
+- **Recent Sessions** - Quick access to recently used chats without scrolling
+- **Automatic Prompt Saving** - Never lose what you're typing
+- **Cross-Device Sync** - Sessions sync to the backend for access from any device
+
+### Marketplace Assistants
+- **GitHub Release Manager** - Automate releases with semantic versioning and commit analysis
+- **GitHub Issues Manager** - Streamline issue tracking and workflow management
+- **Incident Report Manager** - Document and track incidents with structured workflows
+- **Company News Tracker** - Research companies with automated news aggregation
+- **Improved Downloads** - Assistants are ready to use immediately after download
+
+### Mobile Experience
+- **Collapsible Sidebar** - Intelligent sidebar collapse on mobile for more screen space
+- **Improved Touch Interaction** - Fixed iOS font sizing and keyboard behavior
+- **Responsive Tab Management** - Chat tabs display as dropdown menu on mobile
+- **Better Tool Output Display** - Collapsible large outputs keep conversations clean
+- **Optimized Prompt Input** - Message input area expands properly on all devices
+- **Cleaner Navigation** - Clear labels and "New Chat" button for quick access
+- **Dynamic Viewport Handling** - Fixed iOS viewport and keyboard issues
+- **Icon-Only Headers** - Maximized space with visual cues on mobile
+
+### Vision Tool
+- **Content Type Validation** - Intelligent validation ensures you use the right tool
+- **Better Error Messages** - Helpful suggestions when analyzing unsupported formats
+- **Memory Optimization** - Fixed vision cache memory leak
+
+### Integration Management
+- **Edit Redirect URLs** - Modify OAuth redirect URLs for flexible configuration
+- **Delete Integrations Reliably** - Fixed critical bugs preventing connection deletion
+- **Delete Confirmation Warning** - Warns when removing connections used by multiple Assistants
+- **Visible Auth URLs** - Authentication URLs displayed in account settings
+- **Cleaner Connection Cards** - Active indicators and icon-based controls
+- **Flexible Authentication Types** - Support for API Key, Basic Auth, Bearer Token, OAuth
+- **Better Error Handling** - Improved stability in connection management
+- **Personal vs. Shared Connections** - Clear distinction between connection types
+
+---
+
 ## ⚠️ Breaking Changes
-### Claude Models Only
-We've streamlined our LLM provider support to focus on Claude models, which provide the best performance and reliability for QuivaWorks:
-- **OpenAI and Gemini models have been removed** - If you're currently using OpenAI or Gemini models with your assistants, you'll need to reconfigure them to use Claude models
-- **Action Required:** Update any assistants that were using OpenAI or Gemini to use Claude (Claude 3.5 Sonnet is recommended for best performance)
-- **Why:** This change allows us to optimize the platform specifically for Claude's capabilities and provide better performance, reliability, and cost efficiency
-### Deprecated Gemini Embedding Model
-- **Gemini embeddings have been removed** - If you're using Gemini for knowledge base embeddings, please migrate to an alternative embedding provider before upgrading
-- **Supported alternatives:** Claude embeddings or other configured providers
-## 🐛 Bug Fixes & Stability Improvements
-- ✅ **Credit Usage Tracking** - Fixed accuracy of credit usage reporting to ensure billing reflects actual usage
-- ✅ **Knowledge File Naming** - Resolved conflicts with knowledge file naming that could cause retrieval issues
-- ✅ **Cross-Account Search** - Improved search functionality when working with multiple accounts
-- ✅ **Secret Key Creation** - Fixed issues preventing proper creation of secret keys for API authentication
-- ✅ **API Key Validation** - Enhanced validation of API keys to prevent invalid configurations
-- ✅ **Indexer Improvements** - Fixed underlying indexing issues that could affect knowledge retrieval performance
-- ✅ **Assistant Download** - Fixed bugs preventing successful download of assistants from the marketplace
+
+### Streamlined LLM Provider Support
+
+We've focused our platform on Claude models for optimal performance and reliability:
+
+- **OpenAI and Gemini models have been removed**
+- **Action Required:** Reconfigure assistants using OpenAI or Gemini to use Claude models
+- **Recommended:** Claude 3.5 Sonnet for best performance
+- **Why:** Enables platform optimization for Claude's capabilities with better performance, reliability, and cost efficiency
+
+### Deprecated Gemini Embeddings
+
+- **Gemini embeddings have been removed**
+- **Action Required:** Migrate to Claude embeddings or other configured providers before upgrading
+- **Impact:** Affects knowledge base embedding configurations only
+
+---
+
+## 🛠️ Technical Improvements
+
+<AccordionGroup>
+  <Accordion title="Credit & Usage Tracking">
+    Fixed accuracy of credit usage reporting to ensure billing reflects actual usage with improved validation.
+  </Accordion>
+  
+  <Accordion title="Knowledge Management">
+    Resolved conflicts with knowledge file naming and improved cross-account search functionality for better retrieval performance.
+  </Accordion>
+  
+  <Accordion title="API & Authentication">
+    Enhanced validation of API keys, fixed secret key creation issues, and improved authentication configuration handling.
+  </Accordion>
+  
+  <Accordion title="Performance & Stability">
+    Fixed indexing issues affecting knowledge retrieval and resolved assistant download bugs for improved platform reliability.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## ✅ What This Means For You
+
+<CardGroup cols={2}>
+  <Card
+    title="Seamless Sessions"
+    icon="clock-rotate-left"
+    color="#16a34a"
+  >
+    Never lose your work. Resume conversations anytime, anywhere, across all your devices.
+  </Card>
+  
+  <Card
+    title="Mobile Excellence"
+    icon="mobile"
+    color="#2563eb"
+  >
+    Native mobile experience with responsive design and iOS-specific optimizations.
+  </Card>
+  
+  <Card
+    title="Reliable Integrations"
+    icon="link"
+    color="#f59e0b"
+  >
+    Manage OAuth connections with confidence using improved authentication tools.
+  </Card>
+  
+  <Card
+    title="More Assistants"
+    icon="robot"
+    color="#8b5cf6"
+  >
+    New marketplace assistants for project management and research workflows.
+  </Card>
+</CardGroup>
+
+---
+
+## 🚀 Getting Started with v1.0.5
+
+Your instance will be automatically updated to v1.0.5. Here's what you should know:
+
+### For Existing Users
+
+1. **Update Assistant Models** - If using OpenAI or Gemini, reconfigure to Claude models
+2. **Explore New Features** - Try session persistence and mobile improvements
+3. **Review Integrations** - Check OAuth connections with new management tools
+4. **Migrate Embeddings** - If using Gemini embeddings, migrate to supported providers
+
+### For New Users
+
+1. **Browse Marketplace** - Deploy new project management and research assistants
+2. **Mobile Experience** - Enjoy optimized mobile interface on any device
+3. **Configure Integrations** - Use improved OAuth tools for third-party connections
+4. **Multi-Session Workflow** - Open multiple tabs to work on different tasks simultaneously
+
+<Tip>
+Visit the marketplace to explore the new GitHub and incident management assistants. These tools can significantly streamline your workflow automation.
+</Tip>
+
+---
+
+## 🔄 Backward Compatibility
+
+✅ **Backward Compatible** (with model migration)
+
+- All existing Assistants continue to work after model reconfiguration
+- No API changes required
+- Previous configurations remain valid (except deprecated models)
+- Full support for existing integrations
+
+---
+
+## 📞 Support & Feedback
+
+Have questions about v1.0.5? We'd love to hear from you!
+
+<CardGroup cols={2}>
+  <Card
+    title="Documentation"
+    icon="book"
+    href="https://docs.quiva.ai"
+  >
+    Explore our comprehensive documentation for guides and tutorials.
+  </Card>
+  
+  <Card
+    title="Community"
+    icon="users"
+    href="https://community.quiva.ai"
+  >
+    Join our community to discuss features and share best practices.
+  </Card>
+  
+  <Card
+    title="Contact Support"
+    icon="envelope"
+    mailto="hello@quiva.ai"
+  >
+    Need help? Reach out to our support team.
+  </Card>
+  
+  <Card
+    title="Feature Requests"
+    icon="lightbulb"
+    mailto="hello@quiva.ai"
+  >
+    Share your ideas for future QuivaWorks improvements.
+  </Card>
+</CardGroup>
+
+---
+
+## 🙏 Thank You
+
+Thank you to everyone who contributed to QuivaWorks v1.0.5. Your feedback and contributions help us continuously improve the platform.
+
+**Happy building with QuivaWorks! 🎉**
+
+---
+
 ## 📚 Learn More
+
 For more details on all changes in this release, see the [full changelog](https://github.com/myevari/evari-olympus/compare/v1.0.4...v1.0.5).
+
+---
+
+*Last updated: February 6, 2026*
 </Update>
 
 
@@ -199,28 +374,28 @@ Have questions about v1.0.4? We'd love to hear from you!
   <Card
     title="Documentation"
     icon="book"
-    href="https://docs.quivaworks.io"
+    href="https://docs.quiva.ai"
   >
     Explore our comprehensive documentation for guides and tutorials.
   </Card>
   <Card
     title="Community"
     icon="users"
-    href="https://community.quivaworks.io"
+    href="https://community.quiva.ai"
   >
     Join our community to discuss features and share best practices.
   </Card>
   <Card
     title="Contact Support"
     icon="envelope"
-    href="https://support.quivaworks.io"
+    mailto="hello@quiva.ai"
   >
     Need help? Reach out to our support team.
   </Card>
   <Card
     title="Feature Requests"
     icon="lightbulb"
-    href="https://feedback.quivaworks.io"
+    mailto="hello@quiva.ai"
   >
     Share your ideas for future QuivaWorks improvements.
   </Card>
