@@ -2,8 +2,82 @@
 title: "Product Updates"
 description: "Updates, improvements and bug fixes"
 ---
+<Update label="February 2026" description="v1.0.5" tags={["Image", "UI", "Integrations", "Models"]}>
+# QuivaWorks v1.0.5 Release Notes
+<Note>
+**Release Date:** February 6, 2026  
+**Version:** v1.0.5  
+**Release Type:** Patch Release  
+</Note>
+## Overview
+This patch release focuses on enhancing your Assistant experience with improved session persistence, expanded marketplace capabilities, better mobile support, and more reliable integrations. We've streamlined the assistant marketplace with new project management and research tools, improved your ability to maintain conversations across sessions, and made critical improvements to authentication and integration management.
+## ✨ New Features & Enhancements
+### Assistant Session Persistence ⭐ **Major Enhancement**
+Your Assistant conversations are now automatically saved and can be restored anytime:
+- ✅ **Resume Conversations** - Close the app and come back later to continue exactly where you left off
+- ✅ **Multiple Chat Tabs** - Keep multiple conversations with the same Assistant open simultaneously and switch between them
+- ✅ **Recent Sessions** - Quick access to your recently used chats without scrolling through history
+- ✅ **Automatic Prompt Saving** - Your input is automatically saved, so you won't lose what you were typing
+- ✅ **Works Across Devices** - Your sessions sync to the backend, so you can access them from any device
+- ✅ **Mobile-Optimized** - Responsive design ensures session management works smoothly on phones and tablets
+### New Assistants in the Marketplace 🤖
+We've expanded the marketplace with powerful new assistants to help you manage projects, track research, and stay informed:
+- ✅ **GitHub Release Manager** - Automate your release process with semantic versioning, commit analysis, and professional release notes generation
+- ✅ **GitHub Issues Manager** - Streamline issue tracking, prioritization, and workflow management directly from QuivaWorks
+- ✅ **Incident Report Manager** - Document, track, and manage incident reports with structured workflows and team collaboration
+- ✅ **Company News Tracker** - Research companies of interest with automated news aggregation for portfolio tracking, reputation management, and competitive intelligence
+**Easier Downloads:** The experience of downloading assistants into your account has been improved, making them ready to use immediately without additional configuration.
+### Mobile View Enhancements 📱
+The mobile experience has been significantly improved with better navigation, responsive layouts, and iOS-specific fixes:
+- ✅ **Collapsible Sidebar** - The sidebar now intelligently collapses on mobile devices, giving you more screen space for your conversations. Tap the hamburger menu to reveal it
+- ✅ **Improved Touch Interaction** - Fixed font sizing and keyboard behavior to prevent unwanted zoom on iOS devices, making typing smoother and more natural
+- ✅ **Responsive Tab Management** - Chat tabs now display as a dropdown menu on mobile instead of a horizontal list, saving precious screen space
+- ✅ **Better Tool Output Display** - Large tool outputs (like JSON data or tables) are now collapsible with "Show More/Less" buttons, keeping conversations clean and readable
+- ✅ **Optimized Prompt Input** - The message input area now expands properly on all mobile devices, giving you more room to type longer messages
+- ✅ **Cleaner Navigation** - The main navigation now clearly labels "Chat" and includes a "New Chat" button for quick access to starting fresh conversations
+- ✅ **Dynamic Viewport Handling** - Fixed iOS-specific issues with viewport height and body positioning to ensure the interface adapts properly when the keyboard appears
+- ✅ **Icon-Only Headers** - Text labels are hidden on mobile to maximize space, with icons providing clear visual cues for each action
+### Vision Tool Improvements
+The vision tool now includes intelligent content type validation to ensure you're using the right tool for the right file type:
+- ✅ **Better Error Messages** - If you accidentally try to analyze a PDF, Word document, or spreadsheet with the vision tool, you'll now get a helpful message suggesting you use the knowledge search tool instead
+- ✅ **Faster Analysis** - The system now validates file types before processing, preventing wasted time on unsupported formats
+- ✅ **Memory Optimization** - Fixed a memory leak in the vision cache that could cause performance degradation over time
+### Integration & OAuth Improvements 🔗
+Integrations are now more reliable and easier to manage with improved authentication configuration and connection management:
+#### OAuth Connection Management
+- ✅ **Edit Redirect URLs** - You can now modify the redirect URL field when configuring OAuth integrations, giving you more flexibility in setting up third-party connections
+- ✅ **Delete Integrations Reliably** - Fixed critical bugs that were preventing users from successfully deleting OAuth connections. You can now cleanly remove integrations from your account
+- ✅ **Delete Confirmation Warning** - When deleting an integration connection that multiple Assistants are using, you'll now see a warning: "If other assistants are using this connection, they will no longer be able to use it and will need to be updated." This prevents accidental disruption to your workflows
+#### Better Integration Discovery
+- ✅ **Visible Auth URLs** - Integration authentication URLs (auth_url and token_url) are now displayed in your account settings when available, making it easier to understand what's required for setup
+- ✅ **Cleaner Connection Cards** - Integration connections now display with an "Active" indicator badge and icon-based controls, making it immediately clear which integrations are connected and working
+#### Improved Integration Stability
+- ✅ **Flexible Authentication Types** - The system now supports a wider range of authentication methods (API Key, Basic Auth, Bearer Token, OAuth) with better detection and handling
+- ✅ **Better Error Handling** - Fixed underlying issues with connection deletion and authentication configuration that were causing integration failures
+- ✅ **Personal vs. Shared Connections** - Clear distinction between personal integrations (only you can use) and shared integrations (your entire team can use)
+## ⚠️ Breaking Changes
+### Claude Models Only
+We've streamlined our LLM provider support to focus on Claude models, which provide the best performance and reliability for QuivaWorks:
+- **OpenAI and Gemini models have been removed** - If you're currently using OpenAI or Gemini models with your assistants, you'll need to reconfigure them to use Claude models
+- **Action Required:** Update any assistants that were using OpenAI or Gemini to use Claude (Claude 3.5 Sonnet is recommended for best performance)
+- **Why:** This change allows us to optimize the platform specifically for Claude's capabilities and provide better performance, reliability, and cost efficiency
+### Deprecated Gemini Embedding Model
+- **Gemini embeddings have been removed** - If you're using Gemini for knowledge base embeddings, please migrate to an alternative embedding provider before upgrading
+- **Supported alternatives:** Claude embeddings or other configured providers
+## 🐛 Bug Fixes & Stability Improvements
+- ✅ **Credit Usage Tracking** - Fixed accuracy of credit usage reporting to ensure billing reflects actual usage
+- ✅ **Knowledge File Naming** - Resolved conflicts with knowledge file naming that could cause retrieval issues
+- ✅ **Cross-Account Search** - Improved search functionality when working with multiple accounts
+- ✅ **Secret Key Creation** - Fixed issues preventing proper creation of secret keys for API authentication
+- ✅ **API Key Validation** - Enhanced validation of API keys to prevent invalid configurations
+- ✅ **Indexer Improvements** - Fixed underlying indexing issues that could affect knowledge retrieval performance
+- ✅ **Assistant Download** - Fixed bugs preventing successful download of assistants from the marketplace
+## 📚 Learn More
+For more details on all changes in this release, see the [full changelog](https://github.com/myevari/evari-olympus/compare/v1.0.4...v1.0.5).
+</Update>
 
-<Update label="January 2026" description="v1.0.4" tags={["Filter 1"]}>
+
+<Update label="January 2026" description="v1.0.4" tags={["Knowledge","UI","Performance"]}>
 # QuivaWorks v1.0.4 Release Notes
 <Note>
 **Release Date:** January 27, 2026  
@@ -11,7 +85,7 @@ description: "Updates, improvements and bug fixes"
 **Release Type:** Patch Release  
 </Note>
 ## Overview
-We're excited to announce **QuivaWorks v1.0.4**, a focused patch release designed to enhance your experience across the platform. This release includes 35+ improvements spanning knowledge management, agent capabilities, navigation, and marketplace features.
+We're excited to announce **QuivaWorks v1.0.4**, a focused patch release designed to enhance your experience across the platform. This release includes 35+ improvements spanning knowledge management, Assistant capabilities, navigation, and marketplace features.
 <Tip>
 All improvements in this release maintain full backward compatibility with previous versions. No migration or configuration changes required.
 </Tip>
@@ -19,12 +93,12 @@ All improvements in this release maintain full backward compatibility with previ
 ## 🎯 Key Highlights
 ### Enhanced Knowledge Management
 Improved knowledge upload and management workflows make it easier to organize and utilize your documentation. Better integration with Mintlify documentation systems ensures seamless content handling.
-### Smarter Agent Features
-Experience improved agent interfaces with enhanced capabilities, better model selection tools, and improved agent-to-agent communication for more sophisticated automations.
+### Smarter Assistant Features
+Experience improved Assistant interfaces with enhanced capabilities, better model selection tools, and improved Assistant-to-Assistant communication for more sophisticated automations.
 ### Redesigned Navigation
 New sidebar navigation system provides a cleaner, more intuitive way to explore QuivaWorks. Navigate faster and find what you need with our improved UX.
 ### Marketplace Expansion
-Deploy marketplace agents directly to your new accounts with improved integration between the marketplace and your core platform.
+Deploy marketplace Assistants directly to your new accounts with improved integration between the marketplace and your core platform.
 ### Credits
 Credits are now included with every plan to allow you to use QuivaWorks as soon as you create an account without the need to get your own API keys.
 ---
@@ -32,18 +106,18 @@ Credits are now included with every plan to allow you to use QuivaWorks as soon 
 ### Knowledge Management
 - **Streamlined Knowledge Upload** - Upload and manage documentation with improved workflows
 - **Enhanced Knowledge UI** - Better interface for organizing and retrieving your knowledge base
-### Agent Improvements
-- **Enhanced Agent Interface** - Redesigned agent tabs for better visibility and control
-- **Streaming Capabilities** - Real-time streaming support for agent communication
-- **Flexible Model Selection** - Improved tools for choosing and configuring agent models
-- **Agent Resources** - New tools for creating and managing agent resources
-- **Better Communication** - Enhanced protocols for agent-to-agent interactions
+### Assistant Improvements
+- **Enhanced Assistant Interface** - Redesigned Assistant tabs for better visibility and control
+- **Streaming Capabilities** - Real-time streaming support for Assistant communication
+- **Flexible Model Selection** - Improved tools for choosing and configuring Assistant models
+- **Assistant Resources** - New tools for creating and managing Assistant resources
+- **Better Communication** - Enhanced protocols for Assistant-to-Assistant interactions
 ### Navigation & Interface
 - **Sidebar Navigation** - Complete redesign of the sidebar for improved navigation
 - **Better Routing** - Faster, more intuitive page transitions
 - **Refined User Experience** - UX improvements throughout the platform
 ### Marketplace & Deployment
-- **Account Deployment** - Deploy marketplace agents to new accounts with a single click
+- **Account Deployment** - Deploy marketplace Assistants to new accounts with a single click
 - **Improved Integration** - Better connection between marketplace and platform features
 ### Performance & Stability
 - **Chat Optimization** - Performance improvements to the chat interface
@@ -94,7 +168,7 @@ Credits are now included with every plan to allow you to use QuivaWorks as soon 
     icon="sparkles"
     color="#8b5cf6"
   >
-    New agent features and marketplace capabilities expand what you can build and automate.
+    New Assistant features and marketplace capabilities expand what you can build and automate.
   </Card>
 </CardGroup>
 ---
@@ -102,19 +176,19 @@ Credits are now included with every plan to allow you to use QuivaWorks as soon 
 No action required! Your instance will be automatically updated to v1.0.4. Here's what you should know:
 ### For Existing Users
 1. **No Changes Needed** - Your current configurations and data remain intact
-2. **New Features Available** - Start using improved agents and knowledge management immediately
+2. **New Features Available** - Start using improved Assistants and knowledge management immediately
 3. **Better Experience** - Enjoy the improved navigation and UI enhancements
 ### For New Users
-1. **Deploy Agents** - Use the improved marketplace to deploy agents to your accounts
+1. **Deploy Assistants** - Use the improved marketplace to deploy Assistants to your accounts
 2. **Manage Knowledge** - Leverage enhanced knowledge management for better documentation handling
-3. **Configure Agents** - Enjoy improved model selection and agent resource management
+3. **Configure Assistants** - Enjoy improved model selection and Assistant resource management
 <Tip>
 Explore the new sidebar navigation to discover all available features. The improved interface makes it easier to find and use QuivaWorks capabilities.
 </Tip>
 ---
 ## 🔄 Backward Compatibility
 ✅ **100% Backward Compatible**
-- All existing agents continue to work without modification
+- All existing Assistants continue to work without modification
 - No API changes required
 - Previous configurations remain valid
 - Full support for existing integrations
