@@ -1,0 +1,2078 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "quiva.ai Gateway",
+        "description": "API service for managing apple calendar and icloud emails",
+        "contact": {
+            "email": "support@quiva.ai"
+        },
+        "license": {
+            "name": "Proprietary"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://api.quiva.ai",
+            "description": "Production API server"
+        }
+    ],
+    "security": [
+        {
+            "basicAuth": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "Calendar",
+            "description": "Calendar management (list, get)"
+        },
+        {
+            "name": "Calendar Event",
+            "description": "Calendar event CRUD operations"
+        },
+        {
+            "name": "Mailbox",
+            "description": "Mailbox management (list, get)"
+        },
+        {
+            "name": "Email",
+            "description": "Email operations (list, get, send, delete)"
+        }
+    ],
+    "paths": {
+        "/apple/calendars": {
+            "get": {
+                "operationId": "listCalendars",
+                "summary": "Get list of calendars",
+                "description": "Returns all calendars available on the iCloud account.",
+                "tags": [
+                    "Calendar"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.get.calendar-list",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ServiceResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "body": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Calendar"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success",
+                                        "data": [
+                                            {
+                                                "id": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUv",
+                                                "name": "Home",
+                                                "description": "Personal calendar",
+                                                "events_supported": true,
+                                                "todos_supported": false
+                                            },
+                                            {
+                                                "id": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL3dvcmsv",
+                                                "name": "Work",
+                                                "description": "Work calendar",
+                                                "events_supported": true,
+                                                "todos_supported": true
+                                            }
+                                        ]
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                }
+            }
+        },
+        "/apple/calendars/{id}": {
+            "get": {
+                "operationId": "getCalendar",
+                "summary": "Get calendar by id",
+                "tags": [
+                    "Calendar"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.get.calendar",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Base64-encoded calendar path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUv"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ServiceResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "body": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/Calendar"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success",
+                                        "data": {
+                                            "id": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUv",
+                                            "name": "Home",
+                                            "description": "Personal calendar",
+                                            "events_supported": true,
+                                            "todos_supported": false
+                                        }
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/CalendarNotFound"
+                    }
+                }
+            }
+        },
+        "/apple/calendars/{id}/events": {
+            "get": {
+                "operationId": "listCalendarEvents",
+                "summary": "Get list of calendar events",
+                "description": "Query calendar events within a date range. Defaults to the last 7 days if `from`/`to` are omitted. Set `expand` to `true` to expand recurring events into individual occurrences.",
+                "tags": [
+                    "Calendar Event"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.get.calendar-event-list",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Base64-encoded calendar path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUv"
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": false,
+                        "description": "Start of date range (defaults to 7 days before `to`)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "example": "2025-02-01T00:00:00Z"
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": false,
+                        "description": "End of date range (defaults to now)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "example": "2025-02-28T23:59:59Z"
+                    },
+                    {
+                        "name": "expand",
+                        "in": "query",
+                        "required": false,
+                        "description": "Expand recurring events into individual occurrences",
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "example": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ServiceResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "body": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Event"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success",
+                                        "data": [
+                                            {
+                                                "id": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUvYWJjMTIzLmljcw==",
+                                                "uid": "abc123",
+                                                "summary": "Team Standup",
+                                                "description": "Daily sync meeting",
+                                                "start": "2025-02-17T09:00:00Z",
+                                                "end": "2025-02-17T09:30:00Z",
+                                                "location": "Conference Room A",
+                                                "status": "CONFIRMED",
+                                                "all_day": false,
+                                                "created_at": "2025-01-15T10:00:00Z",
+                                                "modified_at": "2025-02-10T14:30:00Z",
+                                                "etag": "\"63842758402\"",
+                                                "categories": [
+                                                    "meetings",
+                                                    "daily"
+                                                ],
+                                                "alarms": [
+                                                    {
+                                                        "id": "alarm-001",
+                                                        "action": "DISPLAY",
+                                                        "trigger": "-PT15M",
+                                                        "description": "Team Standup in 15 minutes"
+                                                    }
+                                                ],
+                                                "attendees": [
+                                                    {
+                                                        "id": "bWFpbHRvOmFsaWNlQGV4YW1wbGUuY29t",
+                                                        "email": "alice@example.com",
+                                                        "name": "Alice",
+                                                        "status": "ACCEPTED"
+                                                    }
+                                                ],
+                                                "attachments": []
+                                            },
+                                            {
+                                                "id": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUvZGVmNDU2Lmljcw==",
+                                                "uid": "def456",
+                                                "summary": "Lunch with Bob",
+                                                "start": "2025-02-17T12:00:00Z",
+                                                "end": "2025-02-17T13:00:00Z",
+                                                "location": "Downtown Cafe",
+                                                "geo_location": "37.332;-122.031",
+                                                "status": "TENTATIVE",
+                                                "all_day": false,
+                                                "alarms": [],
+                                                "attendees": [],
+                                                "attachments": []
+                                            }
+                                        ]
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/CalendarNotFound"
+                    }
+                }
+            }
+        },
+        "/apple/events/{id}": {
+            "get": {
+                "operationId": "getCalendarEvent",
+                "summary": "Get event by id",
+                "tags": [
+                    "Calendar Event"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.get.event",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Base64-encoded event path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUvYWJjMTIzLmljcw=="
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ServiceResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "body": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/Event"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success",
+                                        "data": {
+                                            "id": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUvYWJjMTIzLmljcw==",
+                                            "uid": "abc123",
+                                            "summary": "Team Standup",
+                                            "description": "Daily sync meeting",
+                                            "start": "2025-02-17T09:00:00Z",
+                                            "end": "2025-02-17T09:30:00Z",
+                                            "location": "Conference Room A",
+                                            "status": "CONFIRMED",
+                                            "priority": "1",
+                                            "all_day": false,
+                                            "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",
+                                            "created_at": "2025-01-15T10:00:00Z",
+                                            "modified_at": "2025-02-10T14:30:00Z",
+                                            "etag": "\"63842758402\"",
+                                            "organizer": "mailto:organizer@example.com",
+                                            "categories": [
+                                                "meetings",
+                                                "daily"
+                                            ],
+                                            "alarms": [
+                                                {
+                                                    "id": "alarm-001",
+                                                    "action": "DISPLAY",
+                                                    "trigger": "-PT15M",
+                                                    "description": "Team Standup in 15 minutes"
+                                                }
+                                            ],
+                                            "attendees": [
+                                                {
+                                                    "id": "bWFpbHRvOmFsaWNlQGV4YW1wbGUuY29t",
+                                                    "email": "alice@example.com",
+                                                    "name": "Alice",
+                                                    "status": "ACCEPTED"
+                                                },
+                                                {
+                                                    "id": "dGVsOisxMjM0NTY3ODkw",
+                                                    "phone": "+1234567890",
+                                                    "name": "Bob",
+                                                    "status": "NEEDS-ACTION"
+                                                }
+                                            ],
+                                            "attachments": [
+                                                {
+                                                    "id": "att-001",
+                                                    "filename": "agenda.pdf",
+                                                    "content_type": "application/pdf",
+                                                    "size": "24531",
+                                                    "url": "https://example.com/agenda.pdf"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/EventNotFound"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "putCalendarEvent",
+                "summary": "Update event by id",
+                "description": "Updates an existing event. All provided fields overwrite existing values. Fields like `alarms`, `attendees`, and `attachments` replace the entire list when provided. The sequence number is automatically incremented.",
+                "tags": [
+                    "Calendar Event"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.put.event",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Base64-encoded event path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUvYWJjMTIzLmljcw=="
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpsertEventBody"
+                            },
+                            "example": {
+                                "summary": "Team Standup (Updated)",
+                                "start": "2025-02-17T10:00:00Z",
+                                "end": "2025-02-17T10:30:00Z",
+                                "status": "CONFIRMED",
+                                "location": "Conference Room B",
+                                "alarms": [
+                                    {
+                                        "action": "DISPLAY",
+                                        "trigger": "-PT10M",
+                                        "description": "Standup in 10 minutes"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Event updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceResponse"
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success"
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/EventNotFound"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "deleteCalendarEvent",
+                "summary": "Delete an event",
+                "tags": [
+                    "Calendar Event"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.delete.event",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Base64-encoded event path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUvYWJjMTIzLmljcw=="
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Event deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceResponse"
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success"
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/EventNotFound"
+                    }
+                }
+            }
+        },
+        "/apple/events": {
+            "post": {
+                "operationId": "postCalendarEvent",
+                "summary": "Create a new event",
+                "tags": [
+                    "Calendar Event"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.post.event",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PostCalendarEventRequest"
+                            },
+                            "example": {
+                                "calendar_id": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUv",
+                                "summary": "Team Standup",
+                                "description": "Daily sync meeting",
+                                "start": "2025-02-17T09:00:00Z",
+                                "end": "2025-02-17T09:30:00Z",
+                                "location": "Conference Room A",
+                                "status": "CONFIRMED",
+                                "categories": [
+                                    "meetings",
+                                    "daily"
+                                ],
+                                "alarms": [
+                                    {
+                                        "action": "DISPLAY",
+                                        "trigger": "-PT15M",
+                                        "description": "Team Standup in 15 minutes"
+                                    }
+                                ],
+                                "attendees": [
+                                    {
+                                        "email": "alice@example.com",
+                                        "name": "Alice",
+                                        "status": "NEEDS-ACTION"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Event created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ServiceResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "body": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string",
+                                                                    "description": "Base64-encoded event path"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success",
+                                        "data": {
+                                            "id": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUvNTUwZTg0MDAtZTI5Yi00MWQ0Lmljcw=="
+                                        }
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/CalendarNotFound"
+                    }
+                }
+            }
+        },
+        "/apple/mailboxes": {
+            "get": {
+                "operationId": "listMailboxes",
+                "summary": "Get list of mailboxes",
+                "tags": [
+                    "Mailbox"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.get.mailbox-list",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ServiceResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "body": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Mailbox"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success",
+                                        "data": [
+                                            {
+                                                "name": "INBOX",
+                                                "readonly": false,
+                                                "total_emails": 142,
+                                                "unseen_emails": 3
+                                            },
+                                            {
+                                                "name": "Sent Messages",
+                                                "readonly": true,
+                                                "total_emails": 89,
+                                                "unseen_emails": 0
+                                            },
+                                            {
+                                                "name": "Drafts",
+                                                "readonly": false,
+                                                "total_emails": 5,
+                                                "unseen_emails": 0
+                                            },
+                                            {
+                                                "name": "Trash",
+                                                "readonly": false,
+                                                "total_emails": 21,
+                                                "unseen_emails": 0
+                                            }
+                                        ]
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                }
+            }
+        },
+        "/apple/mailboxes/{name}": {
+            "get": {
+                "operationId": "getMailbox",
+                "summary": "Get mailbox by name",
+                "tags": [
+                    "Mailbox"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.get.mailbox",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "description": "Mailbox name (e.g. INBOX, Sent Messages)",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "INBOX"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ServiceResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "body": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/Mailbox"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success",
+                                        "data": {
+                                            "name": "INBOX",
+                                            "readonly": false,
+                                            "total_emails": 142,
+                                            "unseen_emails": 3
+                                        }
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/MailboxNotFound"
+                    }
+                }
+            }
+        },
+        "/apple/mailboxes/{name}/emails": {
+            "get": {
+                "operationId": "listMailboxEmails",
+                "summary": "Get list of mailbox emails by date",
+                "description": "Query emails within a date range. Defaults to the last 7 days if `from`/`to` are omitted.\n\n**Note:** IMAP `BEFORE`/`SINCE` uses date-only comparison and the date boundary is exclusive. The service automatically adjusts `to` by adding one day to account for this.",
+                "tags": [
+                    "Email"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.get.mailbox-email-list",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "description": "Mailbox name",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "INBOX"
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": false,
+                        "description": "Start of date range (defaults to 7 days before `to`)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "example": "2025-02-01T00:00:00Z"
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": false,
+                        "description": "End of date range (defaults to now)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "example": "2025-02-14T00:00:00Z"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ServiceResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "body": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Email"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success",
+                                        "data": [
+                                            {
+                                                "uid": 1234,
+                                                "seq_num": 142,
+                                                "subject": "Project Update - Q1 Planning",
+                                                "date": "2025-02-10T14:30:00Z",
+                                                "body": "Hi team,\n\nHere is the latest project update for Q1.\n\nBest regards,\nAlice",
+                                                "html_body": "<p>Hi team,</p><p>Here is the latest project update for Q1.</p><p>Best regards,<br>Alice</p>",
+                                                "from": [
+                                                    "alice@example.com"
+                                                ],
+                                                "to": [
+                                                    "team@example.com"
+                                                ],
+                                                "cc": [
+                                                    "manager@example.com"
+                                                ],
+                                                "bcc": [],
+                                                "attachments": []
+                                            },
+                                            {
+                                                "uid": 1235,
+                                                "seq_num": 143,
+                                                "subject": "Meeting Notes - Feb 11",
+                                                "date": "2025-02-11T16:00:00Z",
+                                                "body": "Attached are the meeting notes from today's session.",
+                                                "html_body": "",
+                                                "from": [
+                                                    "bob@example.com"
+                                                ],
+                                                "to": [
+                                                    "alice@example.com"
+                                                ],
+                                                "cc": [],
+                                                "bcc": [],
+                                                "attachments": [
+                                                    {
+                                                        "filename": "meeting-notes.pdf",
+                                                        "content_type": "application/pdf",
+                                                        "content": "JVBERi0xLjQK...",
+                                                        "size": 48210
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/MailboxNotFound"
+                    }
+                }
+            }
+        },
+        "/apple/mailboxes/{name}/emails/recent": {
+            "get": {
+                "operationId": "listMailboxRecentEmails",
+                "summary": "Get list of mailbox recent emails",
+                "description": "Returns the most recent emails from a mailbox. Defaults to 10 if `limit` is omitted.",
+                "tags": [
+                    "Email"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.get.mailbox-email-recent-list",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "description": "Mailbox name",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "INBOX"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "description": "Max number of recent emails to return",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 10
+                        },
+                        "example": 5
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ServiceResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "body": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Email"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success",
+                                        "data": [
+                                            {
+                                                "uid": 1240,
+                                                "seq_num": 148,
+                                                "subject": "Re: Deployment Schedule",
+                                                "date": "2025-02-17T08:15:00Z",
+                                                "body": "Looks good, let's proceed with the rollout.",
+                                                "html_body": "",
+                                                "from": [
+                                                    "devops@example.com"
+                                                ],
+                                                "to": [
+                                                    "team@example.com"
+                                                ],
+                                                "cc": [],
+                                                "bcc": [],
+                                                "attachments": []
+                                            }
+                                        ]
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/MailboxNotFound"
+                    }
+                }
+            }
+        },
+        "/apple/mailboxes/{name}/emails/{uid}": {
+            "get": {
+                "operationId": "getEmail",
+                "summary": "Get email by uid",
+                "tags": [
+                    "Email"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.get.email",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "description": "Mailbox name",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "INBOX"
+                    },
+                    {
+                        "name": "uid",
+                        "in": "path",
+                        "required": true,
+                        "description": "Email UID",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1234
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ServiceResponse"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "body": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "$ref": "#/components/schemas/Email"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success",
+                                        "data": {
+                                            "uid": 1234,
+                                            "seq_num": 142,
+                                            "subject": "Project Update - Q1 Planning",
+                                            "date": "2025-02-10T14:30:00Z",
+                                            "body": "Hi team,\n\nHere is the latest project update for Q1.\n\nBest regards,\nAlice",
+                                            "html_body": "<p>Hi team,</p><p>Here is the latest project update for Q1.</p><p>Best regards,<br>Alice</p>",
+                                            "from": [
+                                                "alice@example.com"
+                                            ],
+                                            "to": [
+                                                "team@example.com"
+                                            ],
+                                            "cc": [
+                                                "manager@example.com"
+                                            ],
+                                            "bcc": [],
+                                            "attachments": [
+                                                {
+                                                    "filename": "q1-plan.xlsx",
+                                                    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                                    "content": "UEsDBBQAAAAI...",
+                                                    "size": 15230
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/EmailNotFound"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "deleteEmail",
+                "summary": "Delete an email",
+                "tags": [
+                    "Email"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.delete.email",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "description": "Mailbox name",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "INBOX"
+                    },
+                    {
+                        "name": "uid",
+                        "in": "path",
+                        "required": true,
+                        "description": "Email UID",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1234
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceResponse"
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success"
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/EmailNotFound"
+                    }
+                }
+            }
+        },
+        "/apple/emails": {
+            "post": {
+                "operationId": "postEmail",
+                "summary": "Send a new email",
+                "tags": [
+                    "Email"
+                ],
+                "x-is-public": true,
+                "x-resource-type": "service",
+                "x-resource": "microstrate.apple.post.email",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PostEmailRequest"
+                            },
+                            "example": {
+                                "from": [
+                                    "sender@icloud.com"
+                                ],
+                                "to": [
+                                    "recipient@example.com"
+                                ],
+                                "cc": [
+                                    "manager@example.com"
+                                ],
+                                "subject": "Project Update",
+                                "body": "Hi,\n\nHere is the latest project update.\n\nBest regards",
+                                "html_body": "<p>Hi,</p><p>Here is the latest project update.</p><p>Best regards</p>",
+                                "attachments": [
+                                    {
+                                        "filename": "report.pdf",
+                                        "content_type": "application/pdf",
+                                        "content": "JVBERi0xLjQK...",
+                                        "size": 24531
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Email sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceResponse"
+                                },
+                                "example": {
+                                    "body": {
+                                        "message": "success"
+                                    },
+                                    "status_code": 200
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "basicAuth": {
+                "type": "http",
+                "scheme": "basic",
+                "description": "Apple ID and App-Specific Password. Username is the Apple ID, password is the Apple App Password.",
+                "x-header": "X-APPLE-AUTHORIZATION"
+            }
+        },
+        "responses": {
+            "BadRequest": {
+                "description": "Bad request",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ServiceResponse"
+                        },
+                        "example": {
+                            "body": {
+                                "message": "failed to connect to apple"
+                            },
+                            "status_code": 400
+                        }
+                    }
+                }
+            },
+            "CalendarNotFound": {
+                "description": "Calendar not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ServiceResponse"
+                        },
+                        "example": {
+                            "body": {
+                                "message": "no calendar exists"
+                            },
+                            "status_code": 404
+                        }
+                    }
+                }
+            },
+            "EventNotFound": {
+                "description": "Event not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ServiceResponse"
+                        },
+                        "example": {
+                            "body": {
+                                "message": "no event exists"
+                            },
+                            "status_code": 404
+                        }
+                    }
+                }
+            },
+            "MailboxNotFound": {
+                "description": "Mailbox not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ServiceResponse"
+                        },
+                        "example": {
+                            "body": {
+                                "message": "no mailbox exists"
+                            },
+                            "status_code": 404
+                        }
+                    }
+                }
+            },
+            "EmailNotFound": {
+                "description": "Email not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ServiceResponse"
+                        },
+                        "example": {
+                            "body": {
+                                "message": "no email exists"
+                            },
+                            "status_code": 404
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "ServiceResponse": {
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "$ref": "#/components/schemas/ServiceResponseBody"
+                    },
+                    "status_code": {
+                        "type": "integer",
+                        "example": 200
+                    }
+                },
+                "required": [
+                    "body",
+                    "status_code"
+                ]
+            },
+            "ServiceResponseBody": {
+                "type": "object",
+                "properties": {
+                    "data": {},
+                    "metadata": {},
+                    "message": {
+                        "type": "string",
+                        "example": "success"
+                    }
+                }
+            },
+            "Calendar": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Base64-encoded calendar path",
+                        "example": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUv"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Home"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Personal calendar"
+                    },
+                    "events_supported": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "todos_supported": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "required": [
+                    "id",
+                    "name"
+                ]
+            },
+            "Event": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Base64-encoded event path",
+                        "example": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUvYWJjMTIzLmljcw=="
+                    },
+                    "uid": {
+                        "type": "string",
+                        "description": "iCal UID",
+                        "example": "abc123"
+                    },
+                    "summary": {
+                        "type": "string",
+                        "example": "Team Standup"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Daily sync meeting"
+                    },
+                    "start": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-02-17T09:00:00Z"
+                    },
+                    "end": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-02-17T09:30:00Z"
+                    },
+                    "duration": {
+                        "type": "string",
+                        "description": "iCal duration (e.g. PT1H30M)",
+                        "example": "PT30M"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-15T10:00:00Z"
+                    },
+                    "modified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-02-10T14:30:00Z"
+                    },
+                    "location": {
+                        "type": "string",
+                        "example": "Conference Room A"
+                    },
+                    "geo_location": {
+                        "type": "string",
+                        "description": "Latitude;Longitude",
+                        "example": "37.332;-122.031"
+                    },
+                    "priority": {
+                        "type": "string",
+                        "description": "0-9 (1 = highest, 9 = lowest, 0 = undefined)",
+                        "example": "1"
+                    },
+                    "categories": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "meetings",
+                            "daily"
+                        ]
+                    },
+                    "comment": {
+                        "type": "string",
+                        "example": "Moved to 10am starting next week"
+                    },
+                    "color": {
+                        "type": "string",
+                        "description": "CSS3 color name",
+                        "example": "steelblue"
+                    },
+                    "all_day": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "TENTATIVE",
+                            "CONFIRMED",
+                            "CANCELLED"
+                        ],
+                        "example": "CONFIRMED"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://example.com/meeting/abc123"
+                    },
+                    "rrule": {
+                        "type": "string",
+                        "description": "iCal RRULE",
+                        "example": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR"
+                    },
+                    "etag": {
+                        "type": "string",
+                        "example": "\"63842758402\""
+                    },
+                    "organizer": {
+                        "type": "string",
+                        "example": "mailto:organizer@example.com"
+                    },
+                    "recurrence_id": {
+                        "type": "string",
+                        "example": "20250217T090000Z"
+                    },
+                    "attendees": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EventAttendee"
+                        }
+                    },
+                    "alarms": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EventAlarm"
+                        }
+                    },
+                    "attachments": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EventAttachment"
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "uid"
+                ]
+            },
+            "EventAttendee": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "bWFpbHRvOmFsaWNlQGV4YW1wbGUuY29t"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "alice@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Alice"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "NEEDS-ACTION",
+                            "ACCEPTED",
+                            "DECLINED",
+                            "TENTATIVE"
+                        ],
+                        "example": "ACCEPTED"
+                    }
+                }
+            },
+            "EventAlarm": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "alarm-001"
+                    },
+                    "action": {
+                        "type": "string",
+                        "enum": [
+                            "DISPLAY",
+                            "AUDIO",
+                            "EMAIL"
+                        ],
+                        "example": "DISPLAY"
+                    },
+                    "trigger": {
+                        "type": "string",
+                        "description": "e.g. -PT15M, -PT1H, PT0S",
+                        "example": "-PT15M"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Team Standup in 15 minutes"
+                    },
+                    "summary": {
+                        "type": "string",
+                        "example": "Reminder: Team Standup"
+                    },
+                    "duration": {
+                        "type": "string",
+                        "description": "Snooze duration",
+                        "example": "PT5M"
+                    },
+                    "repeat": {
+                        "type": "string",
+                        "description": "Snooze repeat count",
+                        "example": "2"
+                    }
+                }
+            },
+            "EventAttachment": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "att-001"
+                    },
+                    "filename": {
+                        "type": "string",
+                        "example": "agenda.pdf"
+                    },
+                    "content_type": {
+                        "type": "string",
+                        "example": "application/pdf"
+                    },
+                    "size": {
+                        "type": "string",
+                        "example": "24531"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://example.com/attachments/agenda.pdf"
+                    }
+                }
+            },
+            "UpsertEventBody": {
+                "type": "object",
+                "properties": {
+                    "summary": {
+                        "type": "string",
+                        "example": "Team Standup"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Daily sync meeting"
+                    },
+                    "start": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-02-17T09:00:00Z"
+                    },
+                    "end": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-02-17T09:30:00Z"
+                    },
+                    "location": {
+                        "type": "string",
+                        "example": "Conference Room A"
+                    },
+                    "geo_location": {
+                        "type": "string",
+                        "description": "lat;long format",
+                        "example": "37.332;-122.031"
+                    },
+                    "priority": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "color": {
+                        "type": "string",
+                        "example": "steelblue"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "TENTATIVE",
+                            "CONFIRMED",
+                            "CANCELLED"
+                        ],
+                        "example": "CONFIRMED"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://example.com/meeting/abc123"
+                    },
+                    "recurrence_rule": {
+                        "type": "string",
+                        "description": "iCal RRULE (e.g. FREQ=WEEKLY;BYDAY=MO)",
+                        "example": "FREQ=WEEKLY;BYDAY=MO,WE,FR"
+                    },
+                    "organizer": {
+                        "type": "string",
+                        "description": "mailto: URI",
+                        "example": "mailto:organizer@example.com"
+                    },
+                    "comment": {
+                        "type": "string",
+                        "example": "Moved to 10am starting next week"
+                    },
+                    "duration": {
+                        "type": "string",
+                        "description": "iCal duration (e.g. PT1H30M)",
+                        "example": "PT30M"
+                    },
+                    "all_day": {
+                        "type": "boolean",
+                        "default": false,
+                        "example": false
+                    },
+                    "categories": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "meetings",
+                            "daily"
+                        ]
+                    },
+                    "alarms": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UpsertEventAlarm"
+                        }
+                    },
+                    "attendees": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UpsertEventAttendee"
+                        }
+                    },
+                    "attachments": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UpsertEventAttachment"
+                        }
+                    }
+                }
+            },
+            "PostCalendarEventRequest": {
+                "allOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "calendar_id": {
+                                "type": "string",
+                                "description": "Base64-encoded calendar path",
+                                "example": "LzExNzc5MTAwMzYvY2FsZW5kYXJzL2hvbWUv"
+                            }
+                        }
+                    },
+                    {
+                        "$ref": "#/components/schemas/UpsertEventBody"
+                    }
+                ]
+            },
+            "UpsertEventAlarm": {
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": [
+                            "DISPLAY",
+                            "AUDIO",
+                            "EMAIL"
+                        ],
+                        "example": "DISPLAY"
+                    },
+                    "trigger": {
+                        "type": "string",
+                        "description": "e.g. -PT15M, -PT1H, PT0S",
+                        "example": "-PT15M"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Meeting in 15 minutes"
+                    },
+                    "summary": {
+                        "type": "string",
+                        "description": "For EMAIL alarms",
+                        "example": "Reminder: Team Standup"
+                    },
+                    "duration": {
+                        "type": "string",
+                        "description": "Snooze duration",
+                        "example": "PT5M"
+                    },
+                    "repeat": {
+                        "type": "string",
+                        "description": "Snooze repeat count",
+                        "example": "2"
+                    }
+                }
+            },
+            "UpsertEventAttendee": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "alice@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Alice"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "NEEDS-ACTION",
+                            "ACCEPTED",
+                            "DECLINED",
+                            "TENTATIVE"
+                        ],
+                        "example": "NEEDS-ACTION"
+                    }
+                }
+            },
+            "UpsertEventAttachment": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "example": "https://example.com/attachments/agenda.pdf"
+                    }
+                }
+            },
+            "Mailbox": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "INBOX"
+                    },
+                    "readonly": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "total_emails": {
+                        "type": "integer",
+                        "example": 142
+                    },
+                    "unseen_emails": {
+                        "type": "integer",
+                        "example": 3
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "Email": {
+                "type": "object",
+                "properties": {
+                    "uid": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1234
+                    },
+                    "seq_num": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 142
+                    },
+                    "subject": {
+                        "type": "string",
+                        "example": "Project Update - Q1 Planning"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-02-10T14:30:00Z"
+                    },
+                    "body": {
+                        "type": "string",
+                        "description": "Plain text body",
+                        "example": "Hi team,\n\nHere is the latest project update.\n\nBest regards,\nAlice"
+                    },
+                    "html_body": {
+                        "type": "string",
+                        "description": "HTML body",
+                        "example": "<p>Hi team,</p><p>Here is the latest project update.</p><p>Best regards,<br>Alice</p>"
+                    },
+                    "from": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "email"
+                        },
+                        "example": [
+                            "alice@example.com"
+                        ]
+                    },
+                    "to": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "email"
+                        },
+                        "example": [
+                            "team@example.com"
+                        ]
+                    },
+                    "cc": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "email"
+                        },
+                        "example": [
+                            "manager@example.com"
+                        ]
+                    },
+                    "bcc": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "email"
+                        },
+                        "example": []
+                    },
+                    "attachments": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EmailAttachment"
+                        }
+                    }
+                },
+                "required": [
+                    "uid",
+                    "seq_num"
+                ]
+            },
+            "EmailAttachment": {
+                "type": "object",
+                "properties": {
+                    "filename": {
+                        "type": "string",
+                        "example": "report.pdf"
+                    },
+                    "content_type": {
+                        "type": "string",
+                        "description": "MIME type",
+                        "example": "application/pdf"
+                    },
+                    "content": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "uint8",
+                            "minimum": 0,
+                            "maximum": 255
+                        },
+                        "description": "Raw byte array content",
+                        "example": [
+                            74,
+                            86,
+                            66,
+                            69,
+                            82,
+                            105,
+                            48,
+                            120
+                        ]
+                    },
+                    "size": {
+                        "type": "integer",
+                        "example": 24531
+                    }
+                }
+            },
+            "PostEmailRequest": {
+                "type": "object",
+                "properties": {
+                    "subject": {
+                        "type": "string",
+                        "example": "Project Update"
+                    },
+                    "body": {
+                        "type": "string",
+                        "description": "Plain text body",
+                        "example": "Hi,\n\nHere is the latest project update.\n\nBest regards"
+                    },
+                    "html_body": {
+                        "type": "string",
+                        "description": "HTML body",
+                        "example": "<p>Hi,</p><p>Here is the latest project update.</p><p>Best regards</p>"
+                    },
+                    "from": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "email"
+                        },
+                        "example": [
+                            "sender@icloud.com"
+                        ]
+                    },
+                    "to": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "email"
+                        },
+                        "example": [
+                            "recipient@example.com"
+                        ]
+                    },
+                    "cc": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "email"
+                        },
+                        "example": [
+                            "manager@example.com"
+                        ]
+                    },
+                    "bcc": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "email"
+                        },
+                        "example": []
+                    },
+                    "attachments": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EmailAttachment"
+                        }
+                    }
+                },
+                "required": [
+                    "subject",
+                    "from",
+                    "to"
+                ]
+            }
+        }
+    }
+}
