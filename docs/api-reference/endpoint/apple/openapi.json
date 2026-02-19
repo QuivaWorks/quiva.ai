@@ -934,7 +934,16 @@
                                                     {
                                                         "filename": "meeting-notes.pdf",
                                                         "content_type": "application/pdf",
-                                                        "content": "JVBERi0xLjQK...",
+                                                        "content": [
+                                                            74,
+                                                            86,
+                                                            66,
+                                                            69,
+                                                            82,
+                                                            105,
+                                                            48,
+                                                            120
+                                                        ],
                                                         "size": 48210
                                                     }
                                                 ]
@@ -1137,7 +1146,16 @@
                                                 {
                                                     "filename": "q1-plan.xlsx",
                                                     "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                                    "content": "UEsDBBQAAAAI...",
+                                                    "content": [
+                                                        74,
+                                                        86,
+                                                        66,
+                                                        69,
+                                                        82,
+                                                        105,
+                                                        48,
+                                                        120
+                                                    ],
                                                     "size": 15230
                                                 }
                                             ]
@@ -1248,7 +1266,16 @@
                                     {
                                         "filename": "report.pdf",
                                         "content_type": "application/pdf",
-                                        "content": "JVBERi0xLjQK...",
+                                        "content": [
+                                            74,
+                                            86,
+                                            66,
+                                            69,
+                                            82,
+                                            105,
+                                            48,
+                                            120
+                                        ],
                                         "size": 24531
                                     }
                                 ]
