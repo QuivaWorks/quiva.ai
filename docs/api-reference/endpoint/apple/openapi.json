@@ -1286,7 +1286,7 @@
                 "type": "http",
                 "scheme": "basic",
                 "description": "Apple ID and App-Specific Password. Username is the Apple ID, password is the Apple App Password.",
-                "x-header": "X-APPLE-AUTHORIZATION"
+                "x-header": "X-Apple-Authorization"
             }
         },
         "responses": {
