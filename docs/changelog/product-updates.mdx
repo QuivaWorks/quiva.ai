@@ -2,6 +2,548 @@
 title: "Product Updates"
 description: "Updates, improvements and bug fixes"
 ---
+<Update label="February 2026" description="v1.1.0" tags={["Chat Streaming", "Sessions", "Marketplace", "Mobile"]}>
+
+# QuivaWorks v1.1.0 Release Notes
+
+<Note>
+**Release Date:** February 13, 2026  
+**Version:** v1.1.0  
+**Release Type:** Minor Release  
+**Headline:** Real-Time Chat Streaming, Hierarchical Sessions & Marketplace Redesign
+</Note>
+
+## Overview
+
+We're thrilled to announce **QuivaWorks v1.1.0**, a transformative minor release that brings real-time chat streaming to the forefront of your experience. Agents now respond in real-time as they think and work, dramatically improving responsiveness and user satisfaction. Beyond streaming, this release introduces intelligent session management, a completely redesigned marketplace, enhanced date/time intelligence, and significant mobile improvements.
+
+This release includes 19 merged pull requests spanning chat streaming, session management, marketplace redesign, mobile optimization, account management, and backend reliability.
+
+<Tip>
+Chat streaming is enabled by default! Watch agent responses appear character-by-character as they're generated. No configuration needed.
+</Tip>
+
+---
+
+## 🎯 Key Highlights
+
+### Real-Time Chat Streaming
+Agents now stream responses in real-time. See responses appear character-by-character as agents think and work through problems, dramatically improving responsiveness and user satisfaction.
+
+### Hierarchical Session Management
+Agents can now offload complex tasks to sub-agents while maintaining conversation context. Navigate seamlessly between parent and child conversations with automatic summarization.
+
+### Redesigned Marketplace
+The marketplace has been completely rebuilt with modern product cards, category-based navigation, dark mode support, and improved discovery for integrations and assistants.
+
+### Enhanced Date & Time Intelligence
+Natural language date parsing now understands "tomorrow", "next week", "in 3 days", and more. Includes calendar display, timezone support, and intelligent timestamp conversion.
+
+### Mobile-First Experience
+Significantly improved mobile experience with responsive layouts, collapsible sidebars, optimized touch interactions, and iOS-specific fixes.
+
+---
+
+## ⚡ Real-Time Chat Streaming
+
+**See agent responses as they happen, not after they complete.**
+
+Chat streaming is the headline feature of v1.1.0. Powered by comprehensive backend improvements, agents now stream their responses in real-time as they think and work through problems. This dramatically improves the user experience.
+
+### What You Get
+- **Instant Feedback** - Watch responses appear character-by-character as agents process information
+- **Better Responsiveness** - No more waiting for long-running operations to complete
+- **Improved Reliability** - Built-in message validation prevents orphaned API errors
+- **Seamless Experience** - Streaming works across all chat interfaces and agent types (GraphAgent, LLM Agent, etc.)
+- **Automatic Repair** - Messages are automatically validated and repaired if chat history is truncated
+
+### How It Works
+
+<AccordionGroup>
+  <Accordion title="Message Validation & Repair (#683)">
+    Ensures streamed messages stay synchronized even when chat history is truncated. Orphaned tool_use/tool_result pairs are automatically detected and repaired before they reach the user.
+  </Accordion>
+  
+  <Accordion title="PDF Text Extraction Improvements (#684)">
+    Enhanced knowledge extraction with automatic CLI fallback when the Go library fails silently. Documents are now gracefully skipped if extraction fails, preventing cache pollution.
+  </Accordion>
+  
+  <Accordion title="Optimized Message Processing">
+    Reordered validation to run AFTER history truncation, catching and repairing issues before they affect users. Comprehensive test coverage ensures reliability.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+Chat streaming is enabled by default and requires no configuration. Start using it immediately with any agent!
+</Tip>
+
+---
+
+## 🔄 Hierarchical Session Management
+
+**Navigate conversations with parent-child session linking.**
+
+Agents can now offload complex tasks to sub-agents while maintaining conversation context. Users can seamlessly navigate between parent and child conversations.
+
+### Key Features
+
+<CardGroup cols={2}>
+  <Card
+    title="Parent-Child Linking"
+    icon="sitemap"
+    color="#16a34a"
+  >
+    Link related conversations together for better organization and context preservation.
+  </Card>
+  
+  <Card
+    title="Auto-Summarization"
+    icon="sparkles"
+    color="#2563eb"
+  >
+    Child sessions are automatically summarized for quick reference and context switching.
+  </Card>
+  
+  <Card
+    title="Navigation Controls"
+    icon="arrow-left"
+    color="#f59e0b"
+  >
+    "Back to parent conversation" button for easy navigation between related sessions.
+  </Card>
+  
+  <Card
+    title="Session Linking"
+    icon="link"
+    color="#8b5cf6"
+  >
+    Tool responses can include links to related sessions for full context.
+  </Card>
+</CardGroup>
+
+### Use Cases
+- **Complex Multi-Step Tasks** - Split work across sub-agents while keeping context
+- **Research Tasks** - Delegate research to specialized agents and review findings
+- **Parallel Processing** - Run multiple sub-tasks simultaneously with conversation tracking
+- **Expert Delegation** - Route to specialized agents while maintaining parent conversation
+
+---
+
+## 📅 Enhanced Date & Time Intelligence
+
+**Smarter temporal understanding with natural language dates.**
+
+The DateTime tool now understands how you naturally think about time, making conversations more natural and reducing user friction.
+
+### New Capabilities
+
+<CardGroup cols={2}>
+  <Card
+    title="Natural Language Parsing"
+    icon="language"
+    color="#16a34a"
+  >
+    "tomorrow", "yesterday", "next week", "in 3 days", "+5 days", "-2 weeks", "YYYY-MM", "Month Year"
+  </Card>
+  
+  <Card
+    title="Calendar Display"
+    icon="calendar"
+    color="#2563eb"
+  >
+    ASCII calendars with ISO 8601 week layout for visual reference and planning.
+  </Card>
+  
+  <Card
+    title="Timestamp Conversion"
+    icon="clock"
+    color="#f59e0b"
+  >
+    Automatically detects and converts millisecond timestamps (13+ digits) to readable dates.
+  </Card>
+  
+  <Card
+    title="Intelligent Defaults"
+    color="#8b5cf6"
+    icon="brain"
+  >
+    Proper handling of leap years, month boundaries, and timezone-aware calculations.
+  </Card>
+</CardGroup>
+
+### Impact
+Agents can now understand temporal references without explicit formatting, making conversations more natural and improving task completion rates.
+
+---
+
+## 🎨 Completely Redesigned Marketplace
+
+**Browse, discover, and manage integrations with a modern interface.**
+
+The marketplace has been completely redesigned from the ground up with a focus on usability, visual appeal, and discoverability.
+
+### What's New
+
+- **Modern Product Cards** - Clean, scannable product listings with rich metadata and visual hierarchy
+- **Sidebar Navigation** - Category-based browsing with collapsible sections for easier discovery
+- **Dark Mode Support** - Full dark mode styling throughout the marketplace
+- **Responsive Design** - Optimized for desktop, tablet, and mobile devices
+- **Product Overview** - Detailed product information with sidebar controls and rich descriptions
+- **Improved Search** - Better filtering and categorization for quick discovery
+- **Visual Improvements** - Updated shadows, borders, and spacing for modern aesthetic
+
+### Components
+
+<AccordionGroup>
+  <Accordion title="Product Cards">
+    Clean, scannable cards with product image, name, description, and quick actions. Hover effects and visual feedback for better interactivity.
+  </Accordion>
+  
+  <Accordion title="Navigation Sidebar">
+    Collapsible sidebar with category-based navigation. Swappable menu items and responsive behavior for mobile.
+  </Accordion>
+  
+  <Accordion title="Product Overview">
+    Detailed product view with sidebar controls, rich descriptions, and action buttons. Grid layout for desktop, responsive flexbox for mobile.
+  </Accordion>
+  
+  <Accordion title="Dark Mode Styling">
+    Full dark mode support with proper contrast, border colors, and background styling throughout the marketplace.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 📱 Mobile Experience Improvements
+
+**Optimized interface for mobile and tablet users.**
+
+Significant improvements across the entire platform for a native mobile experience.
+
+### Mobile Enhancements
+
+<CardGroup cols={2}>
+  <Card
+    title="Responsive Chat"
+    icon="message-square"
+    color="#16a34a"
+  >
+    Fixed chat focus behavior on mobile. Separate height limits for mobile (135px) vs desktop (400px) inputs.
+  </Card>
+  
+  <Card
+    title="Compact Sidebar"
+    icon="sidebar"
+    color="#2563eb"
+  >
+    Dynamic sidebar that collapses on smaller screens. Intelligent breakpoint at 625px height for compact mode.
+  </Card>
+  
+  <Card
+    title="Touch-Friendly Forms"
+    icon="hand-pointer"
+    color="#f59e0b"
+  >
+    Improved form layouts and input handling for touch interfaces. Better spacing and larger touch targets.
+  </Card>
+  
+  <Card
+    title="Responsive Buttons"
+    icon="square"
+    color="#8b5cf6"
+  >
+    Better button sizing and spacing for touch interfaces. Icon-only headers on mobile for space efficiency.
+  </Card>
+</CardGroup>
+
+### Technical Improvements
+- Portable device detection to prevent unwanted chat focus
+- Dynamic layout calculations based on viewport size
+- Horizontal scrolling for agent details tabs on mobile
+- Optimized thumbnail sizing with responsive properties
+- Fixed iOS viewport and keyboard handling
+
+---
+
+## 👤 Enhanced Account & Billing Management
+
+**Better control over subscriptions, seats, and team management.**
+
+Account management has been significantly enhanced with new features for managing subscriptions and team members.
+
+### New Features
+
+<CardGroup cols={2}>
+  <Card
+    title="Seat Management"
+    icon="users"
+    color="#16a34a"
+  >
+    Track occupied seats and manage user assignments. Validate seat availability before unsuspending users.
+  </Card>
+  
+  <Card
+    title="Subscription Scheduling"
+    icon="calendar-check"
+    color="#2563eb"
+  >
+    Schedule downgrades with advance notice. Support for subscription schedule cancellation with clear notifications.
+  </Card>
+  
+  <Card
+    title="Advanced User Search"
+    icon="search"
+    color="#f59e0b"
+  >
+    Search users by multiple conditions. Last login tracking to see when team members last accessed the platform.
+  </Card>
+  
+  <Card
+    title="Improved Email Templates"
+    icon="envelope"
+    color="#8b5cf6"
+  >
+    Better formatted notification emails with multi-recipient support. Cleaner HTML structure for better compatibility.
+  </Card>
+</CardGroup>
+
+### Account Operations
+- Parallel processing for faster user list operations
+- Enhanced webhook logging for billing events
+- New billing event types: `DowngradeScheduled`, `DowngradeUnscheduled`, `DowngradeFailed`
+- Admin notifications for billing issues
+- Pending downgrade tracking in account information
+
+---
+
+## 🔧 Technical Improvements & Backend Reliability
+
+**Faster, more reliable infrastructure.**
+
+Under the hood, we've made significant improvements to backend performance and reliability.
+
+### Performance & Stability
+
+<AccordionGroup>
+  <Accordion title="Message Validation">
+    Prevents orphaned tool_use/tool_result pairs in streamed conversations. Automatic repair when chat history is truncated.
+  </Accordion>
+  
+  <Accordion title="PDF Handling">
+    Graceful fallback for PDF text extraction failures. CLI fallback when Go library fails silently. Skip empty content to prevent cache pollution.
+  </Accordion>
+  
+  <Accordion title="Knowledge Base">
+    Improved document processing with better error handling. Optimized content caching to prevent invalid entries.
+  </Accordion>
+  
+  <Accordion title="Prometheus Configuration">
+    Optimized default storage directory structure. Improved indexing for better retrieval performance.
+  </Accordion>
+  
+  <Accordion title="Test Coverage">
+    Fixed 26+ test failures across the entire test suite. Comprehensive regression testing for all subsystems.
+  </Accordion>
+</AccordionGroup>
+
+### Developer Experience
+
+- **API Refactoring** - New `agent.api.ts` separates API requests from services for better code organization
+- **Component System** - New `AltButton` component eliminates code duplication
+- **Directive Improvements** - Enhanced `class-list.directive` with reactive updates
+- **Monitoring** - New monitoring request types for better observability
+
+---
+
+## 📊 Release Statistics
+
+| Metric | Value |
+|--------|-------|
+| **PRs Merged** | 19 |
+| **Files Changed** | 150+ |
+| **Lines Added** | ~5,500+ |
+| **Lines Removed** | ~2,000+ |
+| **Contributors** | 4 |
+| **Development Period** | 7 days |
+| **Test Coverage** | 26+ fixes |
+
+---
+
+## ✅ Backward Compatibility
+
+<Note>
+✅ **Fully Backward Compatible** - No breaking changes in v1.1.0
+
+All existing agents, integrations, and configurations continue to work without modification. This is a pure feature addition release with no deprecated functionality.
+</Note>
+
+---
+
+## 🚀 Getting Started with v1.1.0
+
+Your instance will be automatically updated to v1.1.0. Here's what you should know:
+
+### For New Users
+
+<Accordion title="New to QuivaWorks?">
+1. **Explore Chat Streaming** - Try any agent and watch responses stream in real-time
+2. **Browse Marketplace** - Discover new integrations and assistants in the redesigned marketplace
+3. **Configure Integrations** - Use improved OAuth tools for third-party connections
+4. **Multi-Session Workflow** - Open multiple tabs to work on different tasks simultaneously
+</Accordion>
+
+### For Existing Users
+
+<Accordion title="Already using QuivaWorks?">
+1. **Experience Chat Streaming** - Existing agents now stream responses automatically
+2. **Try Hierarchical Sessions** - Use sub-agents for complex tasks with parent-child linking
+3. **Explore Marketplace** - Check out the redesigned marketplace with new features
+4. **Mobile Improvements** - Test the optimized mobile experience on your device
+</Accordion>
+
+### For Developers
+
+<Accordion title="Building on QuivaWorks?">
+1. **Review API Changes** - Check out the new `agent.api.ts` structure
+2. **Update Components** - Use `AltButton` for consistent button styling
+3. **Test Streaming** - Verify streaming responses work with your custom agents
+4. **Review Message Validation** - Understand new validation for custom implementations
+</Accordion>
+
+### For Enterprise
+
+<Accordion title="Managing Enterprise Deployments?">
+1. **Review Account Management** - New seat tracking and subscription scheduling
+2. **Configure Billing** - Set up downgrade schedules and notifications
+3. **Monitor Performance** - Use new Prometheus configuration for better insights
+4. **Plan Migrations** - No migration needed; v1.1.0 is fully backward compatible
+</Accordion>
+
+---
+
+## 📚 Documentation & Resources
+
+<CardGroup cols={3}>
+  <Card
+    title="Chat Streaming Guide"
+    icon="zap"
+    href="https://docs.quivaworks.com/features/chat-streaming"
+  >
+    Learn how chat streaming works and how to use it in your agents.
+  </Card>
+  
+  <Card
+    title="Session Management"
+    icon="sitemap"
+    href="https://docs.quivaworks.com/features/sessions"
+  >
+    Master hierarchical sessions and parent-child conversation linking.
+  </Card>
+  
+  <Card
+    title="Marketplace Guide"
+    icon="shopping-bag"
+    href="https://docs.quivaworks.com/marketplace"
+  >
+    Explore the redesigned marketplace and discover new integrations.
+  </Card>
+  
+  <Card
+    title="API Reference"
+    icon="code"
+    href="https://docs.quivaworks.com/api"
+  >
+    Complete API documentation for developers.
+  </Card>
+  
+  <Card
+    title="Mobile Guide"
+    icon="mobile"
+    href="https://docs.quivaworks.com/mobile"
+  >
+    Tips and tricks for using QuivaWorks on mobile devices.
+  </Card>
+  
+  <Card
+    title="Troubleshooting"
+    icon="help-circle"
+    href="https://docs.quivaworks.com/support"
+  >
+    Common issues and solutions.
+  </Card>
+</CardGroup>
+
+---
+
+## 💬 Feedback & Support
+
+Have questions about v1.1.0? We'd love to hear from you!
+
+<CardGroup cols={2}>
+  <Card
+    title="Contact Support"
+    icon="envelope"
+    href="mailto:support@quivaworks.com"
+  >
+    Reach out to our support team for help and questions.
+  </Card>
+  
+  <Card
+    title="Report Bugs"
+    icon="bug"
+    href="https://github.com/myevari/evari-olympus/issues"
+  >
+    Found an issue? Report it on GitHub.
+  </Card>
+  
+  <Card
+    title="Feature Requests"
+    icon="lightbulb"
+    href="mailto:feedback@quivaworks.com"
+  >
+    Share your ideas for future QuivaWorks improvements.
+  </Card>
+  
+  <Card
+    title="Community"
+    icon="users"
+    href="https://community.quivaworks.com"
+  >
+    Join our community to discuss features and share best practices.
+  </Card>
+</CardGroup>
+
+---
+
+## 🙏 Thank You
+
+Thank you to everyone who contributed to QuivaWorks v1.1.0:
+
+- **Paul** (paulevari) - Chat streaming infrastructure, message validation, PDF extraction
+- **Maria** (mariaveneva200) - Account management, billing, email templates, marketplace fixes
+- **Chris** (ChrisHumboldtEvari) - Infrastructure, Prometheus configuration
+- **Sam** (Saface89) - UI/UX, marketplace redesign, mobile optimizations
+
+Your feedback and contributions help us continuously improve the platform.
+
+**Happy building with QuivaWorks! 🎉**
+
+---
+
+## 📚 Learn More
+
+For more details on all changes in this release, see the [full changelog](https://github.com/myevari/evari-olympus/compare/v1.0.5...v1.1.0).
+
+View the [complete list of merged PRs](https://github.com/myevari/evari-olympus/pulls?q=is%3Apr+is%3Amerged+base%3Amain+merged%3A2026-02-05..2026-02-11).
+
+---
+
+*Last updated: February 13, 2026*
+
+</Update>
+
+---
+
 <Update label="February 2026" description="v1.0.5" tags={["Image", "UI", "Integrations", "Models"]}>
 # QuivaWorks v1.0.5 Release Notes
 
