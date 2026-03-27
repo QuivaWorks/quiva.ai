@@ -2,6 +2,142 @@
 title: "Product Updates"
 description: "Updates, improvements and bug fixes"
 ---
+
+<Update label="March 2026" description="v1.1.4" tags={["Flows", "Marketplace", "Chat", "Editor", "Assistants"]}>
+
+<Note>**Release Date:** March 27, 2026
+**Version:** v1.1.4 – Patch Release
+**Release Type:** Maintenance & Improvements</Note>
+
+# Quiva v1.1.4 – Enhanced Flows, Marketplace, & Chat Experience
+
+<Tip>This patch release focuses on critical bug fixes and user experience improvements without any breaking changes. All existing workflows and Assistants remain fully compatible.</Tip>
+
+## 🎯 Key Highlights
+
+<CardGroup cols={2}>
+
+ <Card title="🔗 Service Functions for Flows" icon="network-wired" color="blue">
+   Add HTTP endpoints and Quiva services to your flows with OpenAPI spec support
+ </Card>
+
+ <Card title="Marketplace Redesign" icon="store" color="purple">
+   Enhanced search, categorization, and featured products for easier discovery
+ </Card>
+
+ <Card title="Sub-Agent Context Sharing" icon="sitemap" color="green">
+   Sub-agents now automatically receive documents and conversation context
+ </Card>
+
+ <Card title="Enhanced Editor" icon="pen" color="orange">
+   Improved code block and table support with better copy/paste handling
+ </Card>
+
+</CardGroup>
+
+## ✨ What's New
+
+### Service Functions for Flows
+
+Your flows now have enhanced support for **HTTP endpoints** and **Quiva service invocations**, opening up new automation possibilities. Drag-and-drop HTTP request nodes and endpoint services into your flow builders alongside agents, conditions, and delays.
+
+**Capabilities include:**
+- **HTTP Request Node** – Call REST APIs with full authentication support (Bearer, Basic, API Key)
+- **Quiva Endpoint Node** – Invoke OpenAPI-compliant services with automatic schema conversion
+- **Delay Node** – Add pauses and timing control to your workflows
+- **Rules Node** – Implement conditional logic based on payload data
+
+All nodes work seamlessly with the existing flow architecture—build complex multi-step automations without leaving the visual builder.
+
+---
+
+### Marketplace Overhaul
+
+The marketplace has been completely redesigned with your feedback in mind:
+
+- **Smarter Search** – Faster, debounced search with instant result filtering
+- **Better Categorization** – Products now organized by type with improved browsing
+- **Featured Section** – Discover hand-picked products and top-rated agents
+- **Mobile-Optimized** – Responsive design works beautifully on all devices
+- **Product Previews** – Enhanced "About" tabs with rich descriptions and requirements
+
+Discovering and installing Assistants, flows, and integrations is now faster and more intuitive.
+
+---
+
+### Sub-Agent Context Sharing
+
+Sub-agents now inherit conversation context from their parent agents automatically. When a sub-agent is invoked, it receives:
+
+- **Document References** – All files and attachments from the parent conversation
+- **Topic Summaries** – Recent conversation context to maintain continuity
+- **No Performance Overhead** – Context is deterministically extracted with minimal token usage
+
+This eliminates the context loss problem where sub-agents had no knowledge of documents referenced in the main conversation. Perfect for multi-agent orchestrations and team workflows.
+
+---
+
+### Editor Improvements
+
+Your writing experience is now smoother:
+
+- **Better Code Blocks** – Paste code snippets with fewer formatting issues
+- **Table Support** – Create and edit tables directly in the editor
+- **Smarter Paste** – Markdown content now pastes with correct indentation and formatting
+- **Cleaner Output** – Non-breaking spaces in code blocks are automatically cleaned
+
+Especially useful when copying documentation, code examples, or formatted content from external sources.
+
+---
+
+## 🛠️ Bug Fixes & Improvements
+
+<AccordionGroup>
+
+ <Accordion title="Password Manager Integration">
+Fixed password manager compatibility by adding proper form hints. Login and sign-up forms now work correctly with browser password managers and autocomplete features.
+ </Accordion>
+
+ <Accordion title="Chat Session Restoration">
+Resolved an issue where chat views weren't properly restoring previous sessions. Chat interface now loads cleanly without unexpected UI glitches.
+ </Accordion>
+
+ <Accordion title="Agent Invocation Stability">
+Fixed critical issues in agent stream handling, including proper cleanup of resources and graceful handling of user cancellations. Invoking sub-agents is now more reliable and prevents memory leaks.
+ </Accordion>
+
+ <Accordion title="Marketplace Permissions & Sharing">
+Improved handling of shared agents and recipes. Ownership and sharing preferences are now properly maintained when downloading from the marketplace.
+ </Accordion>
+
+</AccordionGroup>
+
+## 📞 Support & Feedback
+
+<CardGroup cols={2}>
+
+ <Card title="Documentation" icon="book" href="https://docs.quiva.ai">
+   Explore flow builder guides and service integration tutorials
+ </Card>
+
+ <Card title="Community" icon="users" href="https://quivaworks.slack.com">
+   Chat with other users and get quick help
+ </Card>
+
+ <Card title="Feature Requests" icon="lightbulb" mailto="hello@quiva.ai">
+   Tell us what you'd like to build next
+ </Card>
+
+ <Card title="Support" icon="envelope" mailto="support@quiva.ai">
+   Contact our support team for assistance
+ </Card>
+
+</CardGroup>
+
+</Update>
+
+---
+
 <Update label="March 2026" description="v1.1.3" tags={["Context Variables", "File Preview", "Customizable Messages", "Knowledge Sorting", "Interactive Onboarding"]}>
 
 <Note>**Release Date:** March 20, 2026  
