@@ -226,7 +226,7 @@
       "anchors": [
         {
           "anchor": "Community",
-          "href": "https://quivaworks.slack.com",
+          "href": "https://quiva.ai/community",
           "icon": "slack"
         },
         {
@@ -262,7 +262,7 @@
   },
   "footer": {
     "socials": {
-      "linkedin": "https://linkedin.com/company/quiva"
+      "linkedin": "https://linkedin.com/company/quivaworks"
     }
   }
 }
