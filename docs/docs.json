@@ -217,7 +217,7 @@
         "groups": [
           {
             "group": "Change Log",
-            "pages": ["changelog/product-updates"]
+            "pages": ["changelog/latest-release","changelog/product-updates"]
           }
         ]
       }
