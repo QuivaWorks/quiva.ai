@@ -20,6 +20,7 @@
               "get-started/overview",
               "get-started/getting-started",
               "get-started/core-concepts",
+              "get-started/collaboration",
               "get-started/plans-and-pricing"
             ]
           },
@@ -96,7 +97,7 @@
             "group": "Account Management",
             "pages": [
               {
-                "icon":"id-card",
+                "icon": "id-card",
                 "group": "Account Management",
                 "pages": [
                   "essentials/account/creating-account",
@@ -106,7 +107,7 @@
                 ]
               },
               {
-                "icon":"people-group",
+                "icon": "people-group",
                 "group": "User Management",
                 "pages": [
                   "essentials/users/user-management",
@@ -115,7 +116,6 @@
                 ]
               },
               {
-                
                 "icon": "lock",
                 "group": "Security",
                 "pages": [
@@ -217,7 +217,7 @@
         "groups": [
           {
             "group": "Change Log",
-            "pages": ["changelog/latest-release","changelog/product-updates"]
+            "pages": ["changelog/latest-release", "changelog/product-updates"]
           }
         ]
       }
