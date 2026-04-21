@@ -1,32 +1,30 @@
 ---
-title: "Agents Overview"
-description: "Build intelligent AI agents that reason, use tools, and make decisions within your workflows"
-icon: "robot"
+title: "Assistants Overview"
+description: "Deploy intelligent AI assistants that reason, learn, and integrate with your systems"
+icon: "sparkles"
 ---
 
-# Understanding Agents
+# Understanding Assistants
 
-Agents are the intelligence layer of QuivaWorks. They're AI-powered workers that can understand context, reason through problems, use tools, and make decisions—all within boundaries you define.
+Assistants are the intelligent core of QuivaWorks. They're AI-powered specialists that understand context, reason through complex tasks, integrate with your systems, and continuously improve through feedback—all within boundaries you define.
 
-## What is an Agent?
+## What is an Assistant?
 
-An agent is an AI that can:
+An assistant is an AI that can:
 
-- **Understand** - Parse natural language and complex data
-- **Reason** - Think through problems step-by-step
-- **Act** - Use tools and APIs to accomplish tasks
-- **Decide** - Make judgements based on policies and context
-- **Adapt** - Handle exceptions and edge cases
+- **Understand** — Parse natural language, context, and complex workflows
+- **Reason** — Think through multi-step problems with intelligent decision-making
+- **Learn** — Improve through feedback and user interactions automatically
+- **Integrate** — Connect to your tools, APIs, and systems seamlessly
+- **Collaborate** — Work alongside your team with clear communication and escalation
 
-Unlike rigid automation or simple chatbots, agents work more like human employees: you give them a goal, the tools they need, and boundaries to operate within—then they figure out how to accomplish the task.
+Unlike rigid automation or simple chatbots, assistants work like expert team members: you define their role, equip them with knowledge and tools, set clear boundaries—and then can continuously improve them by providing feedback on interactions.
 
-<img 
-  src="/images/agents/agent-diagram.png" 
-  alt="Agent Architecture"
-  className="rounded-lg"
-/>
+<Tip>
+Assistants are designed to handle complexity, variability, and judgment calls—exactly where human-like AI adds the most value.
+</Tip>
 
-## Agents vs. Automation vs. Chatbots
+## Assistants vs. Automation vs. Chatbots vs. LLMs
 
 <CardGroup cols={3}>
   <Card title="Traditional Automation" icon="gears">
@@ -39,8 +37,8 @@ Unlike rigid automation or simple chatbots, agents work more like human employee
     ❌ Brittle with edge cases
   </Card>
   
-  <Card title="Simple Chatbots" icon="comment">
-    **"Conversation interface"**
+  <Card title="Simple Chatbots" icon="message">
+    **"Powerful text generation"**
     
     Responds to keywords. Limited to chat. No real reasoning or actions.
     
@@ -48,114 +46,316 @@ Unlike rigid automation or simple chatbots, agents work more like human employee
     ⚠️ Can't use tools  
     ⚠️ Limited to conversation
   </Card>
-  
-  <Card title="quiva.ai Agents" icon="robot">
-    **"Digital workforce"**
+
+  <Card title="Large Language Models" icon="chip">
+    **"Intelligent specialist"**
     
-    Reasons through problems. Uses tools. Handles exceptions. Makes decisions.
+    Advanced language models that generate high-quality text. Conversational but stateless—no memory or tool usage.
+    
+    ✅ Excellent writing quality  
+    ✅ Fast responses  
+    ❌ No memory between chats  
+    ❌ Prone to hallucinations  
+    ❌ No decision-making
+
+  </Card>
+  
+  <Card title="QuivaWorks Assistants" icon="sparkles">
+    **"Intelligent specialist"**
+    
+    Reasons through problems. Learns from feedback. Integrates with systems. Handles complexity.
     
     ✅ Intelligent reasoning  
-    ✅ Uses tools dynamically  
-    ✅ Handles complexity  
+    ✅ System integration  
+    ✅ Feedback mechanism  
     ✅ Works within boundaries
   </Card>
 </CardGroup>
 
-## Core Agent Capabilities
+## Core Assistant Capabilities
 
-### 1. Intelligence & Reasoning
+### 1. Intelligent Reasoning & Contextual Understanding
 
-Agents can:
-- Understand natural language and intent
-- Reason through multi-step problems
-- Handle ambiguity and edge cases
-- Learn from context and conversation history
-- Apply business logic flexibly
+Assistants can:
+- Understand natural language and complex intent
+- Reason through multi-step problems with context awareness
+- Handle ambiguity, edge cases, and exceptions gracefully
+- Apply business logic flexibly based on situation
+- Remember conversation history and context automatically
 
-<Card title="Example: Customer Service" icon="headset">
-**Customer**: "I want to return this shirt but I lost the receipt. It's been 35 days."
-
-**Traditional Automation**: Breaks (doesn't match exact return scenario)
-
-**Agent**: 
-1. Understands customer wants to return an item
-2. Checks order history (using tool)
-3. Sees purchase was 35 days ago (5 days past standard policy)
-4. Reviews return policy (using tool)
-5. Notes customer has good history and high lifetime value
-6. **Decides** to approve as one-time exception
-7. Processes return and explains decision to customer
+<Card title="Example: Documentation Generation" icon="pen">
+  **You**: "Create documentation for our customer feature!"
+  
+  **Your Documentation Assistant**:
+  1. Reads your description and has access to your documentation guidelines
+  2. Generates clear, user-focused documentation based on your style
+  3. You review and provide feedback: "Make this more beginner-friendly, add real examples"
+  4. Assistant revises based on your input
+  5. You vote on what worked well and consolidate successful patterns into a Learning file
+  6. Next time you create a documentation assistant, it can apply that Learning file to guide its behaviour
+  
+  You're collaborating with an expert that understands your context, your systems, and your needs—not starting from scratch each time. You explicitly capture what works and apply it intentionally.
 </Card>
 
-### 2. Tool Usage
+### 2. System Integration & Tool Access
 
-Agents can use tools (connectors) to:
-- Search knowledge bases
-- Query databases
-- Call APIs
-- Access CRM data
-- Process documents
-- Send emails
-- Update systems
+Assistants integrate with:
+- Knowledge bases and documentation
+- CRM and customer data systems
+- Databases and data sources
+- APIs and external services
+- GitHub, email, and communication platforms
+- Custom business systems
 
-Agents **decide which tools to use** based on the task. You don't program "if customer asks about order, call order API"—the agent figures that out.
+Assistants **decide which tools to use** based on the task at hand, you just need to provide authorisation and access to the integration and the assistant will do the rest. You don't program "if customer asks about orders, call Order API"—the assistant figures that out intelligently.
 
-<Info>
-Tools are MCP (Model Context Protocol) servers that provide standardized access to your systems. Learn more in [Tools & Connectors](/agents/tools-and-connectors).
-</Info>
+<Tip>
+Integrations are configured once during setup, then your assistant automatically uses the right system at the right time.
+</Tip>
 
-### 3. Guardrails & Boundaries
+### 3. Smart Configuration & Control
 
-Agents work within boundaries you define:
+Assistants work within boundaries you define:
 
-- **Output validation** - Ensures responses match required format
-- **Business rules** - Enforces policies and constraints
-- **Human-in-the-loop** - Escalates critical decisions
-- **Context limits** - Controls memory and token usage
-- **Response modes** - Synchronous or background execution
+- **Instructions** — Define role, personality, and specific capabilities
+- **Knowledge** — Provide training data, guidelines, and context
+- **Output validation** — Enforce required response formats
+- **Integrations** — Control which systems the assistant can access
+- **Context limits** — Set token budgets and memory size
+- **Execution modes** — Synchronous or background processing
 
-<Warning>
-Agents are powerful but not perfect. Always define boundaries, validate outputs, and use human-in-the-loop for critical decisions.
-</Warning>
+<Callout type="info">
+Boundaries aren't limitations—they're guardrails that ensure your assistant works exactly as you need.
+</Callout>
 
-### 4. Self-Optimization
+### 4. Continuous Learning & Self-Improvement
 
-Agents improve automatically:
+Assistants improve through:
 
-- **Smart Context** - Intelligently manages conversation memory
-- **Prompt Optimization** - Automatically enhances prompts based on configuration
-- **Adaptive Behavior** - Learns from usage patterns (coming soon)
+- **Smart Context Management** — Intelligently handles conversation memory without manual tuning
+- **Learning System** — Accumulates feedback from interactions and surfaces actionable insights
+- **Performance Insights** — Consolidates patterns from successful interactions so you can identify what works well
+- **Intentional Refinement** — You review insights and refine your assistant's instructions and behaviour based on what you've learned
 
-## When to Use Agents
+The Learning tab shows consolidated feedback, allowing you to make informed decisions about how to improve your assistant's performance over time.
+
+## When to Use Assistants
 
 ### Perfect For
 
 <AccordionGroup>
   <Accordion title="Customer Service & Support" icon="headset">
-    - Answer customer questions with context
+    - Answer questions with full context and history
     - Troubleshoot issues using knowledge base
+    - Apply policies with judgment (returns, refunds, exceptions)
+    - Handle complex, multi-turn conversations
+    - Escalate to humans when needed
+    - Learn from each interaction to improve
+  </Accordion>
+
+  <Accordion title="Lead Qualification & Sales" icon="user-check">
+    - Ask discovery questions dynamically
+    - Research companies and prospects
+    - Score leads based on ICP criteria
+    - Enrich data from multiple sources
+    - Personalise outreach at scale
+    - Route qualified opportunities intelligently
+  </Accordion>
+
+  <Accordion title="Content & Messaging" icon="pen">
+    - Create personalised campaigns
+    - Generate and adapt messaging by audience
+    - Maintain brand voice across channels
+    - Repurpose content efficiently
+    - A/B test messaging variants
+  </Accordion>
+
+  <Accordion title="Data Processing & QA" icon="database">
+    - Extract information from documents
+    - Validate data against business rules
+    - Make contextual decisions on exceptions
+    - Cross-reference multiple systems
+    - Flag issues for human review
+    - Learn from manual corrections
+  </Accordion>
+
+  <Accordion title="Technical Operations" icon="cogs">
+    - Triage and manage issues
+    - Automate routine technical tasks
+    - Generate documentation and reports
+    - Coordinate between teams
+    - Learn best practices from interactions
+  </Accordion>
+</AccordionGroup>
+
+### Not Ideal For
+
+<Card title="When to Use Automation Instead" icon="triangle-exclamation">
+- **Simple, predictable tasks** — If it's always the same steps, use a condition or rule
+- **High-volume, low-variability** — Assistants have per-run costs; save them for complexity
+- **Pure data transformation** — Use Rules or Functions for straightforward data work
+- **Time-critical micro-operations** — Assistants add latency; use functions for speed
+- **Deterministic calculations** — Use Rules for exact math and logic
+
+**Rule of thumb**: If you can write "if X then Y" rules that cover every case, use automation. If there's judgment, context, learning, or exceptions, use an assistant.
+</Card>
+
+## Building Your First Assistant
+
+<Steps>
+  <Step title="Define the Role">
+    What is this assistant responsible for? Customer service? Sales support? Technical operations? Be specific about the domain and focus.
+  </Step>
+  <Step title="Write Instructions">
+    Describe the assistant's role, personality, communication style, and specific capabilities. This is like writing a detailed job description.
+  </Step>
+  <Step title="Add Knowledge">
+    Provide training data, guidelines, policies, and context. Upload documents, paste knowledge, or link URLs. This is how your assistant learns your business.
+  </Step>
+  <Step title="Choose a Model">
+    Select the AI provider and model. Use Claude for long context, GPT-4 for reasoning, or start with our Workforce model for best value.
+  </Step>
+  <Step title="Connect Integrations">
+    Add the systems your assistant needs: GitHub, CRM, knowledge bases, APIs. Start with essentials, add more as needed.
+  </Step>
+  <Step title="Set Boundaries">
+    Define what the assistant can and cannot do. Set output schemas, validation rules, escalation criteria.
+  </Step>
+  <Step title="Test & Learn">
+    Use the Chat interface to test with real scenarios. Review the Learning tab for insights on what's working and what needs refinement.
+  </Step>
+  <Step title="Deploy & Monitor">
+    Activate in flows, review performance regularly, and refine based on feedback and learning insights.
+  </Step>
+</Steps>
+
+<Card title="Create Your First Assistant" icon="rocket" href="/assistants/creating-first-assistant">
+Follow our step-by-step guide to deploy your first assistant in minutes
+</Card>
+
+## Configuration & Smart Features
+
+Every assistant has intelligent configuration areas:
+
+### Instructions Configuration
+
+Define your assistant's identity and behaviour:
+
+- **Role & Personality** — Who is this assistant? What's their expertise?
+- **Specific Capabilities** — What tasks should they handle?
+- **Communication Style** — How should they respond? Formal? Friendly?
+- **Limitations** — What should they NOT do? When should they escalate?
+
+Instructions are like a job description—be specific and clear about expectations.
+
+[Learn more about Instructions →](/assistants/configuration/instructions)
+
+### Knowledge Management
+
+Train your assistant with relevant information:
+
+- **Manual Entry** — Paste guidelines, policies, or context directly
+- **File Upload** — Import documents, PDFs, or training materials
+- **URL Import** — Link to web pages, documentation, or knowledge bases
+- **Knowledge Relevance** — The assistant automatically uses relevant knowledge when needed
+
+Knowledge is what makes your assistant domain-expert smart.
+
+[Learn more about Knowledge →](/assistants/configuration/knowledge)
+
+### Integration Configuration
+
+Connect your business systems:
+
+- **GitHub Issues & PRs** — Manage repositories and workflows
+- **CRM Systems** — Access customer data and history
+- **APIs & Webhooks** — Connect custom systems
+- **Knowledge Bases** — Link documentation and guidelines
+- **Email & Communication** — Send messages and updates
+
+Your assistant intelligently decides which system to access for each task.
+
+[Learn more about Integrations →](/assistants/configuration/integrations)
+
+### Context Variables
+
+Configure dynamic settings:
+
+- **Project & Repository** — Specify where the assistant should work
+- **API Keys & Credentials** — Securely store authentication
+- **Custom Parameters** — Define workflow-specific variables
+- **Environment Settings** — Set execution parameters
+
+Context Variables keep your assistant focused and secure.
+
+[Learn more about Context Variables →](/assistants/configuration/context-variables)
+
+### Provider Settings
+
+Choose the AI model:
+
+- **Provider Options** — Workforce (our custom model), OpenAI, Claude, Gemini
+- **Model Selection** — Choose specific models (GPT-4, Claude Sonnet, etc.)
+- **Output Token Limits** — Set maximum response size
+- **Configuration** — Fine-tune behaviour settings
+
+Different models excel at different tasks. Test to find what works best for your use case.
+
+[Learn more about Provider Settings →](/assistants/configuration/provider-settings)
+
+### Learning System
+
+Enable continuous improvement:
+
+- **Feedback Accumulation** — Collect insights from interactions
+- **Performance Insights** — See what's working and what needs improvement
+- **Consolidate Learnings** — Turn feedback into actionable guidance
+- **Adaptive Refinement** — Automatically improve over time
+
+The Learning tab shows you exactly how your assistant is performing and where to focus refinement efforts.
+
+[Learn more about Learning →](/assistants/configuration/learning)
+
+## When to Use Assistants
+
+Assistants excel when you need intelligent collaboration, judgment, and contextual decision-making. They're expert partners you work with to accomplish complex tasks.
+
+### Perfect For
+
+<AccordionGroup>
+  <Accordion title="Expert Collaboration & Research" icon="brain">
+    - Research complex topics with intelligent analysis
+    - Draft content with iterative refinement
+    - Brainstorm strategies and approaches
+    - Analyse data and generate insights
+    - Work collaboratively on problem-solving
+  </Accordion>
+
+  <Accordion title="Customer Service & Support" icon="headset">
+    - Answer customer questions with context
+    - Troubleshoot issues using knowledge bases
     - Apply policies with judgment (returns, refunds)
     - Handle complex, multi-turn conversations
     - Escalate to humans when needed
   </Accordion>
 
-  <Accordion title="Lead Qualification" icon="user-check">
+  <Accordion title="Lead Qualification & Discovery" icon="user-check">
     - Ask discovery questions dynamically
     - Research companies and contacts
-    - Score leads based on ICP criteria
+    - Score leads based on your ICP criteria
     - Enrich data from multiple sources
     - Route qualified leads intelligently
   </Accordion>
 
-  <Accordion title="Content Generation" icon="pen">
-    - Create personalized email campaigns
+  <Accordion title="Content Generation & Adaptation" icon="pen">
+    - Create personalised email campaigns
     - Generate social media posts
     - Adapt messaging by audience segment
     - Maintain brand voice across channels
-    - Repurpose content efficiently
+    - Collaborate on content refinement
   </Accordion>
 
-  <Accordion title="Data Processing" icon="database">
+  <Accordion title="Data Processing & Analysis" icon="database">
     - Extract information from documents
     - Validate data against business rules
     - Make contextual decisions on exceptions
@@ -164,7 +364,7 @@ Agents improve automatically:
   </Accordion>
 
   <Accordion title="Sales & Outreach" icon="handshake">
-    - Personalize outreach at scale
+    - Personalise outreach at scale
     - Research prospects automatically
     - Follow up based on engagement
     - Book meetings intelligently
@@ -174,258 +374,94 @@ Agents improve automatically:
 
 ### Not Ideal For
 
-<Card title="When to Use Traditional Automation Instead" icon="triangle-exclamation">
-- **Simple, predictable tasks** - If it's always the same steps, use a condition or function
-- **High-volume, low-variability** - Agents have per-run costs; save them for complexity
-- **Pure data transformation** - Use Map, Rules, or Functions for straightforward data manipulation
-- **Time-critical micro-operations** - Agents add latency; use functions for speed-critical tasks
-- **Deterministic calculations** - Use Rules for exact math and logic
+<Card title="When to Use Workflows Instead" icon="triangle-exclamation">
+  - **Simple, predictable tasks** - If it's always the same steps, use a function or condition
+  - **High-volume, low-variability** - Assistants have per-interaction costs; save them for complexity
+  - **Pure data transformation** - Use Rules or Functions for straightforward data manipulation
+  - **Time-critical micro-operations** - Assistants add latency; use functions for speed-critical tasks
+  - **Deterministic calculations** - Use Rules for exact math and logic
 
-**Rule of thumb**: If you can write "if X then Y" rules that cover all cases, use automation. If there's judgment, context, or exceptions, use agents.
+**Rule of thumb**: If you can write "if X then Y" rules that cover all cases, use automation. If there's judgment, context, exceptions, or collaboration—use an assistant.
 </Card>
 
-## Agent Architecture
+### Assistant Costs
 
-Every agent has three main configuration areas:
+Assistants are billed through a credit system based on your plan:
 
-### 1. Information Settings
+**How Credits Work:**
+- Each interaction consumes credits based on model usage and complexity
+- Included credits refresh monthly and are allocated per user
+- Purchase additional credits at discounted rates—they never expire and roll over
+- Credits apply regardless of which Claude model you're using
 
-Define your agent's identity and behavior:
+**Credit Allocation by Plan:**
+- **Free:** 500 credits per account
+- **Pro:** 1,000 credits per user (purchase additional at $8/1,000)
+- **Team:** 1,500 credits per user (purchase additional at $7/1,000)
 
-- **Name & Description** - What this agent does
-- **Response Mode** - Wait for completion or run in background
-- **Agent Instructions** - Role, personality, and capabilities
+**Default Model:**
+All new assistants use Claude Haiku 4.5, our fastest and most cost-effective model. It's optimised for most business workflows whilst keeping costs low.
 
-<Tip>
-Agent instructions are like a job description. Be specific about what the agent should do, how it should communicate, and what its limitations are.
-</Tip>
+**Cost Optimisation Tips:**
+- Use Claude Haiku 4.5 for most tasks—excellent balance of performance and cost
+- Start with shorter conversations and context to reduce credit consumption
+- Consolidate feedback through the Learning system to refine instructions and reduce re-work
+- Monitor assistant performance in the analytics dashboard to identify cost-saving opportunities
 
-[Learn more about Information Settings →](/agents/configuration/information-settings)
-
-### 2. Provider Settings
-
-Configure the AI model and integration:
-
-- **Provider** - Workforce (custom), OpenAI, Claude, Gemini
-- **Model** - Specific model version (GPT-4, Claude Sonnet, etc.)
-- **API Key** - Securely stored authentication
-- **Output Schema** - Define required response structure
-
-<Info>
-Different models excel at different tasks. GPT-4 for general intelligence, Claude for long context, Gemini for multimodal. Test to find what works best.
-</Info>
-
-[Learn more about Provider Settings →](/agents/configuration/provider-settings)
-
-### 3. Context Settings
-
-Control memory and reasoning behavior:
-
-- **Smart Context** - Automatic conversation memory management
-- **Prompt Optimization** - Auto-enhance prompts
-- **Token Limits** - Maximum context size
-- **Message History** - How many messages to remember
-- **Reasoning Steps** - How many tool uses allowed
-
-<Tip>
-Higher token limits = more context = better decisions, but higher costs. Start with defaults and increase if needed.
-</Tip>
-
-[Learn more about Context Settings →](/agents/configuration/context-settings)
-
-## Building Your First Agent
-
-<Steps>
-  <Step title="Define the Role">
-    What is this agent responsible for? Customer service? Lead qualification? Content creation?
-  </Step>
-  <Step title="Write Instructions">
-    Describe the agent's role, personality, and capabilities clearly
-  </Step>
-  <Step title="Choose a Model">
-    Select the LLM provider and model that fits your needs
-  </Step>
-  <Step title="Attach Tools">
-    Connect the systems and data sources the agent needs
-  </Step>
-  <Step title="Set Boundaries">
-    Define output schemas, validation rules, and escalation criteria
-  </Step>
-  <Step title="Test Thoroughly">
-    Try edge cases, exceptions, and realistic scenarios
-  </Step>
-  <Step title="Deploy & Monitor">
-    Activate in a flow and review performance regularly
-  </Step>
-</Steps>
-
-<Card title="Start Building" icon="rocket" href="/agents/creating-first-agent">
-Follow our step-by-step guide to create your first agent in minutes
-</Card>
-
-## Agent Examples
-
-### Customer Service Agent
-
-```
-Role: Customer service representative for [Company]
-
-Instructions: 
-You help customers with order tracking, returns, and product questions. 
-You're friendly, professional, and resolve issues on first contact.
-
-Tools:
-- Search Knowledge Base
-- Get Order History
-- Apply Return Policy
-- Create Support Ticket
-
-Boundaries:
-- Approve returns up to $200 without escalation
-- Escalate refunds over $200 to human
-- Always verify customer identity before accessing orders
-```
-
-### Lead Qualification Agent
-
-```
-Role: Sales development representative
-
-Instructions:
-You qualify inbound leads by understanding their needs, company fit, 
-and timeline. You ask relevant discovery questions and score leads 
-based on our ICP criteria.
-
-Tools:
-- Search CRM
-- Company Data API (Clearbit/ZoomInfo)
-- Calendar Booking
-- Lead Scoring Rules
-
-Boundaries:
-- Only book meetings with qualified leads (score > 70)
-- Maximum 5 discovery questions
-- If lead doesn't match ICP, add to nurture campaign
-```
-
-### Content Generation Agent
-
-```
-Role: Content marketing specialist
-
-Instructions:
-You create engaging social media posts and email campaigns that 
-match our brand voice. You adapt messaging for different audience 
-segments and channels while maintaining consistency.
-
-Tools:
-- Get Brand Guidelines
-- Get Customer Segments
-- Get Performance Metrics
-- Content Calendar
-
-Boundaries:
-- Follow brand voice guidelines strictly
-- Include call-to-action in every post
-- Adapt length and tone by channel
-- Flag sensitive topics for human review
-```
-
-## Best Practices
-
-<AccordionGroup>
-  <Accordion title="Be Specific in Instructions" icon="bullseye">
-    Don't say "help customers." Say "help customers with order tracking, returns within policy, and product questions. Escalate refunds over $200."
-  </Accordion>
-
-  <Accordion title="Give the Right Tools" icon="toolbox">
-    Connect data sources the agent needs. More context = better decisions. But don't connect everything—focus on relevant tools.
-  </Accordion>
-
-  <Accordion title="Define Clear Boundaries" icon="fence">
-    Specify what the agent can and cannot do. Define escalation criteria. Use output schemas to enforce structure.
-  </Accordion>
-
-  <Accordion title="Test with Real Scenarios" icon="flask">
-    Use actual customer emails, edge cases, and exceptions. Agents learn from examples in instructions.
-  </Accordion>
-
-  <Accordion title="Start Simple, Add Complexity" icon="seedling">
-    Begin with basic instructions and a few tools. Test thoroughly. Then add more capabilities and guardrails.
-  </Accordion>
-
-  <Accordion title="Monitor and Refine" icon="chart-line">
-    Review agent conversations regularly. Refine instructions based on performance. Update tools as systems change.
-  </Accordion>
-
-  <Accordion title="Use Human-in-the-Loop" icon="user-check">
-    Add human approval for critical decisions, high-value actions, or when confidence is low.
-  </Accordion>
-</AccordionGroup>
-
-## Agent Costs
-
-Agents have per-run costs based on:
-
-- **Model chosen** - GPT-4 > GPT-3.5, Claude Opus > Sonnet
-- **Context size** - More tokens = higher cost
-- **Tool usage** - Each tool call adds processing
-- **Reasoning steps** - More steps = more tokens
-
-<Info>
-Use the **Workforce** model (our custom model) for the best balance of performance and cost. Or bring your own API keys to use any provider's pricing.
-</Info>
-
-See [Plans & Pricing](/get-started/plans-and-pricing) for details.
+See [Plans & Pricing](/get-started/plans-and-pricing) for detailed billing information and plan comparisons.
 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Create Your First Agent" icon="rocket" href="/agents/creating-first-agent">
-    Step-by-step guide to building an agent
+  <Card title="Create Your First Assistant" icon="rocket" href="/assistants/creating-first-assistant">
+    Step-by-step guide to building and deploying an assistant
   </Card>
   
-  <Card title="Information Settings" icon="info-circle" href="/agents/configuration/information-settings">
-    Configure agent identity and behavior
+  <Card title="Instructions Configuration" icon="message-square" href="/assistants/configuration/instructions">
+    Define role, personality, and capabilities
   </Card>
   
-  <Card title="Provider Settings" icon="sliders" href="/agents/configuration/provider-settings">
-    Choose models and configure AI
+  <Card title="Knowledge Management" icon="book" href="/assistants/configuration/knowledge">
+    Train your assistant with domain knowledge
   </Card>
   
-  <Card title="Context Settings" icon="brain" href="/agents/configuration/context-settings">
-    Manage memory and reasoning
+  <Card title="Integrations" icon="plug" href="/assistants/configuration/integrations">
+    Connect GitHub, CRM, APIs, and more
   </Card>
   
-  <Card title="Tools & Connectors" icon="plug" href="/agents/tools-and-connectors">
-    Connect your systems and data
+  <Card title="Context Variables" icon="sliders" href="/assistants/configuration/context-variables">
+    Configure dynamic settings and security
   </Card>
   
-  <Card title="Prompt Engineering" icon="wand-magic-sparkles" href="/agents/prompt-engineering">
-    Write effective agent instructions
+  <Card title="Provider Settings" icon="cpu" href="/assistants/configuration/provider-settings">
+    Choose AI models and fine-tune behaviour
   </Card>
   
-  <Card title="Best Practices" icon="star" href="/agents/best-practices">
-    Patterns for successful agents
+  <Card title="Learning System" icon="brain" href="/assistants/configuration/learning">
+    Enable continuous improvement through feedback
   </Card>
   
-  <Card title="Use in Flows" icon="diagram-project" href="/flows/steps/agents">
-    Add agents to your workflows
+  <Card title="Use in Flows" icon="workflow" href="/flows/steps/assistants">
+    Deploy assistants in your workflows
   </Card>
 </CardGroup>
 
-## Need Help?
+<Callout type="success">
+Ready to deploy your first intelligent assistant? Start simple—define a clear role, add essential knowledge and integrations, then watch your assistant improve with every interaction. The Learning system will guide your refinements.
+</Callout>
+
+## Get Help
 
 <CardGroup cols={3}>
   <Card title="Community" icon="users" href="https://quiva.ai/community">
-    Ask questions and share agents
+    Share assistants and learn from others
   </Card>
   
   <Card title="Support" icon="life-ring" href="https://quiva.ai/help-center">
     Get help from our team
   </Card>
   
-  <Card title="Examples" icon="book" href="/examples/agents">
-    Browse agent templates
+  <Card title="Marketplace" icon="store" href="https://www.quiva.ai/marketplace/">
+    Browse assistant templates and examples
   </Card>
 </CardGroup>
