@@ -25,6 +25,26 @@
             ]
           },
           {
+            "group": "Assistants",
+            "pages": [
+              "agents/overview",
+              "agents/creating-first-agent",
+              {
+                "group": "Configuration",
+                "icon": "sliders",
+                "pages": [
+                  "agents/configuration/information-settings",
+                  "agents/configuration/provider-settings",
+                  "agents/configuration/context-settings"
+                ]
+              },
+              "agents/tools-and-connectors",
+              "agents/learning",
+              "agents/prompt-engineering",
+              "agents/best-practices"
+            ]
+          },
+          {
             "group": "Flows",
             "pages": [
               "flows/overview",
@@ -74,25 +94,7 @@
               "flows/best-practices"
             ]
           },
-          {
-            "group": "Agents",
-            "pages": [
-              "agents/overview",
-              "agents/creating-first-agent",
-              {
-                "group": "Configuration",
-                "icon": "sliders",
-                "pages": [
-                  "agents/configuration/information-settings",
-                  "agents/configuration/provider-settings",
-                  "agents/configuration/context-settings"
-                ]
-              },
-              "agents/tools-and-connectors",
-              "agents/prompt-engineering",
-              "agents/best-practices"
-            ]
-          },
+          
           {
             "group": "Account Management",
             "pages": [

@@ -4,7 +4,7 @@ description: "Help your assistants improve through user feedback—rate conversa
 icon: "sparkles"
 ---
 
-Help your assistants learn and improve by rating conversations. Assistant Learning captures your feedback on assistant responses, consolidates insights using AI, and uses those learnings to enhance future assistant performance.
+Help your assistants learn and improve by rating messages or entire conversations. Assistant Learning captures your feedback on assistant responses, consolidates insights using AI, and uses those learnings to build a knowledge source to enhance future assistant performance.
 
 <Tip>
 Assistant Learning works best when users consistently rate conversations. The more feedback you provide, the better your assistants become at handling similar interactions in future conversations.
@@ -17,6 +17,10 @@ Assistant Learning works best when users consistently rate conversations. The mo
 - **Automatic Consolidation** — AI-powered system analyses feedback patterns and generates actionable insights
 - **Contextual Learning** — Assistants automatically use consolidated learnings in future conversations when enabled
 
+<Note>
+Learning is per assistant, and any ratings you give will improve only your assistant responses in your account and do not inform training data.
+</Note>
+
 ## Getting Started with Assistant Learning
 
 ### Rate Your First Conversation
@@ -27,6 +31,7 @@ Rating conversations is the simplest way to help your assistants learn. You'll s
 2. Click the **thumbs up** (👍) to indicate a good response, or **thumbs down** (👎) for a response that could improve
 3. To rate the entire conversation, use the **'Rate this conversation'** option at the bottom of the chat
 4. Select your rating—the system captures your feedback immediately
+5. View your learning by navigating to the "Learning" tab by clicking on the assistant settings. You can review and edit the learnings manually, as well as "consolidate" any pending feedback
 
 <Frame>
   <img 
@@ -35,7 +40,7 @@ Rating conversations is the simplest way to help your assistants learn. You'll s
   />
 </Frame>
 
-The feedback you provide is stored securely and used to help your assistants improve over time.
+The feedback you provide is stored securely as knowledge in your own account and used to help your assistants improve over time.
 
 ## Understanding Assistant Learning Insights
 
@@ -44,9 +49,9 @@ The feedback you provide is stored securely and used to help your assistants imp
 Each assistant has a **Learning** tab where you can see patterns and insights generated from all user feedback.
 
 1. Navigate to your assistant's settings or details page
-2. Select the **Learning** tab to view feedback summary
+2. Select the **Learning** tab to view feedback summary and trigger consolidation of new feedback into learnings
 3. Review consolidated insights—AI-generated summaries of what's working well and areas for improvement
-4. Use these insights to refine assistant instructions, behaviour, or scope
+4. These insights are used automatically as a knowledge source to refine assistant instructions, behaviour, or scope
 
 <Frame>
   <img 
@@ -57,7 +62,7 @@ Each assistant has a **Learning** tab where you can see patterns and insights ge
 
 ### How Consolidation Works
 
-When sufficient feedback is collected, the system uses an AI model to analyse patterns and generate high-level insights. This consolidation process:
+When feedback is collected, the system uses an AI model to analyse patterns and generate high-level insights. This consolidation process:
 
 - Identifies common themes in user feedback
 - Summarises what users consistently rate positively or negatively
@@ -70,26 +75,26 @@ You can review consolidated feedback anytime and use these insights to improve y
 
 ### Automatic Learning Context
 
-When Assistant Learning is enabled for an assistant, the consolidation insights are automatically included in the assistant's context during new conversations. This means:
+When Assistant Learning is triggered for an assistant, the consolidation insights are automatically included as additional context for the assistant during new conversations. This means:
 
 - Assistants can reference previous learnings to improve responses
 - Insights about common user preferences inform assistant behaviour
 - Assistants become more aligned with user expectations over time
 - The learning loop continuously strengthens assistant performance
 
-This happens automatically—no manual intervention required once you've set up learning for an assistant.
+To trigger the learning file generation, the "Consolidate" button needs to be clicked on the learning tab which will trigger an updated using all the votes that have been cast.
 
 ## Common Questions About Assistant Learning
 
 <AccordionGroup>
   <Accordion title="How quickly do assistants start learning from feedback?">
-    Assistant Learning works continuously as you rate conversations. The AI consolidation process runs automatically when sufficient feedback is collected, typically after you've rated multiple conversations. New consolidated insights become available shortly after and are immediately used in future assistant invocations.
+    Assistant Learning works by rating conversations and triggering the consolidation process. Consolidated insights become available shortly after and are immediately updated for you to review and edit.
   </Accordion>
   <Accordion title="Can I edit or delete learning feedback?">
     Yes. In the Learning tab, you can view all collected feedback and edit the consolidation notes. This is useful if you want to refine the insights or remove feedback that's no longer relevant.
   </Accordion>
   <Accordion title="What if I want to disable Assistant Learning for an assistant?">
-    You can disable Assistant Learning in the assistant's Learning settings. This stops collecting new feedback and prevents learning context from being injected into assistant invocations. Existing feedback is retained and can be re-enabled later.
+    Assistant learning needs to be triggered by voting, and then running the consolidation of votes. Not using this or removing the contents of the file will stop the assistant using the context.
   </Accordion>
   <Accordion title="How do I know if Assistant Learning is actually helping?">
     Monitor your assistant's performance in real conversations and compare responses before and after feedback consolidation. Look for assistants responding more accurately to common scenarios, handling edge cases better, and aligning more closely with your preferences.
@@ -101,7 +106,7 @@ This happens automatically—no manual intervention required once you've set up 
     Yes. Different users can rate the same conversation independently. All ratings are captured and contribute to the consolidated learning insights.
   </Accordion>
   <Accordion title="What happens to learning feedback when I delete an assistant?">
-    Learning feedback is retained in your workspace history. If you recreate an assistant with the same configuration, you can restore its learning context from previous feedback.
+    The learning forms part of the assistant configuration. If it is deleted, the learning file will also be deleted.
   </Accordion>
 </AccordionGroup>
 
@@ -116,7 +121,7 @@ Rate conversations regularly to build a comprehensive feedback library. The more
 
 ### Be Specific About Why You're Rating
 
-When possible, provide context for your rating. If you're rating a response negatively, consider what could improve. This helps the consolidation process understand root causes.
+When possible, provide context for your rating. If you're rating a response negatively, consider what could improve. This helps the consolidation process understand root causes. The best way to provide this feedback is to correct the assistant in the chat, and then vote positively for the corrected response.
 
 ### Use Learning Insights to Refine Assistants
 
@@ -124,25 +129,26 @@ Don't just collect feedback—act on it. Use the consolidated insights to adjust
 - Assistant instructions and system prompts
 - Assistant capabilities and scope
 - Response guidelines and tone
+You can always copy feedback from the learning file and incorporate it into your assistant instructions directly.
 
-### Review Learning Regularly
+### Review Learning After Consolidation
 
-Check your assistant's Learning tab weekly or monthly to monitor progress and identify patterns. This helps you stay informed about how your assistants are performing and where improvements are needed.
+Check your assistant's Learning output to ensure it is accruate once it is consolidated. This helps your assistants perform to your expectations.
 
 ## Next Steps
 
 <CardGroup cols={2}>
   <Card 
-    title="Manage Assistant Settings" 
+    title="Consolidate Something" 
     icon="sliders"
   >
-    Configure which assistants use learning and customise learning consolidation preferences
+    Use past conversations to add votes and create your first learning file
   </Card>
   <Card 
-    title="Create or Update Assistants" 
+    title="Monitor Learning Performance" 
     icon="wand-magic-sparkles"
   >
-    Build new assistants or refine existing ones based on learning insights
+    Keep an eye on the performance of your learnings and how they are impacting the assistant behaviour
   </Card>
 </CardGroup>
 
