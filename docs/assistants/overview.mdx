@@ -213,7 +213,7 @@ The Learning tab shows consolidated feedback, allowing you to make informed deci
     Provide training data, guidelines, policies, and context. Upload documents, paste knowledge, or link URLs. This is how your assistant learns your business.
   </Step>
   <Step title="Choose a Model">
-    Select the AI provider and model. Use Claude for long context, GPT-4 for reasoning, or start with our Workforce model for best value.
+    All assistants default to Claude Haiku 4.5, included in every plan. On Team and Enterprise plans, you can bring your own API key to use a different model.
   </Step>
   <Step title="Connect Integrations">
     Add the systems your assistant needs: GitHub, CRM, knowledge bases, APIs. Start with essentials, add more as needed.
@@ -248,7 +248,7 @@ Define your assistant's identity and behaviour:
 
 Instructions are like a job description—be specific and clear about expectations.
 
-[Learn more about Instructions →](/assistants/configuration/instructions)
+[Learn more about Instructions →](/assistants/configuration/information-settings)
 
 ### Knowledge Management
 
@@ -275,7 +275,7 @@ Connect your business systems:
 
 Your assistant intelligently decides which system to access for each task.
 
-[Learn more about Integrations →](/assistants/configuration/integrations)
+[Learn more about Integrations →](/assistants/tools-and-connectors)
 
 ### Context Variables
 
@@ -288,14 +288,14 @@ Configure dynamic settings:
 
 Context Variables keep your assistant focused and secure.
 
-[Learn more about Context Variables →](/assistants/configuration/context-variables)
+[Learn more about Context Variables →](/assistants/configuration/context-settings)
 
 ### Provider Settings
 
 Choose the AI model:
 
-- **Provider Options** — Workforce (our custom model), OpenAI, Claude, Gemini
-- **Model Selection** — Choose specific models (GPT-4, Claude Sonnet, etc.)
+- **Default Model** — Claude Haiku 4.5, included in all plans
+- **Bring Your Own Keys** — Connect Anthropic, OpenAI, or Google AI keys on Team and Enterprise plans
 - **Output Token Limits** — Set maximum response size
 - **Configuration** — Fine-tune behaviour settings
 
@@ -310,11 +310,11 @@ Enable continuous improvement:
 - **Feedback Accumulation** — Collect insights from interactions
 - **Performance Insights** — See what's working and what needs improvement
 - **Consolidate Learnings** — Turn feedback into actionable guidance
-- **Adaptive Refinement** — Automatically improve over time
+- **Intentional Refinement** — Review insights and decide when and how to update your assistant
 
 The Learning tab shows you exactly how your assistant is performing and where to focus refinement efforts.
 
-[Learn more about Learning →](/assistants/configuration/learning)
+[Learn more about Learning →](/assistants/learning)
 
 ## When to Use Assistants
 
@@ -417,7 +417,7 @@ See [Plans & Pricing](/get-started/plans-and-pricing) for detailed billing infor
     Step-by-step guide to building and deploying an assistant
   </Card>
   
-  <Card title="Instructions Configuration" icon="message-square" href="/assistants/configuration/instructions">
+  <Card title="Instructions Configuration" icon="message-square" href="/assistants/configuration/information-settings">
     Define role, personality, and capabilities
   </Card>
   
@@ -425,11 +425,11 @@ See [Plans & Pricing](/get-started/plans-and-pricing) for detailed billing infor
     Train your assistant with domain knowledge
   </Card>
   
-  <Card title="Integrations" icon="plug" href="/assistants/configuration/integrations">
+  <Card title="Integrations" icon="plug" href="/assistants/tools-and-connectors">
     Connect GitHub, CRM, APIs, and more
   </Card>
   
-  <Card title="Context Variables" icon="sliders" href="/assistants/configuration/context-variables">
+  <Card title="Context Variables" icon="sliders" href="/assistants/configuration/context-settings">
     Configure dynamic settings and security
   </Card>
   
@@ -437,11 +437,11 @@ See [Plans & Pricing](/get-started/plans-and-pricing) for detailed billing infor
     Choose AI models and fine-tune behaviour
   </Card>
   
-  <Card title="Learning System" icon="brain" href="/assistants/configuration/learning">
+  <Card title="Learning System" icon="brain" href="/assistants/learning">
     Enable continuous improvement through feedback
   </Card>
   
-  <Card title="Use in Flows" icon="workflow" href="/flows/steps/assistants">
+  <Card title="Use in Flows" icon="workflow" href="/flows/steps/agents">
     Deploy assistants in your workflows
   </Card>
 </CardGroup>

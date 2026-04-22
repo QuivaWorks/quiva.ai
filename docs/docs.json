@@ -27,21 +27,24 @@
           {
             "group": "Assistants",
             "pages": [
-              "agents/overview",
-              "agents/creating-first-agent",
+              "assistants/overview",
+              "assistants/creating-first-assistant",
               {
                 "group": "Configuration",
                 "icon": "sliders",
                 "pages": [
-                  "agents/configuration/information-settings",
-                  "agents/configuration/provider-settings",
-                  "agents/configuration/context-settings"
+                  "assistants/configuration/information-settings",
+                  "assistants/configuration/provider-settings",
+                  "assistants/configuration/context-settings",
+                  "assistants/configuration/knowledge"
                 ]
               },
-              "agents/tools-and-connectors",
-              "agents/learning",
-              "agents/prompt-engineering",
-              "agents/best-practices"
+              "assistants/tools-and-connectors",
+              "assistants/capabilities",
+              "assistants/learning",
+              "assistants/multi-agent",
+              "assistants/prompt-engineering",
+              "assistants/best-practices"
             ]
           },
           {
@@ -104,6 +107,7 @@
                 "pages": [
                   "essentials/account/creating-account",
                   "essentials/account/account-settings",
+                  "essentials/account/global-admin-branding-settings",
                   "essentials/account/billing-subscriptions",
                   "essentials/account/closing-account"
                 ]

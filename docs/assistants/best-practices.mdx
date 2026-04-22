@@ -1,10 +1,10 @@
 ---
-title: "Agent Best Practices"
-description: "Proven patterns and strategies for building high-performing agents"
+title: "Assistant Best Practices"
+description: "Proven patterns and strategies for building high-performing assistants"
 icon: "star"
 ---
 
-# Agent Best Practices
+# Assistant Best Practices
 
 This guide compiles proven patterns, strategies, and lessons learned from building successful agents. Follow these practices to create agents that perform reliably, cost-effectively, and delight users.
 
@@ -452,17 +452,16 @@ Vague instructions produce inconsistent results. Specificity drives performance.
     
     | Task Complexity | Recommended Model | Cost Level |
     |----------------|-------------------|------------|
-    | Simple classification | GPT-3.5, Workforce | Low |
-    | Standard automation | Workforce, Sonnet | Medium |
-    | Complex reasoning | GPT-4 Turbo, Sonnet | Medium-High |
-    | Maximum capability | GPT-4, Opus | High |
+    | Simple classification | Claude Haiku 4.5 (default) | Low |
+    | Standard automation | Claude Haiku 4.5 | Low |
+    | Complex reasoning | Claude Sonnet 4.6 | Medium |
+    | Maximum capability | Claude Opus 4.7 | High |
     
     **Example optimization:**
     - Task: Simple lead qualification (company size, industry match)
-    - Original: GPT-4 ($0.03/1K tokens)
-    - Optimized: Workforce or GPT-3.5 ($0.002/1K tokens)
-    - Savings: 93% cost reduction
-    - Performance: Negligible difference for simple task
+    - Start with: Claude Haiku 4.5 (default, included in plan)
+    - Upgrade only if: Task complexity requires deeper reasoning
+    - Performance: Haiku 4.5 handles most qualification tasks extremely well
   </Accordion>
 
   <Accordion title="Monitor and Alert" icon="bell">
@@ -1028,19 +1027,19 @@ Use this checklist when building or optimizing agents:
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Create Your First Agent" icon="rocket" href="/agents/creating-first-agent">
+  <Card title="Create Your First Agent" icon="rocket" href="/assistants/creating-first-assistant">
     Step-by-step tutorial
   </Card>
   
-  <Card title="Prompt Engineering" icon="wand-magic-sparkles" href="/agents/prompt-engineering">
+  <Card title="Prompt Engineering" icon="wand-magic-sparkles" href="/assistants/prompt-engineering">
     Master instruction writing
   </Card>
   
-  <Card title="Configuration Guides" icon="sliders" href="/agents/configuration/information-settings">
+  <Card title="Configuration Guides" icon="sliders" href="/assistants/configuration/information-settings">
     Detailed configuration documentation
   </Card>
   
-  <Card title="Tools & Connectors" icon="plug" href="/agents/tools-and-connectors">
+  <Card title="Tools & Connectors" icon="plug" href="/assistants/tools-and-connectors">
     Connect your systems
   </Card>
 </CardGroup>
