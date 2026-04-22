@@ -1,0 +1,467 @@
+---
+title: "Assistants Overview"
+description: "Deploy intelligent AI assistants that reason, learn, and integrate with your systems"
+icon: "sparkles"
+---
+
+# Understanding Assistants
+
+Assistants are the intelligent core of QuivaWorks. They're AI-powered specialists that understand context, reason through complex tasks, integrate with your systems, and continuously improve through feedback—all within boundaries you define.
+
+## What is an Assistant?
+
+An assistant is an AI that can:
+
+- **Understand** — Parse natural language, context, and complex workflows
+- **Reason** — Think through multi-step problems with intelligent decision-making
+- **Learn** — Improve through feedback and user interactions automatically
+- **Integrate** — Connect to your tools, APIs, and systems seamlessly
+- **Collaborate** — Work alongside your team with clear communication and escalation
+
+Unlike rigid automation or simple chatbots, assistants work like expert team members: you define their role, equip them with knowledge and tools, set clear boundaries—and then can continuously improve them by providing feedback on interactions.
+
+<Tip>
+Assistants are designed to handle complexity, variability, and judgment calls—exactly where human-like AI adds the most value.
+</Tip>
+
+## Assistants vs. Automation vs. Chatbots vs. LLMs
+
+<CardGroup cols={3}>
+  <Card title="Traditional Automation" icon="gears">
+    **"If this, then that"**
+    
+    Follows exact rules. Breaks on exceptions. Requires programming every scenario.
+    
+    ❌ Can't handle variability  
+    ❌ Needs explicit programming  
+    ❌ Brittle with edge cases
+  </Card>
+  
+  <Card title="Simple Chatbots" icon="message">
+    **"Powerful text generation"**
+    
+    Responds to keywords. Limited to chat. No real reasoning or actions.
+    
+    ⚠️ Keyword-based only  
+    ⚠️ Can't use tools  
+    ⚠️ Limited to conversation
+  </Card>
+
+  <Card title="Large Language Models" icon="chip">
+    **"Intelligent specialist"**
+    
+    Advanced language models that generate high-quality text. Conversational but stateless—no memory or tool usage.
+    
+    ✅ Excellent writing quality  
+    ✅ Fast responses  
+    ❌ No memory between chats  
+    ❌ Prone to hallucinations  
+    ❌ No decision-making
+
+  </Card>
+  
+  <Card title="QuivaWorks Assistants" icon="sparkles">
+    **"Intelligent specialist"**
+    
+    Reasons through problems. Learns from feedback. Integrates with systems. Handles complexity.
+    
+    ✅ Intelligent reasoning  
+    ✅ System integration  
+    ✅ Feedback mechanism  
+    ✅ Works within boundaries
+  </Card>
+</CardGroup>
+
+## Core Assistant Capabilities
+
+### 1. Intelligent Reasoning & Contextual Understanding
+
+Assistants can:
+- Understand natural language and complex intent
+- Reason through multi-step problems with context awareness
+- Handle ambiguity, edge cases, and exceptions gracefully
+- Apply business logic flexibly based on situation
+- Remember conversation history and context automatically
+
+<Card title="Example: Documentation Generation" icon="pen">
+  **You**: "Create documentation for our customer feature!"
+  
+  **Your Documentation Assistant**:
+  1. Reads your description and has access to your documentation guidelines
+  2. Generates clear, user-focused documentation based on your style
+  3. You review and provide feedback: "Make this more beginner-friendly, add real examples"
+  4. Assistant revises based on your input
+  5. You vote on what worked well and consolidate successful patterns into a Learning file
+  6. Next time you create a documentation assistant, it can apply that Learning file to guide its behaviour
+  
+  You're collaborating with an expert that understands your context, your systems, and your needs—not starting from scratch each time. You explicitly capture what works and apply it intentionally.
+</Card>
+
+### 2. System Integration & Tool Access
+
+Assistants integrate with:
+- Knowledge bases and documentation
+- CRM and customer data systems
+- Databases and data sources
+- APIs and external services
+- GitHub, email, and communication platforms
+- Custom business systems
+
+Assistants **decide which tools to use** based on the task at hand, you just need to provide authorisation and access to the integration and the assistant will do the rest. You don't program "if customer asks about orders, call Order API"—the assistant figures that out intelligently.
+
+<Tip>
+Integrations are configured once during setup, then your assistant automatically uses the right system at the right time.
+</Tip>
+
+### 3. Smart Configuration & Control
+
+Assistants work within boundaries you define:
+
+- **Instructions** — Define role, personality, and specific capabilities
+- **Knowledge** — Provide training data, guidelines, and context
+- **Output validation** — Enforce required response formats
+- **Integrations** — Control which systems the assistant can access
+- **Context limits** — Set token budgets and memory size
+- **Execution modes** — Synchronous or background processing
+
+<Callout type="info">
+Boundaries aren't limitations—they're guardrails that ensure your assistant works exactly as you need.
+</Callout>
+
+### 4. Continuous Learning & Self-Improvement
+
+Assistants improve through:
+
+- **Smart Context Management** — Intelligently handles conversation memory without manual tuning
+- **Learning System** — Accumulates feedback from interactions and surfaces actionable insights
+- **Performance Insights** — Consolidates patterns from successful interactions so you can identify what works well
+- **Intentional Refinement** — You review insights and refine your assistant's instructions and behaviour based on what you've learned
+
+The Learning tab shows consolidated feedback, allowing you to make informed decisions about how to improve your assistant's performance over time.
+
+## When to Use Assistants
+
+### Perfect For
+
+<AccordionGroup>
+  <Accordion title="Customer Service & Support" icon="headset">
+    - Answer questions with full context and history
+    - Troubleshoot issues using knowledge base
+    - Apply policies with judgment (returns, refunds, exceptions)
+    - Handle complex, multi-turn conversations
+    - Escalate to humans when needed
+    - Learn from each interaction to improve
+  </Accordion>
+
+  <Accordion title="Lead Qualification & Sales" icon="user-check">
+    - Ask discovery questions dynamically
+    - Research companies and prospects
+    - Score leads based on ICP criteria
+    - Enrich data from multiple sources
+    - Personalise outreach at scale
+    - Route qualified opportunities intelligently
+  </Accordion>
+
+  <Accordion title="Content & Messaging" icon="pen">
+    - Create personalised campaigns
+    - Generate and adapt messaging by audience
+    - Maintain brand voice across channels
+    - Repurpose content efficiently
+    - A/B test messaging variants
+  </Accordion>
+
+  <Accordion title="Data Processing & QA" icon="database">
+    - Extract information from documents
+    - Validate data against business rules
+    - Make contextual decisions on exceptions
+    - Cross-reference multiple systems
+    - Flag issues for human review
+    - Learn from manual corrections
+  </Accordion>
+
+  <Accordion title="Technical Operations" icon="cogs">
+    - Triage and manage issues
+    - Automate routine technical tasks
+    - Generate documentation and reports
+    - Coordinate between teams
+    - Learn best practices from interactions
+  </Accordion>
+</AccordionGroup>
+
+### Not Ideal For
+
+<Card title="When to Use Automation Instead" icon="triangle-exclamation">
+- **Simple, predictable tasks** — If it's always the same steps, use a condition or rule
+- **High-volume, low-variability** — Assistants have per-run costs; save them for complexity
+- **Pure data transformation** — Use Rules or Functions for straightforward data work
+- **Time-critical micro-operations** — Assistants add latency; use functions for speed
+- **Deterministic calculations** — Use Rules for exact math and logic
+
+**Rule of thumb**: If you can write "if X then Y" rules that cover every case, use automation. If there's judgment, context, learning, or exceptions, use an assistant.
+</Card>
+
+## Building Your First Assistant
+
+<Steps>
+  <Step title="Define the Role">
+    What is this assistant responsible for? Customer service? Sales support? Technical operations? Be specific about the domain and focus.
+  </Step>
+  <Step title="Write Instructions">
+    Describe the assistant's role, personality, communication style, and specific capabilities. This is like writing a detailed job description.
+  </Step>
+  <Step title="Add Knowledge">
+    Provide training data, guidelines, policies, and context. Upload documents, paste knowledge, or link URLs. This is how your assistant learns your business.
+  </Step>
+  <Step title="Choose a Model">
+    All assistants default to Claude Haiku 4.5, included in every plan. On Team and Enterprise plans, you can bring your own API key to use a different model.
+  </Step>
+  <Step title="Connect Integrations">
+    Add the systems your assistant needs: GitHub, CRM, knowledge bases, APIs. Start with essentials, add more as needed.
+  </Step>
+  <Step title="Set Boundaries">
+    Define what the assistant can and cannot do. Set output schemas, validation rules, escalation criteria.
+  </Step>
+  <Step title="Test & Learn">
+    Use the Chat interface to test with real scenarios. Review the Learning tab for insights on what's working and what needs refinement.
+  </Step>
+  <Step title="Deploy & Monitor">
+    Activate in flows, review performance regularly, and refine based on feedback and learning insights.
+  </Step>
+</Steps>
+
+<Card title="Create Your First Assistant" icon="rocket" href="/assistants/creating-first-assistant">
+Follow our step-by-step guide to deploy your first assistant in minutes
+</Card>
+
+## Configuration & Smart Features
+
+Every assistant has intelligent configuration areas:
+
+### Instructions Configuration
+
+Define your assistant's identity and behaviour:
+
+- **Role & Personality** — Who is this assistant? What's their expertise?
+- **Specific Capabilities** — What tasks should they handle?
+- **Communication Style** — How should they respond? Formal? Friendly?
+- **Limitations** — What should they NOT do? When should they escalate?
+
+Instructions are like a job description—be specific and clear about expectations.
+
+[Learn more about Instructions →](/assistants/configuration/information-settings)
+
+### Knowledge Management
+
+Train your assistant with relevant information:
+
+- **Manual Entry** — Paste guidelines, policies, or context directly
+- **File Upload** — Import documents, PDFs, or training materials
+- **URL Import** — Link to web pages, documentation, or knowledge bases
+- **Knowledge Relevance** — The assistant automatically uses relevant knowledge when needed
+
+Knowledge is what makes your assistant domain-expert smart.
+
+[Learn more about Knowledge →](/assistants/configuration/knowledge)
+
+### Integration Configuration
+
+Connect your business systems:
+
+- **GitHub Issues & PRs** — Manage repositories and workflows
+- **CRM Systems** — Access customer data and history
+- **APIs & Webhooks** — Connect custom systems
+- **Knowledge Bases** — Link documentation and guidelines
+- **Email & Communication** — Send messages and updates
+
+Your assistant intelligently decides which system to access for each task.
+
+[Learn more about Integrations →](/assistants/tools-and-connectors)
+
+### Context Variables
+
+Configure dynamic settings:
+
+- **Project & Repository** — Specify where the assistant should work
+- **API Keys & Credentials** — Securely store authentication
+- **Custom Parameters** — Define workflow-specific variables
+- **Environment Settings** — Set execution parameters
+
+Context Variables keep your assistant focused and secure.
+
+[Learn more about Context Variables →](/assistants/configuration/context-settings)
+
+### Provider Settings
+
+Choose the AI model:
+
+- **Default Model** — Claude Haiku 4.5, included in all plans
+- **Bring Your Own Keys** — Connect Anthropic, OpenAI, or Google AI keys on Team and Enterprise plans
+- **Output Token Limits** — Set maximum response size
+- **Configuration** — Fine-tune behaviour settings
+
+Different models excel at different tasks. Test to find what works best for your use case.
+
+[Learn more about Provider Settings →](/assistants/configuration/provider-settings)
+
+### Learning System
+
+Enable continuous improvement:
+
+- **Feedback Accumulation** — Collect insights from interactions
+- **Performance Insights** — See what's working and what needs improvement
+- **Consolidate Learnings** — Turn feedback into actionable guidance
+- **Intentional Refinement** — Review insights and decide when and how to update your assistant
+
+The Learning tab shows you exactly how your assistant is performing and where to focus refinement efforts.
+
+[Learn more about Learning →](/assistants/learning)
+
+## When to Use Assistants
+
+Assistants excel when you need intelligent collaboration, judgment, and contextual decision-making. They're expert partners you work with to accomplish complex tasks.
+
+### Perfect For
+
+<AccordionGroup>
+  <Accordion title="Expert Collaboration & Research" icon="brain">
+    - Research complex topics with intelligent analysis
+    - Draft content with iterative refinement
+    - Brainstorm strategies and approaches
+    - Analyse data and generate insights
+    - Work collaboratively on problem-solving
+  </Accordion>
+
+  <Accordion title="Customer Service & Support" icon="headset">
+    - Answer customer questions with context
+    - Troubleshoot issues using knowledge bases
+    - Apply policies with judgment (returns, refunds)
+    - Handle complex, multi-turn conversations
+    - Escalate to humans when needed
+  </Accordion>
+
+  <Accordion title="Lead Qualification & Discovery" icon="user-check">
+    - Ask discovery questions dynamically
+    - Research companies and contacts
+    - Score leads based on your ICP criteria
+    - Enrich data from multiple sources
+    - Route qualified leads intelligently
+  </Accordion>
+
+  <Accordion title="Content Generation & Adaptation" icon="pen">
+    - Create personalised email campaigns
+    - Generate social media posts
+    - Adapt messaging by audience segment
+    - Maintain brand voice across channels
+    - Collaborate on content refinement
+  </Accordion>
+
+  <Accordion title="Data Processing & Analysis" icon="database">
+    - Extract information from documents
+    - Validate data against business rules
+    - Make contextual decisions on exceptions
+    - Cross-reference multiple systems
+    - Flag issues for human review
+  </Accordion>
+
+  <Accordion title="Sales & Outreach" icon="handshake">
+    - Personalise outreach at scale
+    - Research prospects automatically
+    - Follow up based on engagement
+    - Book meetings intelligently
+    - Qualify and route opportunities
+  </Accordion>
+</AccordionGroup>
+
+### Not Ideal For
+
+<Card title="When to Use Workflows Instead" icon="triangle-exclamation">
+  - **Simple, predictable tasks** - If it's always the same steps, use a function or condition
+  - **High-volume, low-variability** - Assistants have per-interaction costs; save them for complexity
+  - **Pure data transformation** - Use Rules or Functions for straightforward data manipulation
+  - **Time-critical micro-operations** - Assistants add latency; use functions for speed-critical tasks
+  - **Deterministic calculations** - Use Rules for exact math and logic
+
+**Rule of thumb**: If you can write "if X then Y" rules that cover all cases, use automation. If there's judgment, context, exceptions, or collaboration—use an assistant.
+</Card>
+
+### Assistant Costs
+
+Assistants are billed through a credit system based on your plan:
+
+**How Credits Work:**
+- Each interaction consumes credits based on model usage and complexity
+- Included credits refresh monthly and are allocated per user
+- Purchase additional credits at discounted rates—they never expire and roll over
+- Credits apply regardless of which Claude model you're using
+
+**Credit Allocation by Plan:**
+- **Free:** 500 credits per account
+- **Pro:** 1,000 credits per user (purchase additional at $8/1,000)
+- **Team:** 1,500 credits per user (purchase additional at $7/1,000)
+
+**Default Model:**
+All new assistants use Claude Haiku 4.5, our fastest and most cost-effective model. It's optimised for most business workflows whilst keeping costs low.
+
+**Cost Optimisation Tips:**
+- Use Claude Haiku 4.5 for most tasks—excellent balance of performance and cost
+- Start with shorter conversations and context to reduce credit consumption
+- Consolidate feedback through the Learning system to refine instructions and reduce re-work
+- Monitor assistant performance in the analytics dashboard to identify cost-saving opportunities
+
+See [Plans & Pricing](/get-started/plans-and-pricing) for detailed billing information and plan comparisons.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Create Your First Assistant" icon="rocket" href="/assistants/creating-first-assistant">
+    Step-by-step guide to building and deploying an assistant
+  </Card>
+  
+  <Card title="Instructions Configuration" icon="message-square" href="/assistants/configuration/information-settings">
+    Define role, personality, and capabilities
+  </Card>
+  
+  <Card title="Knowledge Management" icon="book" href="/assistants/configuration/knowledge">
+    Train your assistant with domain knowledge
+  </Card>
+  
+  <Card title="Integrations" icon="plug" href="/assistants/tools-and-connectors">
+    Connect GitHub, CRM, APIs, and more
+  </Card>
+  
+  <Card title="Context Variables" icon="sliders" href="/assistants/configuration/context-settings">
+    Configure dynamic settings and security
+  </Card>
+  
+  <Card title="Provider Settings" icon="cpu" href="/assistants/configuration/provider-settings">
+    Choose AI models and fine-tune behaviour
+  </Card>
+  
+  <Card title="Learning System" icon="brain" href="/assistants/learning">
+    Enable continuous improvement through feedback
+  </Card>
+  
+  <Card title="Use in Flows" icon="workflow" href="/flows/steps/agents">
+    Deploy assistants in your workflows
+  </Card>
+</CardGroup>
+
+<Callout type="success">
+Ready to deploy your first intelligent assistant? Start simple—define a clear role, add essential knowledge and integrations, then watch your assistant improve with every interaction. The Learning system will guide your refinements.
+</Callout>
+
+## Get Help
+
+<CardGroup cols={3}>
+  <Card title="Community" icon="users" href="https://quiva.ai/community">
+    Share assistants and learn from others
+  </Card>
+  
+  <Card title="Support" icon="life-ring" href="https://quiva.ai/help-center">
+    Get help from our team
+  </Card>
+  
+  <Card title="Marketplace" icon="store" href="https://www.quiva.ai/marketplace/">
+    Browse assistant templates and examples
+  </Card>
+</CardGroup>

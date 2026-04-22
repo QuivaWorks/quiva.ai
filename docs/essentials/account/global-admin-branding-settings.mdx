@@ -1,0 +1,178 @@
+---
+title: "Global Admin Branding & Settings"
+description: "Customise your QuivaWorks workspace with branded colours, logos, app names, and global assistant instructions"
+icon: "palette"
+---
+
+Global Admin Settings let you personalise your entire workspace to reflect your brand identity. Configure custom colours, upload branded logos, set a custom app name, and manage global assistant instructions that apply across your entire account — all from a centralised admin panel.
+
+<Tip>
+Global settings apply account-wide. All assistants inherit these customisations, ensuring a consistent brand experience.
+</Tip>
+
+---
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Custom Brand Colours" icon="palette">
+    Define primary and secondary colours that automatically update your interface theme, buttons, and accent elements
+  </Card>
+  <Card title="Custom Logo & Favicon" icon="image">
+    Upload your company logo and favicon to appear throughout the application and browser tabs
+  </Card>
+  <Card title="Custom App Name" icon="tag">
+    Replace the default "QuivaWorks" branding with your own application name across the interface
+  </Card>
+  <Card title="Global Instructions" icon="scroll">
+    Set organisation-wide instructions that every assistant inherits, ensuring consistent behaviour and brand voice
+  </Card>
+  <Card title="Global Knowledge" icon="book">
+    Add shared knowledge resources that all assistants can access across your account
+  </Card>
+</CardGroup>
+
+---
+
+## Accessing Global Admin Settings
+
+The Global Admin panel is accessible to **account administrators only**.
+
+1. Navigate to **Account Settings** via the gear icon or your account menu
+2. Open the **Advanced Editor** section
+3. Locate **Global Settings**
+4. Use the tabs to navigate between Branding, Global Instructions, and Global Knowledge
+
+---
+
+## Configure Brand Colours
+
+1. In the **Branding** tab, click the primary colour field
+2. Select your brand's main colour
+3. Select a secondary colour for accents and highlights
+4. Your workspace instantly reflects these colours across buttons, links, and UI elements
+5. Click **Save** to persist your branding
+
+---
+
+## Upload a Custom Logo and Favicon
+
+1. In the **Branding** tab, select **Upload Logo**
+2. Choose your company logo file (supports PNG, JPG, SVG)
+3. Your logo will appear in the application header and menus
+4. To set a custom favicon (the small icon in browser tabs), select **Upload Favicon**
+5. The favicon appears on all browser tabs when your workspace is open
+
+<Frame>
+<img src="/images/global-admin-branding-panel.png" alt="Global Admin Branding & Settings panel showing colour pickers, logo upload area, and app name field" />
+</Frame>
+
+---
+
+## Set a Custom App Name
+
+Replace default QuivaWorks branding with your organisation's application name:
+
+1. In the **Global Settings** panel, find the **App Name** field
+2. Enter your preferred application name (e.g., "Acme AI Assistant")
+3. This name appears in the browser title, headers, and throughout the interface
+4. Save your changes to apply the custom name
+
+---
+
+## Global Assistant Instructions
+
+Global instructions serve as baseline guidelines for all assistants in your account. Every assistant follows these instructions as a foundation — assistant-specific instructions are merged on top at runtime.
+
+**Setting up global instructions:**
+
+1. Navigate to the **Global Instructions** tab
+2. Click **Add Instructions**
+3. Enter your organisation's guidelines, tone preferences, and behavioural rules
+
+**Examples of useful global instructions:**
+- "Always maintain a professional, friendly tone"
+- "Reference our company policies when relevant"
+- "Escalate complex issues to a human when requested"
+- "Do not discuss competitor products"
+
+<Info>
+Global instructions apply to every assistant invocation. Keep them concise — focus on account-wide standards. Specific behaviours belong in individual assistant instructions.
+</Info>
+
+---
+
+## Global Knowledge
+
+Add organisation-wide knowledge resources that all assistants can reference:
+
+1. Navigate to the **Global Knowledge** tab
+2. Click **Add Knowledge Source**
+3. Upload documents, paste text, or link URLs (FAQs, company policies, product documentation)
+4. Enable global knowledge on individual assistants in their **Knowledge** tab
+
+Assistants automatically search global knowledge when responding. Updates are immediately available to all assistants.
+
+<Card title="Learn more about Knowledge" icon="book" href="/assistants/configuration/knowledge">
+  How knowledge sources work at team, personal, and account levels →
+</Card>
+
+---
+
+## How Global Settings Work Together
+
+Global settings create a configuration hierarchy:
+
+- **Global Branding** — colours, logo, and app name apply instantly across the interface
+- **Global Instructions** — automatically merged into every assistant's prompt at runtime
+- **Global Knowledge** — indexed and available when assistants need to retrieve information
+
+When an assistant is invoked, global settings merge with team and personal settings, giving precedence to more specific settings. [Learn more about the configuration hierarchy →](/get-started/core-concepts)
+
+---
+
+## Common Questions
+
+<AccordionGroup>
+  <Accordion title="Can individual assistants override global instructions?">
+    Yes. Assistant-specific instructions are merged on top of global instructions at runtime. If an assistant needs different behaviour, its own instructions take precedence over the global guidelines for that specific use case.
+  </Accordion>
+
+  <Accordion title="When do updates to global instructions take effect?">
+    Updates to global instructions apply immediately to all assistants on their next invocation. No redeployment is needed.
+  </Accordion>
+
+  <Accordion title="Can I revert to default branding?">
+    Yes. In the Branding section, select **Remove Custom Branding** to revert to QuivaWorks default colours, logo, and app name.
+  </Accordion>
+
+  <Accordion title="Are global settings visible to end users?">
+    Your custom branding (colours, logo, app name) is visible to all users. Global instructions and knowledge base content are not visible — only the results of assistants using that information.
+  </Accordion>
+
+  <Accordion title="Who can modify global settings?">
+    Only account administrators can access and modify Global Admin Settings. [Manage roles →](/essentials/users/roles-permissions)
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Account Settings" icon="gear" href="/essentials/account/account-settings">
+    Configure your account preferences and security settings
+  </Card>
+
+  <Card title="Create Your First Assistant" icon="sparkles" href="/assistants/creating-first-assistant">
+    Build assistants that inherit your global instructions and knowledge
+  </Card>
+
+  <Card title="Knowledge Configuration" icon="book" href="/assistants/configuration/knowledge">
+    Manage knowledge at account, team, and personal levels
+  </Card>
+
+  <Card title="Team Management" icon="people-group" href="/essentials/users/user-management">
+    Manage administrator access and team permissions
+  </Card>
+</CardGroup>

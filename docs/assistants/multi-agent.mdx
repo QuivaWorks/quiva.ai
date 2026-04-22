@@ -1,0 +1,171 @@
+---
+title: "Multi-Agent Systems"
+description: "Link assistants together and use sub-agents to handle complex, large-scale tasks"
+icon: "diagram-project"
+---
+
+QuivaWorks supports two types of multi-agent behaviour: **assistant-to-assistant communication**, where you explicitly link specialists together, and **automatic sub-agents**, where QuivaWorks handles tool-heavy or large-document tasks behind the scenes.
+
+---
+
+## Assistant-to-Assistant Communication
+
+Any assistants in your account can be linked together. This lets one assistant delegate work to another — enabling you to build systems where a coordinator routes tasks to the right specialist.
+
+### How It Works
+
+When assistants are linked, the primary assistant can call another assistant as a tool. The called assistant receives the request, performs its task using its own instructions, knowledge, and integrations, and returns the result.
+
+Each assistant in a multi-agent system can have:
+- Different instructions and expertise
+- Different knowledge sources
+- Different integrations and tool access
+- Different permission scopes
+
+### Setting Up Assistant-to-Assistant Links
+
+1. Open the assistant you want to use as the **coordinator** (the primary assistant that delegates work)
+2. Navigate to the **Integrations** tab
+3. Under **Assistants**, enable the specialists you want this assistant to be able to call
+4. In the coordinator's instructions, describe when and how to delegate to each specialist
+
+**Example instruction for a coordinator:**
+
+```
+You are a research coordinator. When a user asks a question:
+
+- For questions about our product features, delegate to the Product Expert assistant
+- For questions about competitors, delegate to the Market Research assistant  
+- For general questions you can answer directly, respond yourself
+
+Always synthesise the responses from specialists into a clear, unified answer.
+```
+
+### When to Use This Pattern
+
+<AccordionGroup>
+  <Accordion title="Specialist Routing">
+    A coordinator receives requests and routes them to the right expert based on topic, intent, or complexity. Each specialist has deep knowledge in its domain.
+    
+    **Example:** A customer-facing assistant delegates product questions to a product expert, billing questions to a finance assistant, and technical questions to a support engineer assistant.
+  </Accordion>
+  
+  <Accordion title="Sequential Processing">
+    One assistant processes output from another in a pipeline. The first extracts or transforms data; the second makes decisions or generates the final output.
+    
+    **Example:** A data extraction assistant parses incoming documents, then passes structured data to an analysis assistant that generates the final report.
+  </Accordion>
+  
+  <Accordion title="Parallel Research">
+    A coordinator dispatches multiple research tasks to different specialists simultaneously, then combines the results.
+    
+    **Example:** A due diligence assistant delegates financial analysis, legal review, and market analysis to three different specialists, then synthesises a summary.
+  </Accordion>
+  
+  <Accordion title="Escalation Chains">
+    When a front-line assistant encounters something outside its scope, it escalates to a more capable specialist rather than to a human.
+    
+    **Example:** A tier-1 support assistant handles common questions directly but escalates complex technical issues to a senior technical assistant before involving a human engineer.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Automatic Sub-Agents
+
+For tool-heavy workflows or large document processing, QuivaWorks automatically uses sub-agents to prevent context window overload. This happens transparently — no configuration required.
+
+### Context Window Management
+
+Every AI model has a limit on how much context it can hold in a single interaction. When an assistant needs to use many tools or process a large document, the accumulated context can exceed this limit.
+
+QuivaWorks handles this automatically:
+
+<Steps>
+  <Step title="Task Detection">
+    QuivaWorks identifies that a task would exceed the context window — either because many tools will be called, or because a large document needs to be processed.
+  </Step>
+  <Step title="Sub-Agent Dispatch">
+    Individual tool calls or document sections are handled by dedicated sub-agents. Each sub-agent works within its own context window.
+  </Step>
+  <Step title="Result Consolidation">
+    Sub-agent results are returned to the main assistant, which synthesises them into a coherent response.
+  </Step>
+</Steps>
+
+### Large Document Processing
+
+When a large document is added to an assistant's knowledge base, sub-agents index it in sections. At query time, a sub-agent retrieves the relevant sections and passes them to the main assistant.
+
+This enables accurate processing of:
+- Long technical documents and specifications
+- Extensive legal contracts
+- Large codebases
+- Book-length research reports
+
+The assistant can answer specific questions about the document without loading the entire thing into context.
+
+---
+
+## Design Principles for Multi-Agent Systems
+
+<AccordionGroup>
+  <Accordion title="Give each assistant a clear, single responsibility">
+    Specialist assistants work best when their scope is narrow and well-defined. A "Customer Support" assistant that tries to handle sales, billing, and engineering questions will be less effective than three focused specialists.
+  </Accordion>
+
+  <Accordion title="Write coordinator instructions explicitly">
+    The coordinator needs clear guidance on when to delegate and when to handle requests directly. Include specific criteria: topic areas, complexity thresholds, or explicit trigger phrases.
+  </Accordion>
+
+  <Accordion title="Match tools and knowledge to the right specialist">
+    Each specialist should only have access to the integrations and knowledge it actually needs. Keeping specialists focused makes them more accurate and easier to debug.
+  </Accordion>
+
+  <Accordion title="Test each specialist independently">
+    Before testing the full multi-agent system, test each specialist assistant on its own. It's much easier to identify and fix issues in isolation than in a complex pipeline.
+  </Accordion>
+
+  <Accordion title="Use flows for structured pipelines">
+    If you need deterministic, ordered processing across multiple assistants, build a [Flow](/flows/overview) with multiple assistant steps rather than using assistant-to-assistant communication. Flows give you explicit control over data passing, branching, and error handling.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Multi-Agent vs. Flows
+
+Both multi-agent systems and flows can orchestrate work across multiple assistants. Choose based on your needs:
+
+| | Multi-Agent | Flows |
+|---|---|---|
+| **Routing logic** | Assistant decides | Explicit conditions |
+| **Data passing** | Via conversation | Via variable mapping |
+| **Error handling** | Assistant handles | Explicit error steps |
+| **Best for** | Dynamic, reasoning-based routing | Predictable, structured pipelines |
+
+Use **multi-agent** when the routing logic requires judgment — the task is complex enough that an AI should decide who handles it.
+
+Use **flows** when the pipeline is predictable — you know in advance which assistants run in which order.
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Tools & Connectors" icon="plug" href="/assistants/tools-and-connectors">
+    Connect assistants to external systems via MCP
+  </Card>
+  
+  <Card title="Flows Overview" icon="bolt" href="/flows/overview">
+    Build structured pipelines with assistant steps
+  </Card>
+  
+  <Card title="Capabilities" icon="stars" href="/assistants/capabilities">
+    Built-in tools, image analysis, and file generation
+  </Card>
+  
+  <Card title="Best Practices" icon="star" href="/assistants/best-practices">
+    Design patterns for effective assistants
+  </Card>
+</CardGroup>

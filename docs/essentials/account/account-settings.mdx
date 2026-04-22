@@ -1,14 +1,16 @@
 ---
 title: "Account Settings"
-description: "Manage your account name, details, and configuration"
+description: "Manage your account name, details, branding, and global configuration"
 icon: "gear"
 ---
 
 # Account Settings
 
-Manage your QuivaWorks account configuration, including account name, company details, and regional settings.
+Manage your QuivaWorks account configuration, including account name, company details, branding, and workspace-wide settings.
 
-## Changing Your Account Name
+## Account Details
+
+### Changing Your Account Name
 
 Your account name is used to log in and appears on billing statements and team invitations.
 
@@ -18,16 +20,16 @@ When you update your account name, all users must use the new name to log in. Al
 
 **To update your account name:**
 
-1. Navigate to **Account Management → Account**
+1. Navigate to **Account Management → Account → Details**
 2. Find the "Account Name" field
 3. Enter your new account name (case-sensitive)
 4. Click "Rename Account"
 
-## Updating Company Details
+### Updating Company Details
 
 Keep your account information current for billing and communication purposes.
 
-1. Navigate to **Account Management → Account**
+1. Navigate to **Account Management → Account → Details**
 2. Update the following fields:
    - **Company/Entity Name**
    - **Address**
@@ -46,7 +48,7 @@ QuivaWorks' multi-cloud mesh architecture allows you to deploy resources across 
   <Card title="EU" icon="location-dot">
     European Union
     - GDPR compliant
-    - Frankfurt/Paris data centers
+    - Frankfurt/Paris data centres
   </Card>
   
   <Card title="US" icon="location-dot">
@@ -99,12 +101,64 @@ Only the root user can change the account's root email address.
 </Steps>
 
 <Warning>
-The old email address must approve the transfer before it takes effect. This prevents unauthorized email changes.
+The old email address must approve the transfer before it takes effect. This prevents unauthorised email changes.
 </Warning>
+
+## Workspace Branding & Customisation
+
+Personalise your QuivaWorks workspace with custom branding, colours, logos, and application name.
+
+Navigate to **Account Management → Account → Branding** to configure:
+
+- **Brand Colours** — Custom primary and secondary colours that update your interface theme
+- **Logo & Favicon** — Upload your company logo and custom favicon for consistency across the application
+- **App Name** — Replace the default QuivaWorks branding with your organisation's application name
+
+<Info>
+Custom branding is applied instantly across your entire workspace for all users.
+</Info>
+
+[Learn more about workspace branding →](/essentials/account/global-admin-branding-settings)
+
+## Global Assistant Instructions
+
+Set organisation-wide guidelines that all agents inherit by default.
+
+Navigate to **Account Management → Account → Global Instructions** to:
+
+- Create baseline behavioural rules and tone guidelines
+- Specify compliance requirements and escalation procedures
+- Maintain consistency across all agents in your workspace
+
+<Info>
+Global instructions are automatically merged into each agent's prompt. Agent-specific instructions can override global guidelines for specialised use cases.
+</Info>
+
+[Explore global instructions in detail →](/essentials/account/global-instructions)
+
+## Global Knowledge Base
+
+Add organisation-wide knowledge resources that agents can reference during conversations.
+
+Navigate to **Account Management → Account → Global Knowledge** to:
+
+- Upload company policies, FAQs, and documentation
+- Link external knowledge sources and resources
+- Make information instantly available to all agents
+
+<Info>
+Global knowledge is indexed and cached for instant retrieval. Updates take effect immediately on the next agent invocation.
+</Info>
+
+[See the global knowledge guide →](/essentials/account/global-knowledge)
 
 ## Related Pages
 
 <CardGroup cols={2}>
+  <Card title="Workspace Branding" icon="palette" href="/essentials/account/global-admin-branding-settings">
+    Configure custom colours, logos, and app name
+  </Card>
+  
   <Card title="User Management" icon="users" href="/essentials/users/user-management">
     Add and manage team members
   </Card>

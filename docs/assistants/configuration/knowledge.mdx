@@ -1,0 +1,191 @@
+---
+title: "Knowledge"
+description: "Give your assistants access to your documentation, policies, and context"
+icon: "book"
+---
+
+**Knowledge** is content you give an assistant to reference when answering questions and completing tasks. Instead of relying solely on general training, your assistant can draw on your specific documentation, policies, guides, and any other context you provide.
+
+---
+
+## How Knowledge Works
+
+When you add knowledge to an assistant, that content is made available during every conversation. The assistant searches and references relevant knowledge automatically — you don't need to prompt it to look things up.
+
+Knowledge is stored at three levels:
+
+<CardGroup cols={3}>
+  <Card title="Account-Level" icon="building">
+    Global knowledge shared across your entire account. Enabled per assistant as needed.
+  </Card>
+  <Card title="Team" icon="users">
+    Knowledge available to all team members using this assistant.
+  </Card>
+  <Card title="Personal" icon="user">
+    Your private knowledge, layered on top of team knowledge. Visible only to you.
+  </Card>
+</CardGroup>
+
+At runtime, all three levels merge together. An assistant configured with both team and personal knowledge can reference both when responding.
+
+---
+
+## Adding Knowledge
+
+Knowledge can be added from three sources:
+
+<Tabs>
+  <Tab title="File Upload">
+    Upload documents directly from your computer.
+    
+    **Supported formats:**
+    - PDF documents
+    - Word documents (.docx)
+    - Plain text files (.txt)
+    - Markdown files (.md)
+    
+    **How to add:**
+    1. Open your assistant configuration
+    2. Click the **Knowledge** tab
+    3. Click **Add Knowledge** → **Upload File**
+    4. Select your file and confirm
+    
+    Large documents are automatically processed using sub-agents, which break the document into structured sections and index them for efficient retrieval. This means even very long documents — well beyond the normal context window — can be searched and referenced accurately.
+  </Tab>
+  
+  <Tab title="URL">
+    Import content directly from a web page or documentation site.
+    
+    **Works well for:**
+    - Product documentation
+    - Help centre articles
+    - Public knowledge bases
+    - Landing pages or product overviews
+    
+    **How to add:**
+    1. Open your assistant configuration
+    2. Click the **Knowledge** tab
+    3. Click **Add Knowledge** → **From URL**
+    4. Enter the URL and confirm
+    
+    QuivaWorks fetches and processes the page content. The URL is not polled for updates — if the page changes, re-add it to refresh the knowledge.
+  </Tab>
+  
+  <Tab title="Manual Entry">
+    Paste or type content directly into the knowledge editor.
+    
+    **Works well for:**
+    - Policies and guidelines
+    - Frequently asked questions
+    - Product specifications
+    - Internal processes
+    - Quick reference material
+    
+    **How to add:**
+    1. Open your assistant configuration
+    2. Click the **Knowledge** tab
+    3. Click **Add Knowledge** → **Manual Entry**
+    4. Give it a title and paste or type your content
+    
+    Manual entries can be edited at any time.
+  </Tab>
+</Tabs>
+
+---
+
+## Account-Level Global Knowledge
+
+Global knowledge is configured at the account level and can be enabled on any assistant. It's designed for company-wide content that many assistants might need — brand guidelines, company policies, product overviews, or shared reference material.
+
+**Setting up global knowledge:**
+1. Go to **Account Settings** → **Global Knowledge**
+2. Add knowledge sources (files, URLs, or manual entries)
+3. In each assistant's Knowledge tab, enable the global knowledge sources you want that assistant to use
+
+<Info>
+Global knowledge isn't enabled by default on every assistant — you choose which sources each assistant can access. This keeps assistants focused and prevents unnecessary context.
+</Info>
+
+---
+
+## Team vs. Personal Knowledge
+
+Every assistant has two knowledge layers:
+
+**Team Knowledge** is configured by assistant editors and shared with everyone who uses the assistant. It provides the shared foundation — the product documentation, policies, and context that everyone on the team should have access to.
+
+**Personal Knowledge** is your private layer. It's added and visible only to you, and it layers on top of team knowledge at runtime. Use it to add your own reference material, notes, or context without affecting the experience for other team members.
+
+<Tip>
+Personal knowledge is a great way to customise a shared assistant for your specific role. For example, a shared customer service assistant could have your personal account list or escalation contacts added as personal knowledge.
+</Tip>
+
+---
+
+## Large Document Processing
+
+QuivaWorks handles documents that exceed the normal context window through automatic sub-agent processing.
+
+When a large document is added as knowledge:
+
+<Steps>
+  <Step title="Document Indexing">
+    The document is broken down into structured sections and stored in memory. This happens once when the knowledge is added.
+  </Step>
+  <Step title="Retrieval at Runtime">
+    During a conversation, a sub-agent searches the indexed document and retrieves the most relevant sections.
+  </Step>
+  <Step title="Contextual Response">
+    The retrieved sections are passed to the main assistant, which uses them to answer the question accurately.
+  </Step>
+</Steps>
+
+This approach enables high-accuracy document processing across entire books, lengthy reports, or large codebases — well beyond what would fit in a single context window.
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Keep knowledge focused and relevant">
+    Only add knowledge that's genuinely useful for the assistant's role. Irrelevant knowledge doesn't help and can dilute retrieval quality. A customer service assistant doesn't need the engineering team's architecture decisions.
+  </Accordion>
+
+  <Accordion title="Use clear, well-structured documents">
+    Documents with clear headings, sections, and structure are indexed more effectively. Avoid dense walls of text — use headers, bullet points, and clear paragraph breaks where possible.
+  </Accordion>
+
+  <Accordion title="Keep knowledge up to date">
+    Knowledge isn't automatically refreshed when source documents change. When you update a policy or documentation page, re-add the knowledge source to keep the assistant current.
+  </Accordion>
+
+  <Accordion title="Use manual entries for frequently referenced policies">
+    For short, important content like return policies or escalation procedures, manual entries are the easiest to manage. They can be edited directly and don't require re-uploading files.
+  </Accordion>
+
+  <Accordion title="Use global knowledge for shared foundations">
+    Company-wide content (brand guidelines, product overviews, shared policies) belongs in global knowledge at the account level. Assistant-specific content belongs in the assistant's own knowledge tab.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Information Settings" icon="scroll" href="/assistants/configuration/information-settings">
+    Configure instructions, name, and assistant type
+  </Card>
+  
+  <Card title="Tools & Connectors" icon="plug" href="/assistants/tools-and-connectors">
+    Connect to external systems via MCP
+  </Card>
+  
+  <Card title="Capabilities" icon="stars" href="/assistants/capabilities">
+    Image analysis, file generation, and app deployment
+  </Card>
+  
+  <Card title="Best Practices" icon="star" href="/assistants/best-practices">
+    Optimise your assistant's performance
+  </Card>
+</CardGroup>
