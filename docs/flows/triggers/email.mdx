@@ -21,6 +21,10 @@ When you add an Email trigger, you can generate unique email addresses for both 
 5. Configure email forwarding or share the addresses with users
 6. When emails arrive at these addresses, your flow triggers automatically with the full email content, attachments, and metadata
 
+<Tip>
+If your forwarding address requires verification, triggering the verification email will start a flow which can be viewed in the monitor (under the flow menu on the left). By clicking on the logs, you can view the trigger details including the complete body of the received email which allows you to click the verification link. 
+</Tip>
+
 ---
 
 ## Configuration
@@ -120,6 +124,20 @@ For more control, you can create Gmail filters to forward only specific emails:
 - Forward only emails from specific domains
 - Forward only emails with attachments
 - Forward only unread emails
+
+### verification
+
+If your forwarding address requires verification, triggering the verification email will start a flow which can be viewed in the monitor (under the flow menu on the left). 
+
+<Frame>
+<img src="/images/flows/monitor-page.png" alt="View the monitor page to find emails that have triggered flows" />
+</Frame>
+
+By clicking on the logs, you can view the trigger details including the complete body of the received email which allows you to click the verification link. 
+
+<Frame>
+<img src="/images/flows/trigger-email-log.png" alt="Access the emal body to review and confirm the forwarding address" />
+</Frame>
 
 ### Response Mode
 

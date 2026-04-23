@@ -42,6 +42,8 @@
               "assistants/tools-and-connectors",
               "assistants/capabilities",
               "assistants/learning",
+              "assistants/document-generation",
+              "assistants/interactive-apps",
               "assistants/multi-agent",
               "assistants/prompt-engineering",
               "assistants/best-practices"
@@ -237,7 +239,7 @@
         },
         {
           "anchor": "Support",
-          "href": "https://quiva.ai/help-center",
+          "href": "https://quiva.ai/help-center/",
           "icon": "headset"
         }
       ]
