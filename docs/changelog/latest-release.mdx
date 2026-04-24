@@ -1,253 +1,161 @@
----
-title: "Latest Release"
-description: "All the detail from the latest version update"
----
-<Update label="April 2026" description="v1.2.0" tags={["Collaboration", "UI Redesign", "Accessibility", "Real-Time Sharing", "Agent Improvements"]}>
+<Update label="April 2026" description="v1.2.1" tags={["Learning", "Branding", "Integration", "FileGeneration"]}>
 
-<Note>**Release Date:** April 17, 2026
-**Version:** v1.2.0
-**Release Type:** Minor Feature Release</Note>
+<Note>
+**Release Date:** April 24, 2026
+**Version:** v1.2.1
+**Release Type:** Patch Release
+</Note>
 
-# Collaborative Assistant Sessions
+# Quiva v1.2.1 – Enhanced Learning & Customization
 
-We're excited to introduce **collaborative assistant sessions**, enabling you and your team to work together on AI-powered chats in real-time. Share assistant sessions, see live updates as your team works, and stay informed with intelligent notifications—all while enjoying a completely redesigned chat interface built for collaboration. Plus, smarter assistants and improved workflows make your AI-powered work even more efficient.
+<Tip>This release includes significant improvements to the Agent Learning System, expanded file generation capabilities, and new simplified deployment options. All changes are backward compatible with existing installations.</Tip>
 
-<Tip>All existing assistant sessions remain fully functional. The new collaboration features are opt-in — start sharing whenever you're ready by typing @.</Tip>
+## Overview
+
+Mintlify v1.2.1 brings powerful enhancements to agent intelligence, content generation, and deployment capabilities. This release focuses on making intelligent agents more adaptive, simplifying multi-format file creation, enabling one-click app deployment, and enhancing brand customization across the platform.
 
 ## 🎯 Key Highlights
 
 <CardGroup cols={2}>
-  <Card title="Shared Assistant Sessions" icon="people-arrows" color="blue">
-    Invite team members to collaborate on assistant conversations in real-time with full session access
+
+  <Card title="Assistant Learning System" icon="brain" color="blue">
+    Assistants now learn from user feedback with upvote/downvote mechanisms on conversations and messages, improving response quality over time.
   </Card>
-  <Card title="Shared With Me Section" icon="inbox" color="green">
-    View all collaborative sessions in one place, automatically organized by who shared them with you and latest update time
+
+  <Card title="Platform Branding" icon="palette" color="purple">
+    Customize your entire platform with custom colors, app naming, and branding configurations from the global admin section.
   </Card>
-  <Card title="Unread Badges" icon="bell" color="yellow">
-    Never miss important results with automatic unread count tracking across all your sessions
+
+  <Card title="Simple App Deployment" icon="cloud" color="cyan">
+    Deploy static web applications and landing pages with zero infrastructure complexity.
   </Card>
-  <Card title="Real-Time Notifications" icon="zap" color="purple">
-    Get instant alerts when, AI and team members complete tasks or add results to shared sessions
+
+  <Card title="PDF & DOCX Export" icon="file" color="orange">
+    Generate documents in PDF and Word formats directly from your workflows and conversations.
   </Card>
-  <Card title="Redesigned Chat Interface" icon="chat" color="indigo">
-    Improved accessibility, voice input, emoji support, better formatting tools, and more intuitive sidebar
-  </Card>
-  <Card title="Global Session Tabs" icon="window" color="pink">
-    Switch effortlessly between multiple assistant sessions without losing context or progress
-  </Card>
+
 </CardGroup>
 
-## 🤝 Collaborative Features
+## ✨ What's New
 
-### **Share Assistant Sessions with Your Team**
+### Intelligent Assistant Learning
 
-Collaboration just got seamless. You can now invite team members to participate in any assistant session, enabling true collaborative AI-powered workflows.
+Assistants can now learn and improve from user interactions. When users upvote or downvote assistant responses, this feedback is captured and used to refine future responses. The learning system tracks both individual message feedback and broader conversation-level evaluations, enabling your assistants to continuously improve accuracy and user satisfaction.
 
-**How it works:**
-- Open an assistant session and mention (@) team members you'd like to collaborate with
-- Confirm if you want to notify the AI or just your team members
-- Shared members are added instantly and receive notifications
-- All collaborators see the same conversation thread and live updates as the assistant works
-- Team members can view results, contribute ideas, and track progress in real-time
-
-This is perfect for code reviews with an AI assistant, brainstorming sessions with multiple perspectives, or delegating AI-powered tasks to your team.
-
-### **"Shared With Me" Section**
-
-A new section in your assistant sidebar automatically displays all sessions that have been shared with you. Sessions are:
-- **Grouped by participants** – See who's in each session at a glance
-- **Organized by assistant** – Easily identify which assistants are involved
-- **Updated in real-time** – New shared sessions appear instantly
-
-This makes it simple to jump into collaborative work without hunting through your entire session history.
-
-### **Unread Badges & Smart Notifications**
-
-Never lose track of important updates across your team's shared sessions:
-- **Session unread counts** – Each shared session shows a badge (1-9+) indicating new results
-- **Member group badges** – Shared groups display cumulative unread counts so you know which collaborations need your attention
-- **Automatic updates** – Badges clear as soon as you view a session and update instantly when new results arrive
-- **Real-time notifications** – When a team member replies in a shared session, you're notified immediately
-
-Perfect for asynchronous teamwork—work at your own pace while staying informed of important updates.
-
-### **Real-Time Activity Updates**
-
-All session members see updates simultaneously as work happens:
-- When an assistant completes a task in a shared session, all members get instant notifications
-- Unread counts automatically increment so everyone knows what's new
-- Session activity is tracked and visible to all collaborators
+<Card title="Learn about Learning" icon="rocket" href="/assistants/learning">
+Understand how to improve your Assistants through feedback
+</Card>
 
 <Frame>
-  <img src="/images/release-v1.2.0/sharing.gif" alt="Collaborative features and @mentions" />
+  <img 
+    src="/images/assistants/learning-file.png" 
+    alt="Assistant Learning tab showing consolidated feedback insights and user ratings summary"
+  />
 </Frame>
 
----
 
-## 🎨 Chat Interface Redesign
 
-### **UI/UX Enhancements Overview**
+### Comprehensive Platform Customization
 
-We've completely redesigned the chat interface for better usability, accessibility, and collaboration. Below are the major visual and functional improvements:
+The new Global Admin Branding section allows you to control every visual aspect of your platform. Set custom primary and secondary colors, define your own application name, configure global knowledge bases, and even set custom favicons. This gives your organization complete white-label capability without requiring code changes.
 
-#### **Improved Accessibility**
-
-The interface has been optimized for clarity and comfort:
+<Card title="Explore customizing your experience" icon="palette" href="/essentials/account/global-admin-branding-settings">
+Customise the branding of your interface and add global instructions and knowledge
+</Card>
 
 <Frame>
-  <img src="/images/release-v1.2.0/ui-update.png" alt="Updated sidebar and chat experience" />
+  <img 
+    src="/images/account-branding.png" 
+    alt="Assistant Learning tab showing consolidated feedback insights and user ratings summary"
+  />
 </Frame>
 
-- **Enhanced Typography** – Refined font sizes and weights throughout for better readability
-- **Improved Color Contrast** – Updated background colors and contrast ratios to meet accessibility standards, reducing eye strain
-- **Better Visual Hierarchy** – Clearer spacing and organization of sidebar sections for easier navigation
-- **Refined Sidebar Layout** – Completely reorganized with clear sections for Favorites, Personal assistants, Team assistants, and Shared sessions
 
-#### **Voice-to-Text Input**
 
-Hands-free interaction is now available on compatible devices:
+### File Generation
+
+Generate professional documents directly from your assistant workflows. Convert conversations and data to PDF or Word documents with full formatting support. Perfect for creating reports, documentation, and shareable outputs from your Quiva interactions.
+
+<Card title="Understand how to use file generation" icon="file-arrow-down" href="/assistants/capabilities#file-generation">
+Learn more about what what files can be generated and how it works
+</Card>
 
 <Frame>
-  <img src="/images/release-v1.2.0/microphone.gif" alt="voice-to-text input in the chat box on a compatible device" />
+  <img 
+    src="/images/assistants/document-generation.png" 
+    alt="Assistant Learning tab showing consolidated feedback insights and user ratings summary"
+  />
 </Frame>
 
-- Click the **microphone icon** in the chat input box to start recording
-- Speak your prompt naturally
-- Your words appear in real-time as you speak
-- Perfect for quick prompts, multitasking, or when typing isn't convenient
-- Works on browsers and devices that support voice recognition APIs
 
-#### **Emoji Support in Chat**
 
-Add personality and clarity to your conversations:
+### Simple App Deployment
+
+Assistants can now deploy static web applications, landing pages, and interactive dashboards:
+
+- **Zero Configuration**: No Docker, Kubernetes, or infrastructure setup required
+- **Just Ask Deployment**: As for deployment and your HTML, CSS, and JavaScript files will go live
+- **Built-in CDN**: Global content delivery for optimal performance
+
+<Card title="Explore how web apps work" icon="globe" href="/assistants/capabilities#simple-app-deployment">
+Learn how assistants can create and deploy simple web applications
+</Card>
 
 <Frame>
-  <img src="/images/release-v1.2.0/emoji-use.gif" alt="Emoji picker and emoji usage in chat messages" />
+  <img 
+    src="/images/assistants/apps.png" 
+    alt="Assistant Learning tab showing consolidated feedback insights and user ratings summary"
+  />
 </Frame>
 
-- Use the **emoji icon** in the chat toolbar to browse and insert emojis
-- Emojis appear naturally in your messages and the assistant's responses
-- Great for adding tone, reactions, and visual markers to conversations
-- Supported throughout the entire chat interface
 
-#### **Better Formatting Tools**
 
-The chat input area now includes enhanced formatting controls:
-
-<Frame>
-  <img src="/images/release-v1.2.0/formatting-tools.gif" alt="Enable and use formatting tools" />
-</Frame>
-
-- **Rich text formatting** – Bold, italic, underline, and code formatting directly in the chat box
-- **Format with markdown** - use markdown syntax to automatically format without needing to use the toolbar
-- **File attachments** – Click the **+ icon** to upload files and images
-- **Cleaner toolbar** – All tools are organized intuitively for faster composition
-
-#### **Global Tabs**
-
-Multitasking just became easier:
-
-<Frame>
-  <img src="/images/release-v1.2.0/tab-switching.gif" alt="Global tab menu to allow easy context switching" />
-</Frame>
-
-- **Open multiple sessions** – Tabs appear at the top of the workspace for each open assistant session
-- **Easy switching** – Click any tab to jump to that conversation without losing context
-- **Workspace scope** – Tabs are now global across your workspace (not limited to individual assistants)
-- **Visual indicators** – Each tab shows the assistant name and unread message count
-- **Perfect for multitasking** – Compare outputs, work on parallel tasks, or reference previous sessions while using a current one
-
-#### **Redesigned Sidebar**
-
-The sidebar is completely restructured for better organization:
-
-<Frame>
-  <img src="/images/release-v1.2.0/sidebar.gif" alt="Redesigned sidebar experience" />
-</Frame>
-
-- **Global new chat button** – Start a new general chat by clicking this button from anywhere in the chat interface 
-- **Favorites section** – Pin your most-used assistants for quick access
-- **Personal assistants** – All your private assistant sessions in one place
-- **Team assistants** – Assistants shared with your team
-- **Shared With Me** – New section showing collaborative sessions grouped by owner
-- **Better scrolling** – Cleaner layout with less visual clutter
-- **Unread indicators** – Badges show which assistants and shared sessions have new activity
-
-#### **Redesigned Chat Prompt**
-
-The chat prompt has been redesigned for better functionality and to work with our new features:
-
-<Frame>
-  <img src="/images/release-v1.2.0/chat-prompt.gif" alt="New functions in the chat prompt box" />
-</Frame>
-
-- **@mention** – Click this button or type @ to find and select your team mate to add to the session
-- **Emojis** – Use emojis in chat with AI and your team mates
-- **Lock Icon** – Allows selecting between private and team visible chats
-- **Assistant selection** – Switch the assistant you are wanting to work with easily right in the chat prompt
-- **Tools actions** – Turn on/off the formatting toolbar, emojis, and detailed chat output
-- **Microphone** – Click to use speech to text. This option disappears once you start typing in the prompt box
-
----
-
-## ✨ Improvements
-
-Your assistants are now more efficient and capable:
+## 🛠️ Bug Fixes & Improvements
 
 <AccordionGroup>
-  <Accordion title="Improved Mobile Experience">
-    Plan selection now works flawlessly on mobile devices with an optimized interface that adapts to smaller screens. Your assistants respond better to mobile interactions, making AI-powered work accessible on the go.
+
+  <Accordion title="Session Management Fixes">
+    Simplified and optimized session deletion logic to ensure clean session termination and prevent orphaned sessions in the system.
   </Accordion>
-  <Accordion title="Better Tool Execution">
-    Assistants can now execute complex API requests with greater reliability. Fixed handling of special numeric formats and improved request processing ensures your tools work correctly every time.
+
+  <Accordion title="Chat Component Stability">
+    Fixed mention explanation display in chat components and corrected rendering issues in embedded chat panels for improved stability.
   </Accordion>
-  <Accordion title="Optimized Performance">
-    Your assistants now default to fast, efficient processing modes without sacrificing quality. Sub-agents operate with optimized settings for quicker responses while maintaining accuracy.
+
+  <Accordion title="Production Hotfixes">
+    Applied critical fixes from the April 17 production release including chat component refinements and marketplace display corrections.
   </Accordion>
-  <Accordion title="Improved Context Understanding">
-    Assistants better understand and apply context from tools and shared knowledge, leading to more relevant and accurate responses across your workflows.
+
+  <Accordion title="API Key Management">
+    Enhanced API key permissions configuration for embedded chat deployments, providing more granular control over API access.
   </Accordion>
+
+  <Accordion title="UI Polish & Performance">
+    Various small fixes and refinements to assistant details display, session management interface, and prompt rendering for improved user experience.
+  </Accordion>
+
 </AccordionGroup>
-
----
-
-## 📋 Additional Improvements
-
-<AccordionGroup>
-  <Accordion title="Dark Mode Refinements">
-    Updated color schemes throughout the interface for better dark mode support, reducing eye strain during extended use
-  </Accordion>
-  <Accordion title="Performance Optimizations">
-    Improved tab switching and session loading for a snappier, more responsive experience when working with multiple conversations
-  </Accordion>
-  <Accordion title="Message Display">
-    Enhanced how messages are rendered with better formatting support, improved planning visualization, and cleaner message layout
-  </Accordion>
-  <Accordion title="Notification System">
-    New notification audio and visual indicators to alert you when team members update shared sessions or complete important tasks
-  </Accordion>
-  <Accordion title="Email Trigger Enhancements">
-    Email-triggered workflows now handle file attachments more reliably, preserving file information for better knowledge management
-  </Accordion>
-</AccordionGroup>
-
----
 
 ## 📞 Support & Feedback
 
 <CardGroup cols={2}>
+
   <Card title="Documentation" icon="book" href="https://docs.quiva.ai">
-    Learn more about collaborative features and how to use the new interface
+    Explore our comprehensive guides and API documentation.
   </Card>
+
   <Card title="Community" icon="users" href="https://quivaworks.slack.com">
-    Connect with other users and share your experience with the new collaborative features
+    Join our community for discussions and support.
   </Card>
-  <Card title="Contact Support" icon="envelope" mailto="hello@quiva.ai">
-    Have questions? Reach out to our support team anytime
+
+  <Card title="Contact Support" icon="envelope" mailto="support@quiva.ai">
+    Need help? Reach out to our support team.
   </Card>
-  <Card title="Share Feedback" icon="lightbulb" mailto="support@quiva.ai">
-    Love the new interface? Have suggestions? We'd love to hear from you
+
+  <Card title="Feature Requests" icon="lightbulb" mailto="hello@quiva.ai">
+    Share your ideas for future features.
   </Card>
+
 </CardGroup>
 
 </Update>
