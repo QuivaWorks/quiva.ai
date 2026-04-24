@@ -278,7 +278,7 @@ Missing images to create
   Used in: assistants/learning.mdx
   Description: Screenshot of thumbs up/down rating UI                       
   ────────────────────────────────────────                  
-  Image path: /images/assistant-learning/learning-tab.png
+  Image path: /images/assistants/learning-file.png
   Used in: assistants/learning.mdx
   Description: Screenshot of the Learning tab with insights
   ────────────────────────────────────────

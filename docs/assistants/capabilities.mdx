@@ -32,7 +32,7 @@ Assistants can analyse images shared in a conversation. Simply attach an image a
 
 ## File Generation
 
-Assistants can generate and export files in common business formats. Generated files are stored in your account and the assistant provides a download link.
+Assistants can generate and export files in common business formats. Generated files can be previewed in the conversation, edited iteratively, and exported for download or deployment.
 
 **Supported output formats:**
 
@@ -41,7 +41,7 @@ Assistants can generate and export files in common business formats. Generated f
     Reports, proposals, contracts, documentation, and any other formatted text content
   </Card>
   <Card title="PowerPoint Presentations (.pptx)" icon="file-powerpoint">
-    Slide decks, pitch presentations, summaries, and training materials
+    Slide decks, pitch presentations, summaries, and training materials with customisable themes
   </Card>
   <Card title="Excel Spreadsheets (.xlsx)" icon="file-excel">
     Data tables, financial models, tracking sheets, and structured data
@@ -49,42 +49,85 @@ Assistants can generate and export files in common business formats. Generated f
   <Card title="CSV Files (.csv)" icon="file-csv">
     Raw data exports, bulk imports, and machine-readable structured data
   </Card>
+  <Card title="PDF Documents (.pdf)" icon="file-pdf">
+    Formatted reports, contracts, and shareable documents with embedded fonts and styling
+  </Card>
+  <Card title="SVG Diagrams (.svg)" icon="file-image">
+    Scalable vector graphics for charts, flowcharts, and technical diagrams
+  </Card>
 </CardGroup>
+
+**What assistants can do with files:**
+- Generate complete documents from descriptions or data
+- Edit and refine generated files — ask the assistant to revise content, styling, or layout
+- Preview files directly in the conversation before downloading
+- Create interactive HTML/CSS/JavaScript applications (see App Deployment below)
+- Support for Mermaid diagrams within documents for flowcharts, entity relationships, and timelines
 
 **Example uses:**
 - "Create a project proposal document based on the brief I've shared"
+- "Generate a slide deck summarising our Q3 results with a professional theme"
 - "Export this table of data as a CSV"
 - "Build a slide deck summarising our Q3 results"
 - "Generate an Excel tracker for this list of tasks"
+- "Create an SVG diagram showing this system architecture"
+- "Add a Mermaid flowchart to the document showing the process steps"
+
+<Tip>
+You can ask the assistant to edit any generated file. Simply review the preview and describe what you'd like changed — the assistant will revise and regenerate it.
+</Tip>
+
+<Frame>
+  <img 
+    src="/images/assistants/document-generation.png" 
+    alt="Generate documents and images in the chat"
+  />
+</Frame>
 
 ---
 
 ## Simple App Deployment
 
-Assistants can build and deploy simple web applications. When an assistant generates an HTML/JS/CSS application and uses the deploy command, the app is published to a unique public URL at `subdomain.quiva.ai`.
-
-**What this enables:**
-- Create interactive tools, calculators, or dashboards
-- Build data visualisations from provided data
-- Deploy simple forms or landing pages
-- Generate and share prototypes instantly
+Assistants can build and deploy interactive web applications. When an assistant generates an HTML/CSS/JavaScript application, you can preview it in the conversation. If JavaScript features are restricted in the preview, the assistant can deploy the complete application to a unique public URL.
 
 **How it works:**
+
 1. Ask the assistant to build a web app describing what you need
 2. The assistant generates the HTML, CSS, and JavaScript
-3. It deploys the assets to a randomly generated subdomain
-4. You receive a public URL to view and share the live app
+3. You preview the application in the conversation
+4. If JavaScript is blocked in the preview (which prevents interactive features from working), ask the assistant to deploy it
+5. The assistant publishes the assets to a randomly generated subdomain at `subdomain.quiva.ai`
+6. You receive a public URL to view and share the fully functional app
+
+**What this enables:**
+- Create interactive tools, calculators, and dashboards with full JavaScript functionality
+- Build data visualisations and charts from provided data
+- Deploy simple forms, landing pages, or prototypes instantly
+- Share live, interactive applications without any hosting setup
+
+**When to deploy:**
+Deploy your application when you want to share it with others or when JavaScript features aren't working in the preview. Deployed apps run at full capability on secure QuivaWorks infrastructure with proper DNS and SSL support.
 
 **Example uses:**
 - "Build a simple ROI calculator for this pricing model and deploy it"
 - "Create an interactive chart of this data and make it shareable"
 - "Generate a one-page landing page for this product concept"
+- "Build a task tracker app and deploy it so my team can use it"
+- "Create a scheduling tool for event bookings"
+
+**Manage your deployed apps**
+Apps can be found under the "more" sub-menu in the side bar where you can manage them.
+
+<Frame>
+  <img 
+    src="/images/assistants/apps.png" 
+    alt="Manage deployed apps"
+  />
+</Frame>
 
 <Info>
 Deployed apps are publicly accessible via their URL. Don't deploy content that includes sensitive or private data.
 </Info>
-
----
 
 ## Built-in Tools
 

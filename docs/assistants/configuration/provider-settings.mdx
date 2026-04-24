@@ -22,7 +22,7 @@ Start with the default. Only consider switching models if you have a specific re
 
 ## Bring Your Own Keys
 
-On **Team and Enterprise plans**, you can connect your own API keys to use specific models directly from Anthropic, OpenAI, or Google AI.
+On **Team and Enterprise plans**, you can connect your own Anthropic API key to use specific Claude models directly.
 
 When using your own keys:
 - You're billed directly by the provider, not through QuivaWorks credits
@@ -33,64 +33,24 @@ When using your own keys:
 Bring Your Own Keys is available on **Team and Enterprise plans only**. [See plans →](/get-started/plans-and-pricing)
 </Info>
 
-### Available Providers
+### Available Models
 
-<Tabs>
-  <Tab title="Anthropic (Claude)">
-    **Anthropic's Claude models** — excellent instruction-following, long context, and strong reasoning.
-    
-    **Best for:**
-    - Long document processing (200K+ token context)
-    - Complex, nuanced instructions
-    - High-accuracy analysis and research
-    - Safety-critical applications
-    
-    **Current models:**
-    - `claude-haiku-4-5` — Fast and cost-effective (same as default)
-    - `claude-sonnet-4-6` — Balanced performance and capability
-    - `claude-opus-4-7` — Most capable, highest cost
-    
-    <Info>
-    Get your Anthropic API key at [console.anthropic.com](https://console.anthropic.com/)
-    </Info>
-  </Tab>
-  
-  <Tab title="OpenAI">
-    **OpenAI's GPT models** — broad capabilities with strong general intelligence.
-    
-    **Best for:**
-    - Complex reasoning tasks
-    - Creative content generation
-    - When you need a specific GPT model's behaviour
-    
-    **Current models:**
-    - `gpt-4o-mini` — Fast and cost-effective
-    - `gpt-4o` — Strong general performance
-    - `gpt-4-turbo` — Large context (128K), balanced cost
-    
-    <Info>
-    Get your OpenAI API key at [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-    </Info>
-  </Tab>
-  
-  <Tab title="Google AI (Gemini)">
-    **Google's Gemini models** — multimodal capabilities with competitive performance.
-    
-    **Best for:**
-    - Multimodal tasks (text + images)
-    - Google ecosystem integration
-    - Cost-effective high-volume workloads
-    
-    **Current models:**
-    - `gemini-1.5-flash` — Fast and efficient
-    - `gemini-1.5-pro` — Strong reasoning and long context
-    - `gemini-2.0-flash` — Latest generation, fast inference
-    
-    <Info>
-    Get your Google AI API key at [ai.google.dev](https://ai.google.dev)
-    </Info>
-  </Tab>
-</Tabs>
+**Anthropic's Claude models** — excellent instruction-following, long context, and strong reasoning.
+
+**Best for:**
+- Long document processing (200K+ token context)
+- Complex, nuanced instructions
+- High-accuracy analysis and research
+- Safety-critical applications
+
+**Current models:**
+- `claude-haiku-4-5` — Fast and cost-effective (same as default)
+- `claude-sonnet-4-5` — Balanced performance and capability
+- `claude-opus-4-5` — Most capable, highest cost
+
+<Info>
+Get your Anthropic API key at [console.anthropic.com](https://console.anthropic.com/)
+</Info>
 
 ---
 
@@ -137,51 +97,6 @@ Once you have an API key from a provider, add it to your assistant:
     <Warning>
     Never share your API key or commit it to a code repository. If it's exposed, delete it in the Anthropic Console and create a new one immediately.
     </Warning>
-  </Step>
-</Steps>
-
-### Getting an OpenAI API Key
-
-<Steps>
-  <Step title="Create an Account">
-    Visit [platform.openai.com/signup](https://platform.openai.com/signup). New accounts receive free credits.
-  </Step>
-  
-  <Step title="Set Up Billing">
-    In the OpenAI dashboard, go to **Billing** and add a payment method. Set a hard spending limit (e.g., $50/month) to prevent unexpected charges.
-    
-    <Warning>
-    Set a hard spending limit before using the API in production to avoid unexpected charges.
-    </Warning>
-  </Step>
-  
-  <Step title="Create Your API Key">
-    1. Navigate to [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-    2. Click **+ Create new secret key** and give it a name (e.g., "QuivaWorks")
-    3. **Copy the key immediately** — it starts with `sk-proj-` and cannot be retrieved after closing the dialog
-    4. Store it securely
-  </Step>
-</Steps>
-
-### Getting a Google AI API Key
-
-<Steps>
-  <Step title="Access Google AI Studio">
-    Visit [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) and sign in with your Google account.
-  </Step>
-  
-  <Step title="Create a Project">
-    If prompted, create a new Google Cloud project or select an existing one. This is required to associate your API key.
-  </Step>
-  
-  <Step title="Create Your API Key">
-    1. Click **Create API Key** and select your project
-    2. Copy the key — it starts with `AIza`
-    3. Store it securely
-    
-    <Info>
-    Google provides a free usage tier. You'll be notified if you need to enable billing for higher usage.
-    </Info>
   </Step>
 </Steps>
 
