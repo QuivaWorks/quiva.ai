@@ -1,11 +1,11 @@
 ---
 title: "Architecture at a Glance"
-description: "Understand how QuivaWorks' stream-first architecture delivers production-grade AI agent systems"
+description: "Understand how QuivaWorks' stream-first architecture delivers production-grade AI assistant systems"
 ---
 
 ## System Architecture Overview
 
-QuivaWorks is built on a **streaming-first architecture** where everything—from agent conversations to workflow executions—is represented as ordered, persistent streams of events. This foundational design makes QuivaWorks uniquely suited for conversational AI and intelligent automation.
+QuivaWorks is built on a **streaming-first architecture** where everything—from assistant conversations to workflow executions—is represented as ordered, persistent streams of events. This foundational design makes QuivaWorks uniquely suited for conversational AI and intelligent automation.
 
 <Info>
 **Why Streams for AI?** Conversations are inherently streaming and temporal. By building on streams from the ground up, QuivaWorks naturally captures the conversational flow of AI interactions, maintains complete context history, and enables real-time processing without architectural complexity.
@@ -216,7 +216,7 @@ QuivaWorks' multi-tenancy is built into the streaming layer through **account is
     
     ```
     Event 1: {agent_id: "123", status: "created"}
-    Event 2: {name: "Customer Support", model: "claude-4"}
+    Event 2: {name: "Customer Support", model: "claude-haiku-4-5"}
     Event 3: {status: "active", endpoint: "/api/chat"}
     Event 4: {type: "unset", path: "endpoint"}
     ↓
@@ -757,15 +757,15 @@ Comprehensive monitoring is built into the streaming platform.
     Learn how to work with streams in workflows
   </Card>
   
-  <Card title="Quick Start Guide" icon="rocket" href="/quickstart">
-    Build your first streaming workflow
+  <Card title="Getting Started" icon="rocket" href="/get-started/getting-started">
+    Create your account and build your first assistant
   </Card>
   
-  <Card title="Use Cases" icon="lightbulb" href="/use-cases">
-    See streaming architecture in action
+  <Card title="Flows Overview" icon="diagram-project" href="/flows/overview">
+    Explore triggers, steps, and flow automation
   </Card>
   
-  <Card title="API Reference" icon="code" href="/api">
-    Technical documentation for stream APIs
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Technical documentation for QuivaWorks APIs
   </Card>
 </CardGroup>

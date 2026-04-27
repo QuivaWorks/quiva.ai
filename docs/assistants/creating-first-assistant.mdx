@@ -1,0 +1,237 @@
+---
+title: "Creating Your First Assistant"
+description: "Build and deploy your first AI assistant in minutes"
+icon: "rocket"
+---
+
+This guide walks you through creating your first AI assistant from scratch. By the end, you'll have a configured assistant ready to use — and optionally shared with your team.
+
+<Info>
+**Time to complete**: 5-10 minutes  
+**What you'll build**: A custom AI assistant configured for your use case  
+**What you'll learn**: The three creation paths, configuration basics, and testing in chat
+</Info>
+
+## Prerequisites
+
+<Steps>
+  <Step title="Create an Account">
+    Sign up at [app.quiva.ai](https://app.quiva.ai/en/signup)
+  </Step>
+  <Step title="Verify Your Email">
+    Check your inbox and verify your email address
+  </Step>
+</Steps>
+
+## Three Ways to Create an Assistant
+
+QuivaWorks offers three paths to create an assistant:
+
+<CardGroup cols={3}>
+  <Card title="Create with AI" icon="sparkles">
+    Describe what you need and QuivaWorks builds the initial configuration for you. Best for starting from scratch.
+  </Card>
+  <Card title="Clone" icon="copy">
+    Duplicate one of your existing assistants as a starting point. Best when you have something similar already.
+  </Card>
+  <Card title="From Marketplace" icon="store">
+    Install a pre-built assistant from the community. Best for common use cases with a head start.
+  </Card>
+</CardGroup>
+
+In this guide, we'll use **Create with AI** — the fastest path for most people.
+
+---
+
+## Step 1: Start Creation
+
+1. In the left sidebar, navigate to **Assistants**
+2. Click the **Create Assistant** button
+3. Select **Create with AI**
+
+A setup dialog will appear. Describe what you want your assistant to do:
+
+```
+A customer service assistant for a SaaS product. It should answer questions
+about the product, help users troubleshoot issues, and know when to escalate
+to a human agent.
+```
+
+Click **Generate** and QuivaWorks will create an initial configuration with a suggested name, description, and instructions.
+
+<Tip>
+Be specific in your description. Mentioning the domain, the task, and any constraints (like "escalate when needed") produces much better initial configurations.
+</Tip>
+
+---
+
+## Step 2: Review Information Settings
+
+After generation, you'll land in the **Information** tab. Review and refine what was generated.
+
+### Name & Description
+
+Give your assistant a clear name that team members will recognise:
+
+```
+Name: Customer Support
+Description: Handles product questions, troubleshooting, and support escalations
+```
+
+### Team vs. Personal
+
+Choose who can access this assistant:
+
+<Tabs>
+  <Tab title="Team Assistant">
+    Visible to all members of your account. Use for shared workflows, standardised processes, and company-wide tools.
+    
+    **Choose this for most production assistants.**
+  </Tab>
+  <Tab title="Personal Assistant">
+    Private to you only. Use for experiments, individual workflows, or personal use cases.
+  </Tab>
+</Tabs>
+
+### Instructions
+
+Instructions define your assistant's role, personality, and behaviour. They're the most impactful part of your configuration:
+
+```
+You are a customer support specialist for [Your Product].
+
+Your responsibilities:
+- Answer questions about product features and pricing
+- Help users troubleshoot common issues step-by-step
+- Escalate to a human agent when needed: billing disputes, account
+  security issues, or when a user explicitly asks for a person
+
+Your personality:
+- Friendly, professional, and patient
+- Solution-focused — always try to resolve the issue before escalating
+- Concise — don't over-explain unless asked
+
+Guidelines:
+- If you don't know something, say so and offer to connect them with the team
+- For billing or account issues, escalate to a human
+- Always confirm the issue is resolved before ending the conversation
+```
+
+<Info>
+Good instructions include: role, responsibilities, personality, tone, and specific behavioural guidelines. Think of it as onboarding a new team member in writing.
+</Info>
+
+---
+
+## Step 3: Configure Provider Settings
+
+Click the **Provider** tab to set the AI model.
+
+All assistants use **Claude Haiku 4.5** by default — fast, cost-effective, and included in all QuivaWorks plans. No API key required. Your plan's credits are used automatically.
+
+Claude Haiku 4.5 handles customer service, research, content, data extraction, and the vast majority of business workflows extremely well. It's the right starting point for almost every assistant.
+
+<Info>
+On **Team and Enterprise plans**, you can connect your own Anthropic API key to use specific Claude models. When using your own key, you're billed directly by Anthropic instead of consuming QuivaWorks credits. [Learn more →](/assistants/configuration/provider-settings)
+</Info>
+
+For this guide, leave the default selected and move on.
+
+---
+
+## Step 4: Add Knowledge (Optional)
+
+Click the **Knowledge** tab to give your assistant access to your specific content.
+
+Knowledge lets your assistant answer questions based on your documentation, FAQs, policies, or any other reference material — not just its general training.
+
+You can add knowledge from:
+- **File upload** — PDFs, Word documents, text files
+- **URL** — Web pages and documentation sites
+- **Manual entry** — Paste text directly
+
+For your first assistant, you can skip this and add knowledge later. The assistant will still work based on its instructions alone.
+
+<Card title="Learn more about Knowledge" icon="book" href="/assistants/configuration/knowledge">
+  How to add and manage knowledge sources →
+</Card>
+
+---
+
+## Step 5: Connect Integrations (Optional)
+
+Click the **Integrations** tab to connect your assistant to external systems via MCP.
+
+Integrations give assistants the ability to take actions — look up orders, search a CRM, create tickets, or call your APIs. For your first assistant, skip this for now and add integrations as you need them.
+
+<Card title="Learn more about Integrations" icon="plug" href="/assistants/tools-and-connectors">
+  How to connect tools and APIs →
+</Card>
+
+---
+
+## Step 6: Save and Open in Chat
+
+Click **Save** to save your configuration, then click **Open in Chat** to test it.
+
+Try a few questions that match your use case:
+
+- "What features does your product have?"
+- "I'm having trouble logging in, can you help?"
+- "I want to speak to a human"
+
+Evaluate the responses: are they on-brand? Does the assistant stay in scope? Do edge cases (like asking for a human) behave correctly?
+
+If something is off, go back to **Instructions** and refine the guidance — then test again.
+
+<Tip>
+Use the thumbs up/down buttons on responses to flag what works and what doesn't. These votes feed into the [Learning system](/assistants/learning) so you can improve the assistant over time.
+</Tip>
+
+---
+
+## Step 7: Share with Your Team (Optional)
+
+If you created a **Team Assistant**, your team can already find and use it in their own sessions.
+
+To collaborate on a specific conversation in real-time:
+
+1. Open the assistant in chat
+2. Type `@` to mention a team member
+3. They'll receive a notification and can join the session instantly
+
+<Card title="Learn more about Collaboration" icon="handshake" href="/get-started/collaboration">
+  Real-time session sharing and @mentions →
+</Card>
+
+---
+
+## What's Next
+
+Your assistant is live. Here are the most impactful ways to build on it:
+
+<CardGroup cols={2}>
+  <Card title="Add Knowledge" icon="book" href="/assistants/configuration/knowledge">
+    Give your assistant access to your documentation and content
+  </Card>
+  
+  <Card title="Connect Integrations" icon="plug" href="/assistants/tools-and-connectors">
+    Link to your CRM, ticketing system, or custom APIs
+  </Card>
+  
+  <Card title="Improve with Learning" icon="brain" href="/assistants/learning">
+    Use feedback votes and insights to refine behaviour over time
+  </Card>
+  
+  <Card title="Automate with Flows" icon="diagram-project" href="/flows/overview">
+    Trigger your assistant automatically via webhook, schedule, or email
+  </Card>
+  
+  <Card title="Prompt Engineering" icon="scroll" href="/assistants/prompt-engineering">
+    Write better instructions for better results
+  </Card>
+  
+  <Card title="Advanced Configuration" icon="sliders" href="/assistants/configuration/information-settings">
+    Explore all configuration options in depth
+  </Card>
+</CardGroup>

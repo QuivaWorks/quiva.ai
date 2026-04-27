@@ -20,7 +20,33 @@
               "get-started/overview",
               "get-started/getting-started",
               "get-started/core-concepts",
+              "get-started/collaboration",
               "get-started/plans-and-pricing"
+            ]
+          },
+          {
+            "group": "Assistants",
+            "pages": [
+              "assistants/overview",
+              "assistants/creating-first-assistant",
+              {
+                "group": "Configuration",
+                "icon": "sliders",
+                "pages": [
+                  "assistants/configuration/information-settings",
+                  "assistants/configuration/provider-settings",
+                  "assistants/configuration/context-settings",
+                  "assistants/configuration/knowledge"
+                ]
+              },
+              "assistants/tools-and-connectors",
+              "assistants/capabilities",
+              "assistants/learning",
+              "assistants/document-generation",
+              "assistants/interactive-apps",
+              "assistants/multi-agent",
+              "assistants/prompt-engineering",
+              "assistants/best-practices"
             ]
           },
           {
@@ -73,40 +99,23 @@
               "flows/best-practices"
             ]
           },
-          {
-            "group": "Agents",
-            "pages": [
-              "agents/overview",
-              "agents/creating-first-agent",
-              {
-                "group": "Configuration",
-                "icon": "sliders",
-                "pages": [
-                  "agents/configuration/information-settings",
-                  "agents/configuration/provider-settings",
-                  "agents/configuration/context-settings"
-                ]
-              },
-              "agents/tools-and-connectors",
-              "agents/prompt-engineering",
-              "agents/best-practices"
-            ]
-          },
+          
           {
             "group": "Account Management",
             "pages": [
               {
-                "icon":"id-card",
+                "icon": "id-card",
                 "group": "Account Management",
                 "pages": [
                   "essentials/account/creating-account",
                   "essentials/account/account-settings",
+                  "essentials/account/global-admin-branding-settings",
                   "essentials/account/billing-subscriptions",
                   "essentials/account/closing-account"
                 ]
               },
               {
-                "icon":"people-group",
+                "icon": "people-group",
                 "group": "User Management",
                 "pages": [
                   "essentials/users/user-management",
@@ -115,7 +124,6 @@
                 ]
               },
               {
-                
                 "icon": "lock",
                 "group": "Security",
                 "pages": [
@@ -217,7 +225,7 @@
         "groups": [
           {
             "group": "Change Log",
-            "pages": ["changelog/product-updates"]
+            "pages": ["changelog/latest-release", "changelog/product-updates"]
           }
         ]
       }
@@ -231,7 +239,7 @@
         },
         {
           "anchor": "Support",
-          "href": "https://quiva.ai/support",
+          "href": "https://quiva.ai/help-center/",
           "icon": "headset"
         }
       ]
@@ -262,7 +270,7 @@
   },
   "footer": {
     "socials": {
-      "linkedin": "https://linkedin.com/company/quiva"
+      "linkedin": "https://linkedin.com/company/quivaworks"
     }
   }
 }

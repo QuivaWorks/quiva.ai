@@ -1,0 +1,191 @@
+---
+title: "Capabilities"
+description: "What assistants can do: image analysis, file generation, app deployment, and built-in tools"
+icon: "stars"
+---
+
+Beyond conversation, QuivaWorks assistants have a set of built-in capabilities that let them analyse images, generate files, deploy simple apps, search the web, and more — all without any additional configuration.
+
+---
+
+## Image Analysis
+
+Assistants can analyse images shared in a conversation. Simply attach an image and ask the assistant to work with it.
+
+**What assistants can do with images:**
+- Describe visual content — photos, screenshots, diagrams
+- Extract text from images (receipts, forms, screenshots)
+- Analyse charts, graphs, and data visualisations
+- Identify objects, people, and scenes
+- Examine technical diagrams and architectural drawings
+- Compare multiple images
+
+**Supported formats:** PNG, JPG, JPEG, GIF, WEBP
+
+**Example uses:**
+- Upload a screenshot of an error and ask the assistant to diagnose it
+- Share a product photo and ask for a description suitable for an e-commerce listing
+- Attach a chart and ask the assistant to summarise the key trends
+- Share a handwritten form and extract the data as structured text
+
+---
+
+## File Generation
+
+Assistants can generate and export files in common business formats. Generated files can be previewed in the conversation, edited iteratively, and exported for download or deployment.
+
+**Supported output formats:**
+
+<CardGroup cols={2}>
+  <Card title="Word Documents (.docx)" icon="file-word">
+    Reports, proposals, contracts, documentation, and any other formatted text content
+  </Card>
+  <Card title="PowerPoint Presentations (.pptx)" icon="file-powerpoint">
+    Slide decks, pitch presentations, summaries, and training materials with customisable themes
+  </Card>
+  <Card title="Excel Spreadsheets (.xlsx)" icon="file-excel">
+    Data tables, financial models, tracking sheets, and structured data
+  </Card>
+  <Card title="CSV Files (.csv)" icon="file-csv">
+    Raw data exports, bulk imports, and machine-readable structured data
+  </Card>
+  <Card title="PDF Documents (.pdf)" icon="file-pdf">
+    Formatted reports, contracts, and shareable documents with embedded fonts and styling
+  </Card>
+  <Card title="SVG Diagrams (.svg)" icon="file-image">
+    Scalable vector graphics for charts, flowcharts, and technical diagrams
+  </Card>
+</CardGroup>
+
+**What assistants can do with files:**
+- Generate complete documents from descriptions or data
+- Edit and refine generated files — ask the assistant to revise content, styling, or layout
+- Preview files directly in the conversation before downloading
+- Create interactive HTML/CSS/JavaScript applications (see App Deployment below)
+- Support for Mermaid diagrams within documents for flowcharts, entity relationships, and timelines
+
+**Example uses:**
+- "Create a project proposal document based on the brief I've shared"
+- "Generate a slide deck summarising our Q3 results with a professional theme"
+- "Export this table of data as a CSV"
+- "Build a slide deck summarising our Q3 results"
+- "Generate an Excel tracker for this list of tasks"
+- "Create an SVG diagram showing this system architecture"
+- "Add a Mermaid flowchart to the document showing the process steps"
+
+<Tip>
+You can ask the assistant to edit any generated file. Simply review the preview and describe what you'd like changed — the assistant will revise and regenerate it.
+</Tip>
+
+<Frame>
+  <img 
+    src="/images/assistants/document-generation.png" 
+    alt="Generate documents and images in the chat"
+  />
+</Frame>
+
+---
+
+## Simple App Deployment
+
+Assistants can build and deploy interactive web applications. When an assistant generates an HTML/CSS/JavaScript application, you can preview it in the conversation. If JavaScript features are restricted in the preview, the assistant can deploy the complete application to a unique public URL.
+
+**How it works:**
+
+1. Ask the assistant to build a web app describing what you need
+2. The assistant generates the HTML, CSS, and JavaScript
+3. You preview the application in the conversation
+4. If JavaScript is blocked in the preview (which prevents interactive features from working), ask the assistant to deploy it
+5. The assistant publishes the assets to a randomly generated subdomain at `subdomain.quiva.ai`
+6. You receive a public URL to view and share the fully functional app
+
+**What this enables:**
+- Create interactive tools, calculators, and dashboards with full JavaScript functionality
+- Build data visualisations and charts from provided data
+- Deploy simple forms, landing pages, or prototypes instantly
+- Share live, interactive applications without any hosting setup
+
+**When to deploy:**
+Deploy your application when you want to share it with others or when JavaScript features aren't working in the preview. Deployed apps run at full capability on secure QuivaWorks infrastructure with proper DNS and SSL support.
+
+**Example uses:**
+- "Build a simple ROI calculator for this pricing model and deploy it"
+- "Create an interactive chart of this data and make it shareable"
+- "Generate a one-page landing page for this product concept"
+- "Build a task tracker app and deploy it so my team can use it"
+- "Create a scheduling tool for event bookings"
+
+**Manage your deployed apps**
+Apps can be found under the "more" sub-menu in the side bar where you can manage them.
+
+<Frame>
+  <img 
+    src="/images/assistants/apps.png" 
+    alt="Manage deployed apps"
+  />
+</Frame>
+
+<Info>
+Deployed apps are publicly accessible via their URL. Don't deploy content that includes sensitive or private data.
+</Info>
+
+## Built-in Tools
+
+Every assistant comes with a set of built-in tools enabled by default. These are available without any integration setup.
+
+<AccordionGroup>
+  <Accordion title="Research & Web">
+    - **Web Search** — Search the web for recent news, facts, and general information
+    - **Content Fetching** — Retrieve and parse any URL as markdown content
+    - **Document Analysis** — Search and analyse knowledge base documents
+  </Accordion>
+  
+  <Accordion title="Data & Computation">
+    - **Math Evaluation** — Solve mathematical expressions accurately
+    - **JSON Extraction** — Extract values from JSON using JSONPath expressions
+    - **Regular Expressions** — Pattern matching and text extraction using Go RE2 syntax
+    - **Date/Time Parsing** — Parse and format dates and times with timezone support
+    - **Data Encoding/Decoding** — Convert data using Base64 and other encoding schemes
+    - **Cryptographic Hashing** — Generate MD5, SHA-256, and other standard hashes
+  </Accordion>
+  
+  <Accordion title="Task & Workflow">
+    - **Task Management** — Create and manage structured task lists during a conversation
+    - **Escalation** — Route requests to a human supervisor when the assistant can't or shouldn't proceed
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Multi-Agent Capabilities
+
+For complex tasks or large documents, assistants automatically use sub-agents to stay within context limits.
+
+- **Sub-agents** handle individual tool calls or document sections in parallel, with results consolidated back to the main assistant
+- **Assistant-to-assistant communication** allows any assistants in your account to be linked together, letting a primary assistant delegate to specialist assistants
+
+<Card title="Learn more about Multi-Agent" icon="diagram-project" href="/assistants/multi-agent">
+  How to build systems where assistants work together →
+</Card>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Tools & Connectors" icon="plug" href="/assistants/tools-and-connectors">
+    Connect to external systems via MCP integrations
+  </Card>
+  
+  <Card title="Multi-Agent Systems" icon="diagram-project" href="/assistants/multi-agent">
+    Link assistants together for complex workflows
+  </Card>
+  
+  <Card title="Knowledge" icon="book" href="/assistants/configuration/knowledge">
+    Add documents and context to your assistant
+  </Card>
+  
+  <Card title="Flows" icon="bolt" href="/flows/overview">
+    Automate assistant tasks with triggers and steps
+  </Card>
+</CardGroup>

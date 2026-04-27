@@ -134,9 +134,7 @@ Select your LLM provider and model.
   LLM provider
   
   **Options**:
-  - `OpenAI` - ChatGPT models
   - `Anthropic` - Claude models
-  - `Google` - Gemini models
   
 </ParamField>
 
@@ -144,21 +142,19 @@ Select your LLM provider and model.
   Specific model version
   
   **Examples**:
-  - OpenAI: `gpt-4-turbo`, `gpt-3.5-turbo`
-  - Anthropic: `claude-3-opus`, `claude-3-sonnet`
-  - Google: `gemini-pro`, `gemini-ultra`
+  - `claude-haiku-4-5` — Fast and cost-effective
+  - `claude-sonnet-4-5` — Balanced performance and capability
+  - `claude-opus-4-5` — Most capable, highest cost
   
   Different models offer varying capabilities, speeds, and costs. Newer models generally provide better performance.
 </ParamField>
 
 <ParamField path="apiKey" type="string" required>
-  Your API key from the provider
+  Your Anthropic API key
   
   API keys are encrypted and securely stored. Never share keys publicly.
   
-  **Get keys**:
-  - [Anthropic API key](https://console.anthropic.com/) 
-  - [OpenAI API key](https://platform.openai.com/api-keys)
+  **Get your key**: [console.anthropic.com](https://console.anthropic.com/)
   
   <Warning>Rotate API keys regularly (every 90 days) and use separate keys for dev/prod environments</Warning>
 </ParamField>
@@ -547,7 +543,7 @@ Agent: "Your order #12345 was delivered this morning!" ✅
 
   <Accordion title="Lead Qualification Agent" icon="filter">
     **Configuration**:
-    - Provider: OpenAI GPT-4 (strong reasoning)
+    - Provider: Anthropic Claude (strong reasoning)
     - Tools: CRM, Company Database
     - Context: Ideal customer profile, pricing tiers
     - Output Schema: `{score: number, category: string, reasons: string[]}`
@@ -577,7 +573,7 @@ Agent: "Your order #12345 was delivered this morning!" ✅
 
   <Accordion title="Data Analysis Agent" icon="chart-line">
     **Configuration**:
-    - Provider: OpenAI GPT-4 (strong analysis)
+    - Provider: Anthropic Claude (strong analysis)
     - Tools: Database, Analytics API
     - Context: Key metrics, business goals
     - Output Schema: `{insights: string[], recommendations: string[], data: object}`
@@ -716,7 +712,7 @@ Agent: "Your order #12345 was delivered this morning!" ✅
     - Make boundaries explicit in instructions with examples
     - Enable output validation
     - Add human-in-the-loop for critical actions
-    - Try different model (GPT-4 or Claude for better instruction following)
+    - Try a more capable Claude model (e.g. Sonnet or Opus) for better instruction following
   </Accordion>
 
   <Accordion title="Slow responses" icon="clock">
@@ -751,7 +747,7 @@ Agent: "Your order #12345 was delivered this morning!" ✅
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Add Tools" icon="wrench" href="/marketplace/mcp-servers">
+  <Card title="Add Tools" icon="wrench" href="/assistants/tools-and-connectors">
     Browse Marketplace for MCP servers
   </Card>
   
@@ -759,11 +755,11 @@ Agent: "Your order #12345 was delivered this morning!" ✅
     Branch based on agent output
   </Card>
   
-  <Card title="Agent Overview" icon="robot" href="/agents/overview">
+  <Card title="Agent Overview" icon="robot" href="/assistants/overview">
     Learn more about agents in QuivaWorks
   </Card>
   
-  <Card title="Variable Mapping" icon="brackets-curly" href="/flows/concepts/variable-mapping">
+  <Card title="Variable Mapping" icon="brackets-curly" href="/advanced/variable-mapping/overview">
     Reference agent output in other steps
   </Card>
 </CardGroup>

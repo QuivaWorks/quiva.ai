@@ -1,230 +1,208 @@
 ---
 title: "Core Concepts"
-description: "Understand the fundamental building blocks of QuivaWorks' intelligent agent platform"
+description: "Understand the fundamental building blocks of the QuivaWorks platform"
 icon: "puzzle-piece"
 ---
 
 ## Overview
 
-QuivaWorks is built around several core concepts that work together to create intelligent, reliable AI agent systems. Understanding these concepts will help you design and implement effective solutions for your business needs.
+QuivaWorks is built around a small set of core concepts that work together to create an intelligent AI platform for teams. Understanding these will help you build effective assistants, design automations, and get the most out of the platform.
 
-## Smart Agents
+## Assistants
 
-At the heart of QuivaWorks are **Smart Agents** - AI-powered entities that can understand context, make decisions, and interact with your systems and data.
+**Assistants** are the heart of QuivaWorks — AI collaborators configured for specific tasks, roles, or domains. Unlike general-purpose AI, QuivaWorks assistants retain context, access your systems, and improve through intentional refinement.
 
-<Card title="What makes an agent 'smart'?" icon="brain">
-  Unlike simple chatbots, QuivaWorks agents have built-in intelligence features that make them reliable for production use
+### Team vs. Personal Assistants
+
+<CardGroup cols={2}>
+  <Card title="Team Assistants" icon="users">
+    Accessible to everyone in your account. Use for standardised workflows, shared tools, and company-wide resources.
+  </Card>
+  <Card title="Personal Assistants" icon="user">
+    Private to the creator only. Use for individual work, experiments, or personal use cases.
+  </Card>
+</CardGroup>
+
+### Configuration Layers
+
+Every assistant has two configuration layers that merge at runtime:
+
+- **Team Settings** — Shared instructions, knowledge, integrations, and context variables for the entire team
+- **Personal Settings** — Individual configurations that layer on top of team settings without affecting others
+
+**Account-Level Settings** sit above both and apply to all your assistants when enable in each assistants settings:
+
+| Setting | Purpose |
+|---|---|
+| **Global Instructions** | Default instructions applied to all assistant invocations |
+| **Global Knowledge** | Company-wide knowledge sources, enabled per assistant |
+| **Branding** | Customise the look and feel of the interface |
+
+### Assistant Configuration
+
+Each assistant is configured across four areas:
+
+<CardGroup cols={2}>
+  <Card title="Instructions" icon="scroll">
+    Define the assistant's role, personality, tone, and responsibilities
+  </Card>
+  <Card title="Knowledge" icon="book">
+    Give the assistant access to your documentation and context
+  </Card>
+  <Card title="Integrations" icon="plug">
+    Connect to your systems via MCP protocol
+  </Card>
+  <Card title="Context Variables" icon="sliders">
+    Configure environment-specific parameters
+  </Card>
+</CardGroup>
+
+<Card title="Learn more about Assistants" icon="sparkles" href="/assistants/overview">
+  Dive deeper into creating and configuring assistants →
 </Card>
 
-### Key Agent Features
+---
 
-<AccordionGroup>
-  <Accordion title="Output Schema Validation">
-    Agents automatically validate their responses against defined schemas. If output doesn't match requirements, the agent enters a correction loop to fix issues before proceeding.
-    
-    **Example**: An agent generating customer reports will automatically verify all required fields are present and correctly formatted before sending.
-  </Accordion>
+## Flows
 
-  <Accordion title="Self-Improving Prompts">
-    AI prompting that automatically optimizes based on agent settings, usage patterns, and success rates. Your agents get better over time without manual intervention.
-    
-    **Example**: An agent handling support tickets learns to provide more relevant responses based on resolution success rates.
-  </Accordion>
+**Flows** are automated sequences of steps that execute in response to a trigger. Think of a flow as a recipe for automation — triggers start the process, steps perform actions, and variable mappings pass data between steps.
 
-  <Accordion title="Smart Context Management">
-    Intelligent memory system that includes relevant conversation history and context while filtering out unnecessary information to maintain performance.
-    
-    **Example**: A sales agent remembers previous customer interactions but doesn't get overwhelmed by irrelevant historical data.
-  </Accordion>
-
-  <Accordion title="Custom Instructions">
-    Define business-specific behavior, tone, and response patterns that align with your company's standards and requirements.
-    
-    **Example**: Configure agents to follow your brand voice, compliance requirements, and escalation procedures.
-  </Accordion>
-</AccordionGroup>
-
-## Flows and Workflows
-
-**Flows** are visual representations of business processes that connect agents, systems, and human decision points into coherent workflows.
-
-### Flow Components
+### Flow Structure
 
 <CardGroup cols={3}>
-  <Card title="Agents" icon="robot">
-    AI entities that process information and make decisions
+  <Card title="Triggers" icon="bolt">
+    Start flows via webhooks, schedules, HTTP requests, emails, file uploads, or stream events
+  </Card>
+  <Card title="Steps" icon="list-check">
+    Run assistants, make decisions, transform data, call APIs, loop over items, or wait for human input
   </Card>
   <Card title="Functions" icon="code">
-    Custom business logic and data processing
-  </Card>
-  <Card title="HTTP Requests" icon="globe">
-    API calls to external systems and services
-  </Card>
-  <Card title="Conditions" icon="fork">
-    Branching logic based on data or agent decisions
-  </Card>
-  <Card title="Loops" icon="repeat">
-    Iterative processing for complex workflows
-  </Card>
-  <Card title="Human Gates" icon="user">
-    Points where human approval or input is required
+    Utility operations for key-value storage, object storage, streams, and data manipulation
   </Card>
 </CardGroup>
 
-### Flow Capabilities
+Flows support conditional branching, parallel execution, nested flows, and human-in-the-loop approval gates.
 
-<Tabs>
-  <Tab title="Visual Builder">
-    Drag-and-drop interface for creating complex workflows without coding. Real-time testing and validation ensure your flows work before deployment.
-  </Tab>
-  <Tab title="Advanced Logic">
-    Support for conditional routing, error handling, parallel processing, and complex business rules.
-  </Tab>
-  <Tab title="Multi-Agent Orchestration">
-    Coordinate multiple specialized agents within a single workflow, enabling sophisticated decision-making and task distribution.
-  </Tab>
-  <Tab title="Version Control">
-    Track changes to your flows with built-in versioning and the ability to roll back to previous configurations.
-  </Tab>
-</Tabs>
+<Card title="Learn more about Flows" icon="diagram-project" href="/flows/overview">
+  Explore triggers, steps, and flow configuration →
+</Card>
 
-## MCP Servers
+---
 
-**Model Context Protocol (MCP) Servers** provide standardized interfaces between agents and external systems, tools, and data sources.
+## Integrations & MCP
 
-<Info>
-  MCP is an open standard that enables AI agents to securely connect to various tools and data sources in a consistent way.
-</Info>
+**Model Context Protocol (MCP)** is an open standard that connects assistants and flows to external systems, tools, and data sources.
 
-### MCP Server Features
+### What MCP Enables
 
-- **Auto-Generation**: Create MCP servers automatically from OpenAPI specifications or Postman collections
-- **Built-in Authentication**: Secure connections with OAuth, API keys, and other authentication methods
-- **Native Support**: First-class MCP protocol support built into the platform
-- **Custom Servers**: Build specialized servers for unique business requirements
+- **Pre-built integrations** — Connect to popular business tools out of the box
+- **Auto-generation Custom integrations** — Create MCP servers automatically from OpenAPI specifications to build your own for proprietary systems and internal APIs
+- **Enhanced specs** — OpenAPI specs with embedded agent instructions are supported
 
-### Common MCP Server Types
+### Built-in Tools
 
-<CardGroup cols={2}>
-  <Card title="Data Sources" icon="database">
-    Connect to databases, files, APIs, and other data repositories
-  </Card>
-  <Card title="Business Tools" icon="tools">
-    Integrate with CRM, ERP, marketing platforms, and SaaS applications
-  </Card>
-  <Card title="Communication" icon="message">
-    Email, Slack, Teams, and other messaging platforms
-  </Card>
-  <Card title="Custom APIs" icon="plug">
-    Your proprietary systems and internal tools
-  </Card>
-</CardGroup>
-
-## QuivaCloud Infrastructure
-
-The underlying platform that powers your agents and workflows with enterprise-grade reliability and performance.
-
-### Core Infrastructure Components
-
-<Tabs>
-  <Tab title="Compute & Storage">
-    - **Functions and Containers**: Serverless execution environment for custom business logic
-    - **Storage Solutions**: Persistent memory for agents and workflow data
-    - **Real-time Data Streams**: High-performance data processing and routing
-  </Tab>
-  <Tab title="Networking & APIs">
-    - **API Gateways**: RESTful APIs for all platform functionality
-    - **WebSocket Support**: Real-time communication and streaming
-    - **Edge Locations**: Distributed infrastructure for optimal performance
-  </Tab>
-  <Tab title="Security & Compliance">
-    - **ISO27001 Certified**: Enterprise-grade security standards
-    - **Data Isolation**: Complete separation of customer data and workloads
-    - **GDPR Compliant**: Full regulatory compliance built-in
-  </Tab>
-  <Tab title="Deployment Options">
-    - **Multi-Cloud**: Choice of hosting locations and cloud providers
-    - **Hybrid**: Combine cloud and on-premise resources
-    - **BYO Cloud**: Deploy on your own cloud infrastructure
-  </Tab>
-</Tabs>
-
-## Marketplace
-
-The **Marketplace** is an ecosystem where you can discover, share, and monetize AI agent solutions.
-
-### Marketplace Content Types
+Every assistant comes with a set of built-in tools available out of the box:
 
 <AccordionGroup>
-  <Accordion title="Agent Templates">
-    Pre-built agents for common business functions like customer support, data analysis, content generation, and workflow automation.
+  <Accordion title="Research & Content">
+    - **Web Search** — Recent news and general web results
+    - **Content Fetching** — Retrieve and parse URLs as markdown
+    - **Document Analysis** — Search and analyse knowledge base documents
   </Accordion>
-
-  <Accordion title="MCP Servers">
-    Ready-to-use connectors for popular tools and services, plus custom API integrations with built-in authentication.
+  <Accordion title="Data & Computation">
+    - **Math Evaluation** — Solve mathematical expressions
+    - **JSON Extraction** — Extract values using JSONPath
+    - **Regular Expressions** — Pattern matching using Go RE2 syntax
+    - **Date/Time Parsing** — Parse and format with timezone support
+    - **Data Encoding/Decoding** — Convert data using various schemes
+    - **Cryptographic Hashing** — Industry-standard hash generation
   </Accordion>
-
-  <Accordion title="Complete Workflows">
-    End-to-end business process automation solutions that combine multiple agents, integrations, and business logic.
-  </Accordion>
-
-  <Accordion title="Functions & Components">
-    Reusable business logic components that can be incorporated into custom workflows.
+  <Accordion title="Task Management">
+    - **Task Management** — Create and manage structured task lists
+    - **Escalation** — Route requests to human supervisors when needed
   </Accordion>
 </AccordionGroup>
 
-### Benefits for Different Users
+### Sub-Agents
 
-<CardGroup cols={2}>
-  <Card title="For Implementers" icon="download">
-    - Accelerated development with proven solutions
-    - Pre-built integrations to popular business tools
-    - Community-validated workflows and patterns
-  </Card>
-  <Card title="For Contributors" icon="upload">
-    - Monetize expertise through revenue sharing (80/20 split)
-    - Build reputation in the AI automation community
-    - Access to advanced development tools and APIs
-  </Card>
-</CardGroup>
+For tool-heavy workflows, QuivaWorks automatically uses sub-agents to prevent context window overload. The context window is split across multiple tool calls, each handled by a dedicated sub-agent, with results consolidated back to the main assistant.
+
+---
+
+## Learning System
+
+Assistants improve through **intentional refinement** — not automatic adjustment. You stay in control of when and how your assistants evolve.
+
+<Steps>
+  <Step title="Vote on Interactions">
+    Use thumbs up/down to flag what works and what doesn't in real conversations
+  </Step>
+  <Step title="Review Insights">
+    The Learning tab consolidates feedback into actionable patterns from successful interactions
+  </Step>
+  <Step title="Refine Behaviour">
+    Update instructions, knowledge, or settings based on what you've learned
+  </Step>
+</Steps>
+
+<Info>
+QuivaWorks uses intentional refinement by design. Assistants don't change automatically — you decide when and how to update them based on the insights surfaced.
+</Info>
+
+<Card title="Learn more about Learning" icon="brain" href="/assistants/learning">
+  See how to improve assistants through feedback and insights →
+</Card>
+
+---
+
+## Collaboration
+
+QuivaWorks is built for teams. Any assistant session can be shared with teammates in real-time — no separate tools or context-switching required.
+
+- **@Mentions** — Type `@` in any session to invite team members instantly
+- **Shared With Me** — A dedicated sidebar section showing all sessions shared with you
+- **Unread Badges** — Track new messages across all shared sessions
+- **Smart Notifications** — Get alerts when teammates complete tasks or reply
+- **Multi-Tab Conversations** — Run multiple assistant sessions simultaneously; assistants continue working while you switch tabs
+
+<Card title="Learn more about Collaboration" icon="handshake" href="/get-started/collaboration">
+  See how to share sessions and work with your team →
+</Card>
+
+---
 
 ## How It All Works Together
 
 <Steps>
-  <Step title="Design Your Workflow">
-    Use the visual flow builder to map out your business process, identifying where agents, systems, and human input are needed.
+  <Step title="Create an Assistant">
+    Configure instructions, knowledge, and integrations for your use case. Set team settings for shared standards and personal settings for individual customisation.
   </Step>
-  <Step title="Configure Smart Agents">
-    Set up agents with appropriate instructions, validation schemas, and context requirements for each step in your workflow.
+  <Step title="Work Together">
+    Use the assistant in sessions. Share with teammates using `@`, track updates with unread badges, and collaborate in real-time.
   </Step>
-  <Step title="Connect Your Systems">
-    Use MCP servers to securely connect agents to your existing tools, databases, and APIs.
+  <Step title="Automate with Flows">
+    Build flows to trigger assistants automatically — on a schedule, via webhook, from an email, or any other trigger.
   </Step>
-  <Step title="Deploy and Monitor">
-    Launch your workflow on QuivaCloud with built-in monitoring, logging, and performance tracking.
-  </Step>
-  <Step title="Optimize and Scale">
-    Use analytics and feedback to improve performance, then scale across your organization.
+  <Step title="Improve Over Time">
+    Vote on interactions, review the Learning tab, and intentionally refine your assistants based on the insights surfaced.
   </Step>
 </Steps>
 
-<Card title="Ready to dive deeper?" icon="compass">
-  Explore our [Architecture Guide](/architecture) to understand how these concepts work together, or check out [real-world use cases](/use-cases) to see them in action.
-</Card>
+---
 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Architecture Overview" icon="building" href="/architecture">
-    See how all components work together in the platform architecture
+  <Card title="Create Your First Assistant" icon="sparkles" href="/assistants/creating-first-assistant">
+    Build an assistant tailored to your use case
   </Card>
-  <Card title="Use Cases & Examples" icon="lightbulb" href="/use-cases">
-    Explore practical applications and implementation patterns
+  <Card title="Explore Flows" icon="diagram-project" href="/flows/overview">
+    Automate tasks with triggers and steps
   </Card>
-  <Card title="Quick Start Guide" icon="rocket" href="/quickstart">
-    Build your first intelligent workflow
+  <Card title="Team Collaboration" icon="users" href="/get-started/collaboration">
+    Share sessions and work together in real-time
   </Card>
-  <Card title="API Reference" icon="code" href="/api">
-    Technical documentation for developers
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Integrate QuivaWorks programmatically
   </Card>
 </CardGroup>
