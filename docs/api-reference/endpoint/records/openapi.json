@@ -1,0 +1,974 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Records Service API",
+    "description": "Manages record configurations (schemas) and the records that conform to them.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/records/config": {
+      "get": {
+        "summary": "List record configurations",
+        "operationId": "listRecordConfigs",
+        "tags": [
+          "Record Configs"
+        ],
+        "x-resource-type": "service",
+        "x-resource": "microstrate.records.get.configs",
+        "responses": {
+          "200": {
+            "description": "List of record configurations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "body": {
+                          "$ref": "#/components/schemas/RecordConfigList"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a record configuration",
+        "operationId": "createRecordConfig",
+        "tags": [
+          "Record Configs"
+        ],
+        "x-resource-type": "service",
+        "x-resource": "microstrate.records.post.config",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordConfigCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created record configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "body": {
+                          "$ref": "#/components/schemas/RecordConfig"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error (invalid ID format, invalid schema, missing required fields)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A record configuration with the given ID already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/records/config/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Record configuration ID",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Get a record configuration",
+        "operationId": "getRecordConfig",
+        "tags": [
+          "Record Configs"
+        ],
+        "x-resource-type": "service",
+        "x-resource": "microstrate.records.get.config",
+        "responses": {
+          "200": {
+            "description": "Record configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "body": {
+                          "$ref": "#/components/schemas/RecordConfig"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record configuration not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a record configuration",
+        "description": "Partially updates a record configuration. Schema changes do not retroactively affect existing records.",
+        "operationId": "updateRecordConfig",
+        "tags": [
+          "Record Configs"
+        ],
+        "x-resource-type": "service",
+        "x-resource": "microstrate.accounts.post.oauth-login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordConfigUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated record configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "body": {
+                          "$ref": "#/components/schemas/RecordConfig"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record configuration not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a record configuration",
+        "description": "Deletes the configuration and its associated records storage bucket.",
+        "operationId": "deleteRecordConfig",
+        "tags": [
+          "Record Configs"
+        ],
+        "x-resource-type": "service",
+        "x-resource": "microstrate.records.patch.config",
+        "responses": {
+          "200": {
+            "description": "Configuration deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "body": {
+                          "$ref": "#/components/schemas/SuccessMessage"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record configuration not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/records/{config_id}": {
+      "parameters": [
+        {
+          "name": "config_id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the record configuration that records belong to",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "summary": "List records",
+        "operationId": "listRecords",
+        "tags": [
+          "Records"
+        ],
+        "x-resource-type": "service",
+        "x-resource": "microstrate.records.get.records",
+        "responses": {
+          "200": {
+            "description": "List of records for the given configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "body": {
+                          "$ref": "#/components/schemas/RecordList"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a record",
+        "description": "Creates a new record conforming to the specified configuration's schema. Record data is validated against the schema at creation time.",
+        "operationId": "createRecord",
+        "tags": [
+          "Records"
+        ],
+        "x-resource-type": "service",
+        "x-resource": "microstrate.records.post.record",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "body": {
+                          "$ref": "#/components/schemas/Record"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error (missing required fields, type mismatch, invalid dropdown value)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record configuration not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/records/{config_id}/{id}": {
+      "parameters": [
+        {
+          "name": "config_id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the record configuration that the record belongs to",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Record ID",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Get a record",
+        "operationId": "getRecord",
+        "tags": [
+          "Records"
+        ],
+        "x-resource-type": "service",
+        "x-resource": "microstrate.records.get.record",
+        "responses": {
+          "200": {
+            "description": "Record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "body": {
+                          "$ref": "#/components/schemas/Record"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a record",
+        "description": "Partially updates a record. Provided data fields are merged into the existing record data. The merged result is validated against the current schema.",
+        "operationId": "updateRecord",
+        "tags": [
+          "Records"
+        ],
+        "x-resource-type": "service",
+        "x-resource": "microstrate.records.patch.record",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "body": {
+                          "$ref": "#/components/schemas/Record"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a record",
+        "operationId": "deleteRecord",
+        "tags": [
+          "Records"
+        ],
+        "x-resource-type": "service",
+        "x-resource": "microstrate.records.delete.record",
+        "responses": {
+          "200": {
+            "description": "Record deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Response"
+                    },
+                    {
+                      "properties": {
+                        "body": {
+                          "$ref": "#/components/schemas/SuccessMessage"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SchemaFieldType": {
+        "type": "string",
+        "enum": [
+          "text",
+          "number",
+          "date",
+          "checkbox",
+          "dropdown",
+          "rich_text"
+        ],
+        "description": "Data type of a schema field. Determines how record data values are validated: text/rich_text/date accept strings, number accepts floats, checkbox accepts booleans, dropdown accepts one of the predefined options."
+      },
+      "SchemaField": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this field within the schema. Used as the key in record data."
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable display name for the field."
+          },
+          "type": {
+            "$ref": "#/components/schemas/SchemaFieldType"
+          },
+          "required": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, records must include a non-null value for this field."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Allowed values for dropdown fields. Required when type is 'dropdown'. Ignored for all other types."
+          }
+        }
+      },
+      "RecordSchema": {
+        "type": "object",
+        "required": [
+          "fields"
+        ],
+        "properties": {
+          "fields": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/SchemaField"
+            },
+            "description": "Ordered list of field definitions. Field IDs must be unique within the schema."
+          }
+        }
+      },
+      "RecordConfig": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "description": "Unique identifier. Immutable after creation. Allowed characters: alphanumeric, underscore, hyphen."
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name for this configuration."
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional longer description of what this configuration represents."
+          },
+          "label": {
+            "type": "string",
+            "description": "Optional short label, e.g. for UI badges or tabs."
+          },
+          "schema": {
+            "$ref": "#/components/schemas/RecordSchema"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "ISO 8601 timestamp set automatically on creation."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "ISO 8601 timestamp updated automatically on every modification."
+          }
+        }
+      },
+      "RecordConfigCreate": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "schema"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "description": "Unique identifier. Must be unique across all configurations. Allowed characters: alphanumeric, underscore, hyphen."
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name for this configuration."
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional longer description."
+          },
+          "label": {
+            "type": "string",
+            "description": "Optional short label."
+          },
+          "schema": {
+            "$ref": "#/components/schemas/RecordSchema"
+          }
+        },
+        "example": {
+          "id": "customer_feedback",
+          "name": "Customer Feedback",
+          "description": "Feedback submissions from customers",
+          "schema": {
+            "fields": [
+              {
+                "id": "rating",
+                "label": "Rating",
+                "type": "number",
+                "required": true
+              },
+              {
+                "id": "category",
+                "label": "Category",
+                "type": "dropdown",
+                "required": true,
+                "options": [
+                  "bug",
+                  "feature",
+                  "general"
+                ]
+              },
+              {
+                "id": "comment",
+                "label": "Comment",
+                "type": "rich_text",
+                "required": false
+              }
+            ]
+          }
+        }
+      },
+      "RecordConfigUpdate": {
+        "type": "object",
+        "description": "All fields are optional. Omitted fields are left unchanged. Schema changes do not retroactively affect existing records.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Updated human-readable name."
+          },
+          "description": {
+            "type": "string",
+            "description": "Updated description."
+          },
+          "label": {
+            "type": "string",
+            "description": "Updated label."
+          },
+          "schema": {
+            "$ref": "#/components/schemas/RecordSchema"
+          }
+        },
+        "example": {
+          "name": "Customer Feedback v2",
+          "schema": {
+            "fields": [
+              {
+                "id": "rating",
+                "label": "Rating",
+                "type": "number",
+                "required": true
+              },
+              {
+                "id": "category",
+                "label": "Category",
+                "type": "dropdown",
+                "required": true,
+                "options": [
+                  "bug",
+                  "feature",
+                  "general",
+                  "other"
+                ]
+              },
+              {
+                "id": "comment",
+                "label": "Comment",
+                "type": "rich_text",
+                "required": false
+              }
+            ]
+          }
+        }
+      },
+      "RecordConfigList": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecordConfig"
+            }
+          },
+          "results_total": {
+            "type": "integer",
+            "description": "Total number of record configurations."
+          }
+        }
+      },
+      "Record": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier. Auto-generated if not provided on creation."
+          },
+          "config_id": {
+            "type": "string",
+            "description": "ID of the RecordConfig that defines this record's schema."
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Key-value map of field values. Keys correspond to SchemaField IDs. Values must match the field type defined in the schema. Extra keys not defined in the schema are permitted."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "ISO 8601 timestamp set automatically on creation."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "ISO 8601 timestamp updated automatically on every modification."
+          }
+        }
+      },
+      "RecordCreate": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "description": "The config_id is taken from the URL path and does not need to be repeated in the body.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Optional explicit ID. A random ID is generated if omitted."
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Field values validated against the configuration schema. Required schema fields must be present. Values are type-checked: text/rich_text/date → string, number → float, checkbox → boolean, dropdown → one of the configured options. Null values are accepted for optional fields. Extra keys not in the schema are allowed."
+          }
+        },
+        "example": {
+          "data": {
+            "rating": 4.5,
+            "category": "feature",
+            "comment": "<p>Great product, would love dark mode.</p>"
+          }
+        }
+      },
+      "RecordUpdate": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Fields to update. Merged into the existing record data (partial update). The merged result is validated against the current schema."
+          }
+        },
+        "example": {
+          "data": {
+            "rating": 5,
+            "comment": "<p>They added dark mode!</p>"
+          }
+        }
+      },
+      "RecordList": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Record"
+            }
+          },
+          "results_total": {
+            "type": "integer",
+            "description": "Total number of records for this configuration."
+          }
+        }
+      },
+      "Response": {
+        "type": "object",
+        "properties": {
+          "status_code": {
+            "type": "integer",
+            "description": "HTTP status code echoed in the response body."
+          },
+          "body": {
+            "type": "object",
+            "description": "Response payload."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status_code": {
+            "type": "integer"
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "string",
+                "description": "Human-readable error message."
+              }
+            }
+          }
+        },
+        "example": {
+          "status_code": 400,
+          "body": {
+            "error": "field 'rating' is required"
+          }
+        }
+      },
+      "SuccessMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "success"
+            ]
+          }
+        },
+        "example": {
+          "message": "success"
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Record Configs",
+      "description": "Manage record configuration schemas. Each configuration defines the structure (fields, types, validation rules) that records must conform to."
+    },
+    {
+      "name": "Records",
+      "description": "Manage individual data records. Each record belongs to exactly one configuration and its data is validated against that configuration's schema."
+    }
+  ]
+}
