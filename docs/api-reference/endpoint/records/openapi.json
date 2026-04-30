@@ -809,27 +809,23 @@
           "name": "Customer Feedback",
           "description": "Feedback submissions from customers",
           "schema": {
-            "fields": [
-              {
-                "id": "rating",
-                "label": "Rating",
+            "type": "object",
+            "required": ["rating", "category"],
+            "properties": {
+              "rating": {
                 "type": "number",
-                "required": true
+                "description": "Rating (1–5)"
               },
-              {
-                "id": "category",
-                "label": "Category",
-                "type": "dropdown",
-                "required": true,
-                "options": ["bug", "feature", "general"]
+              "category": {
+                "type": "string",
+                "enum": ["bug", "feature", "general"],
+                "description": "Feedback category"
               },
-              {
-                "id": "comment",
-                "label": "Comment",
-                "type": "rich_text",
-                "required": false
+              "comment": {
+                "type": "string",
+                "description": "Optional free-text comment"
               }
-            ]
+            }
           }
         }
       },
@@ -856,27 +852,23 @@
         "example": {
           "name": "Customer Feedback v2",
           "schema": {
-            "fields": [
-              {
-                "id": "rating",
-                "label": "Rating",
+            "type": "object",
+            "required": ["rating", "category"],
+            "properties": {
+              "rating": {
                 "type": "number",
-                "required": true
+                "description": "Rating (1–5)"
               },
-              {
-                "id": "category",
-                "label": "Category",
-                "type": "dropdown",
-                "required": true,
-                "options": ["bug", "feature", "general", "other"]
+              "category": {
+                "type": "string",
+                "enum": ["bug", "feature", "general", "other"],
+                "description": "Feedback category"
               },
-              {
-                "id": "comment",
-                "label": "Comment",
-                "type": "rich_text",
-                "required": false
+              "comment": {
+                "type": "string",
+                "description": "Optional free-text comment"
               }
-            ]
+            }
           }
         }
       },
