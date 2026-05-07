@@ -301,6 +301,81 @@
                 }
             }
         },
+        "/records": {
+            "get": {
+                "summary": "Query records",
+                "description": "Search for records across a folder or space. At least one of `x-param-query-folder` or `x-param-query-space_id` must be provided. Multiple conditions are combined with AND.",
+                "operationId": "queryRecords",
+                "tags": [
+                    "Records"
+                ],
+                "x-resource-type": "service",
+                "x-resource": "microstrate.records.get.query-records",
+                "parameters": [
+                    {
+                        "name": "x-param-query-folder",
+                        "in": "header",
+                        "required": false,
+                        "description": "Folder ID to filter records by. At least one of `folder` or `space_id` must be provided.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "x-param-query-space_id",
+                        "in": "header",
+                        "required": false,
+                        "description": "Space ID to filter records by. At least one of `folder` or `space_id` must be provided.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Matching records",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Response"
+                                        },
+                                        {
+                                            "properties": {
+                                                "body": {
+                                                    "$ref": "#/components/schemas/RecordList"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing required filter parameter or invalid authorization token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No records found matching the query",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/records/{config_id}": {
             "parameters": [
                 {
@@ -803,6 +878,13 @@
                     "schema": {
                         "$ref": "#/components/schemas/JSONSchema"
                     },
+                    "ui": {
+                        "type": "object",
+                        "description": "A map of field IDs to UI configuration for table and form rendering.",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/FieldConfig"
+                        }
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
@@ -816,6 +898,87 @@
                         "description": "ISO 8601 timestamp updated automatically on every modification."
                     }
                 }
+            },
+            "FieldConfigTable": {
+                "type": "object",
+                "properties": {
+                    "visible": {
+                        "type": "boolean",
+                        "description": "Whether the field is visible in table/list views."
+                    },
+                    "label": {
+                        "type": "string",
+                        "description": "Label to display for the field in table headers."
+                    },
+                    "width": {
+                        "oneOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ],
+                        "description": "Preferred width of the table column, as a number or CSS width string."
+                    },
+                    "sortable": {
+                        "type": "boolean",
+                        "description": "Whether the field is sortable in table views."
+                    },
+                    "formatter": {
+                        "$ref": "#/components/schemas/Formatter"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "FieldConfigForm": {
+                "type": "object",
+                "properties": {
+                    "visible": {
+                        "type": "boolean",
+                        "description": "Whether the field is visible in form views."
+                    },
+                    "label": {
+                        "type": "string",
+                        "description": "Label to display for the field in forms."
+                    },
+                    "input": {
+                        "$ref": "#/components/schemas/InputType"
+                    },
+                    "placeholder": {
+                        "type": "string",
+                        "description": "Placeholder text for the field input."
+                    },
+                    "defaultValue": {},
+                    "inputProps": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "description": "Additional input-specific properties for the form renderer."
+                    }
+                },
+                "additionalProperties": false
+            },
+            "FieldConfig": {
+                "type": "object",
+                "properties": {
+                    "table": {
+                        "$ref": "#/components/schemas/FieldConfigTable"
+                    },
+                    "form": {
+                        "$ref": "#/components/schemas/FieldConfigForm"
+                    }
+                },
+                "additionalProperties": true,
+                "description": "UI configuration for a single record field."
+            },
+            "Formatter": {
+                "type": "object",
+                "description": "Formatter metadata used by table renderers.",
+                "additionalProperties": true
+            },
+            "InputType": {
+                "type": "string",
+                "description": "Input type for form rendering (for example, text, select, checkbox, date, etc.)."
             },
             "RecordConfigCreate": {
                 "type": "object",
