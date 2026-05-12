@@ -618,7 +618,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Unique identifier for the space. Tasks belonging to the space receive IDs prefixed with this value. Must consist of letters, numbers, and hyphens only."
+            "description": "Unique identifier for the space. Tasks belonging to the space receive IDs prefixed with this value. Must consist of letters, numbers, and underscores only."
           },
           "name": {
             "type": "string"
