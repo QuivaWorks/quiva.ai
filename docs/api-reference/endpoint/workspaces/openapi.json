@@ -461,6 +461,60 @@
         }
       }
     },
+    "/workspaces/task/{task_id}/comment/{id}/reaction": {
+      "post": {
+        "summary": "Add or remove a reaction on a comment",
+        "operationId": "reactToComment",
+        "x-resource-type": "service",
+        "x-resource": "microstrate.workspaces.post.comment-reaction",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentReactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/workspaces/task/{task_id}/comment/{id}": {
       "get": {
         "summary": "Get a comment by ID",
@@ -924,7 +978,12 @@
             "description": "User ID of the comment author, set by the backend"
           },
           "reactions": {
-            "description": "Free-form reactions data"
+            "type": "object",
+            "readOnly": true,
+            "description": "Reactions aggregated by emoji. Keys are emoji characters.",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CommentReactionEntry"
+            }
           },
           "reply_id": {
             "type": "string"
@@ -955,9 +1014,6 @@
               "type": "string"
             }
           },
-          "reactions": {
-            "description": "Free-form reactions data"
-          },
           "reply_id": {
             "type": "string"
           }
@@ -969,13 +1025,42 @@
           "body": {
             "type": "string"
           },
-          "reactions": {
-            "description": "Free-form reactions data"
-          },
           "reply_id": {
             "type": "object",
             "additionalProperties": true,
             "nullable": true
+          }
+        }
+      },
+      "CommentReactionEntry": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "description": "Number of users who reacted with this emoji"
+          },
+          "users": {
+            "type": "array",
+            "description": "IDs of users who reacted with this emoji",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CommentReactionRequest": {
+        "type": "object",
+        "required": ["reaction"],
+        "properties": {
+          "reaction": {
+            "type": "object",
+            "description": "Map of emoji character to boolean. Set true to add the reaction, false to remove it.",
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "example": {
+              "😛": true
+            }
           }
         }
       },
