@@ -749,6 +749,11 @@
             "type": "string",
             "readOnly": true
           },
+          "url": {
+            "type": "string",
+            "readOnly": true,
+            "description": "UI URL to navigate directly to this space"
+          },
           "name": {
             "type": "string"
           },
@@ -813,6 +818,11 @@
           "id": {
             "type": "string",
             "readOnly": true
+          },
+          "url": {
+            "type": "string",
+            "readOnly": true,
+            "description": "UI URL to navigate directly to this task"
           },
           "title": {
             "type": "string"
@@ -962,6 +972,11 @@
           "id": {
             "type": "string",
             "readOnly": true
+          },
+          "url": {
+            "type": "string",
+            "readOnly": true,
+            "description": "UI URL to navigate directly to this comment"
           },
           "body": {
             "type": "string"
