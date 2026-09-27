@@ -50,6 +50,7 @@ The panel row sits under the space header:
 | **Overview** | A dashboard of the current folder — file count and size, task counts by status, chats |
 | **Files & Folders** | The folder browser: upload, create folders, navigate |
 | **Tasks** | The task list, with List, Board and Schedule views |
+| **Contacts** (named after the Space's contact record) | Only on a Space with a contact anchor — see [Entities & Contacts](/spaces/entities-contacts) |
 | **Records** | The record sets attached to this Space, and the records in them |
 | **Chats** | Chat sessions belonging to this Space or folder |
 | **Meetings** | Meetings indexed into this Space — see [Meetings](/meetings/overview) |
@@ -148,9 +149,32 @@ The cog in the Space header opens **Edit Space**. It has five menus.
     The Space image, its **name**, its **owner** (shown, not editable) and its
     **description**. Name and description are edited in place, one at a time.
   </Accordion>
-  <Accordion title="Basic" icon="sliders">
+  <Accordion title="General" icon="sliders">
+    **Modules** — turn a module off to remove both its tab and its Overview card from this
+    Space:
+
+    | Module | Removes |
+    |---|---|
+    | Files & folders | Store and organise documents in this Space |
+    | Tasks | Track work on a board or list |
+    | Records | Structured records and forms |
+    | Chats | Assistant chat sessions in this Space |
+    | Meetings | Meeting recordings, transcripts and summaries |
+
+    A module with no explicit setting is treated as on.
+
     **Default view** — the panel that opens first when someone enters this Space. Choose
     from Overview, Files, Tasks, Records or Chats.
+
+    **Hidden tabs** — withdraw individual tabs without turning off the whole module:
+    Contacts, Files & Folders, Tasks, Records, Chats, Meetings, Distribution, and any
+    vertical-specific tab deployed to the account. Overview can never be hidden, and a
+    link to a hidden tab lands there instead. Hidden tabs are not offered on the built-in
+    system Spaces.
+
+    <Frame caption="Edit space, General: the Modules toggles, the default view and the Hidden tabs checkboxes.">
+      <img src="/images/spaces/edit-space-general.png" alt="The Edit space dialog on the General menu, with toggles for Files and folders, Tasks, Records, Chats and Meetings, a Default view dropdown, and Hidden tabs checkboxes" />
+    </Frame>
   </Accordion>
   <Accordion title="Tasks" icon="list-check">
     Five tabs:
@@ -176,9 +200,11 @@ The cog in the Space header opens **Edit Space**. It has five menus.
   </Accordion>
   <Accordion title="Records" icon="database">
     **Base record** — the record kind this Space's tasks are tracked against, and what
-    this Space calls one. **Assistants** — the assistants offered from the Records panel.
-    A **Form views** tab also appears when an attached record set exposes more than one
-    form.
+    this Space calls one (see [Entities & Contacts](/spaces/entities-contacts)).
+    **Organisation record** — the firm a contact belongs to, optional; setting one enables
+    the folder-scoped Contacts panel. **Assistants** — the assistants offered from the
+    Records panel. A **Form views** tab also appears when an attached record set exposes
+    more than one form.
   </Accordion>
   <Accordion title="Files" icon="folder-tree">
     **Assistants** — the assistants offered from the Files panel.
@@ -283,16 +309,21 @@ A system Space accepts a small, fixed set of edits:
 | Default view | Yes |
 | Record sets attached to the Space | Yes |
 | Base record | Yes |
+| Organisation record | Yes |
 | Statuses and default status | **No** |
 | Priorities | **No** |
 | Tags | **No** |
+| Modules | **No** |
+| Hidden tabs | **No** |
 | Space image | **No** |
 | Owner | **No** |
 | Per-panel assistants | **No** |
 
 The Edit Space dialog reflects this: on a system Space the Tasks and Files menus are not
-shown at all, and Records offers only Base record (plus Form views where they apply).
-Escalations has no Records menu either, matching its missing Records panel.
+shown at all, and Records offers only Base record and Organisation record (plus Form views
+where they apply). Escalations has no Records menu either, matching its missing Records
+panel. General still shows the Modules toggles and Default view, but Modules on a system
+Space is not saved — its panel row is fixed. Hidden tabs is not offered there at all.
 
 <Warning>
 Statuses on the system Spaces are deliberately immutable. Automation addresses a Leads
@@ -306,6 +337,9 @@ set has to stay stable across every account.
   <Card title="Tasks" icon="list-check" href="/spaces/tasks">
     The Tasks panel: List, Board and Schedule views, filters, and how a task is put
     together.
+  </Card>
+  <Card title="Entities & Contacts" icon="address-book" href="/spaces/entities-contacts">
+    What a contact and an organisation are, and the folder-scoped Contacts panel.
   </Card>
   <Card title="Records" icon="database" href="/spaces/records">
     Attaching record sets to a Space and working with the records inside them.

@@ -1,0 +1,77 @@
+---
+title: "Run the servers locally"
+description: "Clone the Quiva MCP servers and run them as stdio processes for Claude Code and other local clients"
+icon: "terminal"
+---
+
+Most people should use the [hosted remote server](/developers/mcp/remote-setup) instead — nothing to clone or run. Run the servers locally when you're developing against them, or where a hosted HTTP connection isn't an option for your client.
+
+This repository is separate from the main Quiva application.
+
+## Requirements
+
+- Node.js **18 or later** (the servers use the global `fetch`)
+- A Quiva API key — see [API keys](/developers/mcp/api-keys)
+
+## Clone and install
+
+```sh
+git clone https://github.com/QuivaWorks/mcp.git
+cd mcp
+npm install
+```
+
+<Note>
+If you can't access this repository, contact support.
+</Note>
+
+Each server lives in its own package (`quiva-flows-mcp`, `quiva-records-mcp`, `quiva-documents-mcp`, `quiva-workspaces-mcp`, `quiva-agents-mcp`, `quiva-distribution-mcp`, `quiva-coworker-mcp`) and runs as an independent stdio process — connect to only the ones you need.
+
+## Configure credentials
+
+Each server reads its own `.env` file:
+
+```sh
+cp quiva-flows-mcp/.env.example quiva-flows-mcp/.env
+```
+
+Fill in **one** of the following (checked in this order if more than one is set):
+
+| Env var | Sent as |
+|---|---|
+| `QUIVA_API_KEY` | `X-Api-Key` header |
+| `QUIVA_BEARER_TOKEN` | `Authorization: Bearer` |
+| `QUIVA_EMAIL` + `QUIVA_PASSWORD` (+ optional `QUIVA_ACCOUNT`) | Logs in, caches the resulting JWT, and re-logs in once on a `401` |
+
+`QUIVA_API_URL` defaults to production (`https://api.quiva.ai`); leave it unset unless you're pointed at a different environment.
+
+<Warning>
+The Abbie coworker server needs an admin or root user for its account-wide writes (organisation profile, task space, organisation environment). An email/password login or bearer token for such a user works; an API key does too, since the gateway resolves it to the same token.
+</Warning>
+
+## Register with your client
+
+### Claude Code
+
+Add each server you want:
+
+```sh
+claude mcp add quiva-flows \
+  -e QUIVA_API_URL=https://api.quiva.ai \
+  -e QUIVA_API_KEY=$QUIVA_API_KEY \
+  -- sh /path/to/mcp/quiva-flows-mcp/bin/run.sh
+```
+
+Repeat for the other packages, changing the directory and env prefix. If the repository ships a `.mcp.json` at its root, opening a session inside that checkout registers everything in it automatically — approve the servers when Claude Code prompts you, and restart the session after adding credentials (MCP servers connect at session start).
+
+### Other clients
+
+Any MCP client that launches a local command over stdio can run these the same way: point it at `sh <package>/bin/run.sh` with the environment variables above set, either in the client's own config or via each package's `.env` file.
+
+## Tool names
+
+Running locally, each server's tools are unprefixed — `list_workflows`, not `flows_list_workflows` — since only one server's tools are loaded into that client connection at a time. The [tool reference](/developers/mcp/tools) lists both the bare name and the prefix it carries on the hosted remote server.
+
+<Card title="Tool reference" icon="list-check" href="/developers/mcp/tools">
+  Every tool, by server, with what it does
+</Card>

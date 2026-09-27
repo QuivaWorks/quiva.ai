@@ -90,8 +90,7 @@
                         }
                     }
                 },
-                "x-resource-type": "service",
-                "x-resource": "microstrate.secrets-manager.get.secret-list"
+                "x-resource-type": "service"
             },
             "put": {
                 "summary": "Create or update a secret",
@@ -149,8 +148,7 @@
                         }
                     }
                 },
-                "x-resource-type": "service",
-                "x-resource": "microstrate.secrets-manager.put.secret"
+                "x-resource-type": "service"
             }
         },
         "/secrets/{key}": {
@@ -214,8 +212,7 @@
                         }
                     }
                 },
-                "x-resource-type": "service",
-                "x-resource": "microstrate.secrets-manager.get.secret"
+                "x-resource-type": "service"
             },
             "delete": {
                 "summary": "Delete a secret",
@@ -282,8 +279,7 @@
                         }
                     }
                 },
-                "x-resource-type": "service",
-                "x-resource": "microstrate.secrets-manager.delete.secret"
+                "x-resource-type": "service"
             }
         }
     },

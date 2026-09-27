@@ -26,7 +26,7 @@
     "tags": [
         {
             "name": "Templates",
-            "description": "Template lifecycle \u2014 create, read, publish, validate, trigger, and delete document templates. Templates follow a **draft \u2192 published** model: writes (`POST`, `PATCH`) always target the draft version, and `POST /templates/{key}/publish` promotes the draft. Document generation only ever uses the published version, so drafts can be edited safely without affecting production output. A template's `source` is a DOCX file containing angular-expression tags rendered at trigger time."
+            "description": "Template lifecycle \u2014 create, read, publish, validate, trigger, and delete document templates. Templates follow a **draft \u2192 published** model: writes (`POST`, `PATCH`) always target the draft version, and `POST /file-generator/templates/{key}/publish` promotes the draft. Document generation only ever uses the published version, so drafts can be edited safely without affecting production output. A template's `source` is a DOCX file containing angular-expression tags rendered at trigger time."
         },
         {
             "name": "Documents",
@@ -38,7 +38,7 @@
         }
     ],
     "paths": {
-        "/templates/{key}": {
+        "/file-generator/templates/{key}": {
             "get": {
                 "tags": [
                     "Templates"
@@ -47,7 +47,6 @@
                 "description": "Retrieve a single document template by key.\n\nPass `?draft=true` to fetch the draft version; omit it (or set `false`) to fetch the published version. A template may exist as draft only (never published), published only (draft deleted after publish), or both \u2014 the two versions are independent records.\n\nThe returned `source.key` points at the DOCX file in `microstrate-documents` object storage bucket, that's being rendered when the template is triggered. Fields such as `output.name` and `signatories[].name`/`email` may contain expression placeholders (e.g. `{client_name}`) that are resolved against the trigger payload.",
                 "operationId": "getTemplate",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.get.template",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/TemplateKey"
@@ -113,10 +112,9 @@
                     "Templates"
                 ],
                 "summary": "Update template",
-                "description": "Update an existing **draft** template. Unlike `POST /templates`, this does not check for pre-existence \u2014 it will create or overwrite the draft.\n\nThis is a merge-style upsert: the supplied fields are written over the draft's event stream, so partial bodies are fine (the example below updates only `output`). To *remove* a field entirely, use `PATCH /templates/{key}/unset` instead.\n\nChanges are not visible to document generation until the draft is re-published via `POST /templates/{key}/publish`.",
+                "description": "Update an existing **draft** template. Unlike `POST /file-generator/templates`, this does not check for pre-existence \u2014 it will create or overwrite the draft.\n\nThis is a merge-style upsert: the supplied fields are written over the draft's event stream, so partial bodies are fine (the example below updates only `output`). To *remove* a field entirely, use `POST /file-generator/templates/{key}/unset` instead.\n\nChanges are not visible to document generation until the draft is re-published via `POST /file-generator/templates/{key}/publish`.",
                 "operationId": "updateTemplate",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.patch.template",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/TemplateKey"
@@ -144,7 +142,7 @@
                                 },
                                 "swap_source": {
                                     "summary": "Point the template at a new DOCX source",
-                                    "description": "Uploads a revised DOCX (validate it first with `POST /templates/validate`) and re-points the draft. Re-publish to make the new source live.",
+                                    "description": "Uploads a revised DOCX (validate it first with `POST /file-generator/templates/validate`) and re-points the draft. Re-publish to make the new source live.",
                                     "value": {
                                         "key": "invoice-template",
                                         "source": {
@@ -214,7 +212,6 @@
                 "description": "Delete a draft or published template. Set `?draft=true` to target the draft version; omit it to target the published version. Deleting one version does not affect the other.\n\nDeletion is implemented as a **poison-pill message** (`type: poison-pilled`) appended to the template's event stream \u2014 the underlying events are retained, but the aggregate resolves to deleted and the key disappears from list/get results. Deleting a published template immediately stops it from being triggerable.",
                 "operationId": "deleteTemplate",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.delete.template",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/TemplateKey"
@@ -252,7 +249,7 @@
                 }
             }
         },
-        "/templates": {
+        "/file-generator/templates": {
             "get": {
                 "tags": [
                     "Templates"
@@ -261,7 +258,6 @@
                 "description": "List all templates. Pass `?draft=true` to list draft templates instead of published ones.\n\nThe response is paged stream-style: `results_total` is the number of items in this response, `total_messages` is the total available, and `next_sequence` is the cursor for the next page.",
                 "operationId": "listTemplates",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.get.templates",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/QueryDraft"
@@ -318,10 +314,9 @@
                     "Templates"
                 ],
                 "summary": "Create template",
-                "description": "Create a new **draft** template. Returns `402` if a template with the same key already exists (use `PATCH /templates/{key}` to update an existing draft).\n\nThe `source` object references a DOCX file already uploaded to `microstrate-documents` object storage bucket. That file is processed by replacing tags with data from payload when the template is triggered: tags inside the DOCX (e.g. `{client_name}`, `{#line_items}\u2026{/line_items}`, `{subtotal + tax}`) are evaluated against the trigger payload to produce the final output \u2014 a PDF when `output.content_type` is `application/pdf`, or a rendered DOCX. \n\nOther expression-aware fields:\n- `output.name` \u2014 output filename template, e.g. `invoice-{invoice_number}`; the extension (`.pdf`/`.docx`) is appended automatically based on `output.content_type`.\n- `signatories[].name` / `signatories[].email` \u2014 resolved against the payload before the Signature request is sent. Signatories whose rendered email is missing or invalid are skipped.\n- `sub_templates[].conditions` \u2014 rule-engine conditions evaluated against the payload; matching sub-templates are rendered and merged after the main template.\n\nIt is recommended to run `POST /templates/validate` on the DOCX content first to catch malformed tags.",
+                "description": "Create a new **draft** template. Returns `402` if a template with the same key already exists (use `PATCH /file-generator/templates/{key}` to update an existing draft).\n\nThe `source` object references a DOCX file already uploaded to `microstrate-documents` object storage bucket. That file is processed by replacing tags with data from payload when the template is triggered: tags inside the DOCX (e.g. `{client_name}`, `{#line_items}\u2026{/line_items}`, `{subtotal + tax}`) are evaluated against the trigger payload to produce the final output \u2014 a PDF when `output.content_type` is `application/pdf`, or a rendered DOCX. \n\nOther expression-aware fields:\n- `output.name` \u2014 output filename template, e.g. `invoice-{invoice_number}`; the extension (`.pdf`/`.docx`) is appended automatically based on `output.content_type`.\n- `signatories[].name` / `signatories[].email` \u2014 resolved against the payload before the Signature request is sent. Signatories whose rendered email is missing or invalid are skipped.\n- `sub_templates[].conditions` \u2014 rule-engine conditions evaluated against the payload; matching sub-templates are rendered and merged after the main template.\n\nIt is recommended to run `POST /file-generator/templates/validate` on the DOCX content first to catch malformed tags.",
                 "operationId": "createTemplate",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.post.template",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -456,16 +451,15 @@
                 }
             }
         },
-        "/templates/{key}/publish": {
+        "/file-generator/templates/{key}/publish": {
             "post": {
                 "tags": [
                     "Templates"
                 ],
                 "summary": "Publish template",
-                "description": "Promote a draft template to published state. The published version is what `POST /templates/trigger` uses to generate documents \u2014 draft edits have no effect on generation until published.\n\nPublishing copies the current draft aggregate to the published record; subsequent draft edits do not leak into the published version. Returns `400` if no draft exists for the key.",
+                "description": "Promote a draft template to published state. The published version is what `POST /file-generator/templates/trigger` uses to generate documents \u2014 draft edits have no effect on generation until published.\n\nPublishing copies the current draft aggregate to the published record; subsequent draft edits do not leak into the published version. Returns `400` if no draft exists for the key.",
                 "operationId": "publishTemplate",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.post.template-publish",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/TemplateKey"
@@ -500,16 +494,15 @@
                 }
             }
         },
-        "/templates/validate": {
+        "/file-generator/templates/validate": {
             "post": {
                 "tags": [
                     "Templates"
                 ],
                 "summary": "Validate template",
-                "description": "Validate a base64-encoded template file before storing it.\n\nThe file is checked by rendering tags with empty data, and any tag errors are returned without persisting anything. The `errors` entries are error explanations, covering problems such as unclosed loop tags, duplicate/unopened close tags, and expressions that fail to compile.\n\nValidation is **syntactic**: it confirms the tags compile, not that the payload you eventually send will contain every referenced identifier \u2014 unresolved identifiers at trigger time render as an empty string rather than failing.\n\nAlways run this before `POST /templates` / `PATCH /templates/{key}` when the source DOCX changes \u2014 a template that stores an invalid source will fail every trigger.",
+                "description": "Validate a base64-encoded template file before storing it.\n\nThe file is checked by rendering tags with empty data, and any tag errors are returned without persisting anything. The `errors` entries are error explanations, covering problems such as unclosed loop tags, duplicate/unopened close tags, and expressions that fail to compile.\n\nValidation is **syntactic**: it confirms the tags compile, not that the payload you eventually send will contain every referenced identifier \u2014 unresolved identifiers at trigger time render as an empty string rather than failing.\n\nAlways run this before `POST /file-generator/templates` / `PATCH /file-generator/templates/{key}` when the source DOCX changes \u2014 a template that stores an invalid source will fail every trigger.",
                 "operationId": "validateTemplate",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.post.template-validate",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -573,16 +566,15 @@
                 }
             }
         },
-        "/templates/{key}/unset": {
-            "patch": {
+        "/file-generator/templates/{key}/unset": {
+            "post": {
                 "tags": [
                     "Templates"
                 ],
                 "summary": "Unset template paths",
-                "description": "Remove specific fields from a **draft** template by dot-notation path. Useful for clearing individual properties (e.g. dropping all signatories, or removing an output folder override) without resending the entire record via `PATCH /templates/{key}`.\n\nEach path is unset as its own `type: unset` event on the template stream. Re-publish for the change to affect generation.",
+                "description": "Remove specific fields from a **draft** template by dot-notation path. Useful for clearing individual properties (e.g. dropping all signatories, or removing an output folder override) without resending the entire record via `PATCH /file-generator/templates/{key}`.\n\nEach path is unset as its own `type: unset` event on the template stream. Re-publish for the change to affect generation.\n\nNote: this is a field-removal operation, but the endpoint is `POST`, not `PATCH` (unlike the equivalent document-unset endpoint, which is `PATCH`).",
                 "operationId": "unsetTemplatePaths",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.patch.template-unset",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/TemplateKey"
@@ -634,16 +626,15 @@
                 }
             }
         },
-        "/templates/trigger": {
+        "/file-generator/templates/trigger": {
             "post": {
                 "tags": [
                     "Templates"
                 ],
                 "summary": "Trigger template",
-                "description": "Generate one or more documents from **published** templates.\n\nEach entry in `list` names a template key and may override its stored `output` configuration. The shared `payload` object is the data context for **angular expression evaluation**: every key in the payload becomes an identifier available to tags inside the template's source DOCX, to the `output.name` filename template, to `signatories[].name`/`email`, and (as `<key>.value` facts) to `sub_templates[].conditions`. Expressions support nested property access (`{client.address.city}`), operators (`{subtotal + tax}`, `{is_overdue ? \"OVERDUE\" : \"\"}`), condition blocks (`{#discount > 0}\u2026{/}`), loops (`{#line_items}{description} \u2014 {qty * unit_price}{/line_items}`), and the built-in filters.\n\n**This is an asynchronous operation.** The `200` response confirms each job was queued (or reports per-template validation errors) and returns the document `subject`. A document record is created immediately with `output: null`; the trigger consumer then fetches the published template and its matching sub-templates, renders them against the payload, merges the results, and updates the record with `output.key` (the storage URI of the generated file) \u2014 or with `errors` if rendering failed. Poll `GET /documents/{key}` to observe completion. If the template defines signatories, the signature request is dispatched automatically after rendering succeeds (each signatory starts as `DRAFT`, moving to `SENT` once the request is created).\n\nThe generated file is written to `{store}://{bucket}/{filepath}` where trigger-level `output` overrides take precedence over the template's stored `output`. Buckets may target the object store (`obj://`, default) or the key-value store (`kv://`).",
+                "description": "Generate one or more documents from **published** templates.\n\nEach entry in `list` names a template key and may override its stored `output` configuration. The shared `payload` object is the data context for **angular expression evaluation**: every key in the payload becomes an identifier available to tags inside the template's source DOCX, to the `output.name` filename template, to `signatories[].name`/`email`, and (as `<key>.value` facts) to `sub_templates[].conditions`. Expressions support nested property access (`{client.address.city}`), operators (`{subtotal + tax}`, `{is_overdue ? \"OVERDUE\" : \"\"}`), condition blocks (`{#discount > 0}\u2026{/}`), loops (`{#line_items}{description} \u2014 {qty * unit_price}{/line_items}`), and the built-in filters.\n\n**This is an asynchronous operation.** The `200` response confirms each job was queued (or reports per-template validation errors) and returns the document `subject`. A document record is created immediately with `output: null`; the trigger consumer then fetches the published template and its matching sub-templates, renders them against the payload, merges the results, and updates the record with `output.key` (the storage URI of the generated file) \u2014 or with `errors` if rendering failed. Poll `GET /file-generator/documents/{key}` to observe completion. If the template defines signatories, the signature request is dispatched automatically after rendering succeeds (each signatory starts as `DRAFT`, moving to `SENT` once the request is created).\n\nThe generated file is written to `{store}://{bucket}/{filepath}` where trigger-level `output` overrides take precedence over the template's stored `output`. Buckets may target the object store (`obj://`, default) or the key-value store (`kv://`).",
                 "operationId": "triggerTemplate",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.post.template-trigger",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -765,16 +756,15 @@
                 }
             }
         },
-        "/documents/{key}": {
+        "/file-generator/documents/{key}": {
             "get": {
                 "tags": [
                     "Documents"
                 ],
                 "summary": "Get document",
-                "description": "Retrieve a single document by key.\n\nDocuments created by `POST /templates/trigger` progress through states observable here:\n- **Queued**: `output: null`, `errors: null` \u2014 rendering in progress.\n- **Generated**: `output.key` set to the storage URI (`obj://bucket/path` or `kv://bucket/path`) of the rendered file.\n- **Failed**: `errors` populated with rendering errors; `output` stays null.\n- **Signing**: `signatures` array populated once a HelloSign request is sent; each signatory's `status` advances `SENT \u2192 SIGNED` (or `EXPIRED`/`FAILED`) as webhook events arrive.",
+                "description": "Retrieve a single document by key.\n\nDocuments created by `POST /file-generator/templates/trigger` progress through states observable here:\n- **Queued**: `output: null`, `errors: null` \u2014 rendering in progress.\n- **Generated**: `output.key` set to the storage URI (`obj://bucket/path` or `kv://bucket/path`) of the rendered file.\n- **Failed**: `errors` populated with rendering errors; `output` stays null.\n- **Signing**: `signatures` array populated once a HelloSign request is sent; each signatory's `status` advances `SENT \u2192 SIGNED` (or `EXPIRED`/`FAILED`) as webhook events arrive.",
                 "operationId": "getDocument",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.get.document",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/DocumentKey"
@@ -885,7 +875,6 @@
                 "description": "Create or update a document record directly. Used to manually set document metadata outside of the template trigger workflow \u2014 for example registering an externally produced file, or correcting metadata on an existing record.\n\nThe `key` is required and derives the document's storage subject. This is an upsert: it creates the record if absent and merges supplied fields if present.",
                 "operationId": "upsertDocument",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.patch.document",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/DocumentKey"
@@ -944,7 +933,6 @@
                 "description": "Delete a document record. Implemented as a **poison-pill message** (`type: poison-pilled`) on the document's event stream \u2014 the record disappears from get/list results.\n\nNote: this deletes the document *record* (metadata, signature state). The generated file referenced by `output.key` remains in object/KV storage and must be removed separately if required.",
                 "operationId": "deleteDocument",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.delete.document",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/DocumentKey"
@@ -979,7 +967,7 @@
                 }
             }
         },
-        "/documents": {
+        "/file-generator/documents": {
             "get": {
                 "tags": [
                     "Documents"
@@ -988,7 +976,6 @@
                 "description": "List documents matching a subject query.\n\nDocument subjects live under `ms.document.document.>` and mirror the sanitised output filepath, with folders as subject tokens (a document written to `contracts/acme-nda-2024.pdf` lives under `contracts.acme-nda-2024.pdf` within that namespace). The required `query` parameter is appended to the namespace and supports stream wildcard patterns:\n- `contracts.*` \u2014 direct children of `contracts` (single level)\n- `contracts.>` \u2014 everything under `contracts` at any depth\n- `invoices.2026.*` \u2014 documents in the `invoices/2026` folder\n\nMissing `query` returns `400` with `` `query` query param is required ``.",
                 "operationId": "listDocuments",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.get.documents",
                 "parameters": [
                     {
                         "name": "query",
@@ -1048,7 +1035,7 @@
                 }
             }
         },
-        "/documents/{key}/unset": {
+        "/file-generator/documents/{key}/unset": {
             "patch": {
                 "tags": [
                     "Documents"
@@ -1057,7 +1044,6 @@
                 "description": "Remove specific fields from a document record by dot-notation path. Each path is unset as its own `type: unset` event. A common use is clearing `errors` and `output` before re-triggering generation for the same document key.",
                 "operationId": "unsetDocumentPaths",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.patch.document-unset",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/DocumentKey"
@@ -1109,7 +1095,7 @@
                 }
             }
         },
-        "/documents/{key}/signature-url": {
+        "/file-generator/documents/{key}/signature-url": {
             "get": {
                 "tags": [
                     "Signatures"
@@ -1118,7 +1104,6 @@
                 "description": "Generate an embedded signing URL for a specific signature on a document, suitable for loading in an iframe.\n\nOnly available for signatures created in **embedded signing mode** (`request.is_embedded: true` on the document's signatory record). Embedded mode is an account-level configuration \u2014 all signatures of a request share it. Requesting a URL for an unknown `signature_id` or a non-embedded signature returns a `500` with the error message (e.g. `Signature url is only available in embedded mode: \u2026`).\n\nEmbedded URLs are short-lived; generate one immediately before presenting the signing UI rather than storing it.",
                 "operationId": "getDocumentSignatureUrl",
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.get.document-signature-url",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/DocumentKey"
@@ -1163,7 +1148,7 @@
                 }
             }
         },
-        "/webhooks/hellosign": {
+        "/file-generator/webhooks/hellosign/{account}": {
             "post": {
                 "tags": [
                     "Signatures"
@@ -1173,8 +1158,18 @@
                 "operationId": "hellosignCallback",
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.file-generator.post.hellosign-callback",
                 "security": [],
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "required": true,
+                        "description": "Account id the webhook event is routed to.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1762,7 +1757,7 @@
                     },
                     "subject": {
                         "type": "string",
-                        "description": "Messaging subject of the queued document (`ms.document.document.{sanitised filepath}`). Present on success \u2014 poll `GET /documents/{key}` with the corresponding key to observe generation progress.",
+                        "description": "Messaging subject of the queued document (`ms.document.document.{sanitised filepath}`). Present on success \u2014 poll `GET /file-generator/documents/{key}` with the corresponding key to observe generation progress.",
                         "example": "ms.document.document.invoices.2026.invoice-INV-2026-014.pdf"
                     },
                     "errors": {

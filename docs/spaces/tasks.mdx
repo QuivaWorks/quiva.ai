@@ -1,6 +1,6 @@
 ---
 title: "Tasks"
-description: "Track work inside a Space with configurable statuses, priorities, tags, subtasks, time tracking and comments"
+description: "Track work inside a Space with configurable statuses, priorities, tags, subtasks, task templates, time tracking and comments"
 icon: "list-check"
 ---
 
@@ -39,6 +39,38 @@ the prefix is what tells them apart.
 
 The author, created date and updated date are stamped by QuivaWorks and shown in the task's
 details popover.
+
+## Task templates
+
+A task template pre-fills the fields above and can seed a set of actions onto the task, so a piece
+of work you repeat doesn't have to be assembled by hand every time.
+
+Click **Use template** on the task creation dialog to open a picker scoped to your account's
+vertical. Choosing one fills in:
+
+| From the template | Onto the new task |
+|---|---|
+| Name and description | Title and description |
+| Assignees, reporter, priority, tags | The matching fields |
+| Folder | A typed location — see [Folders and contacts](#folders-and-contacts) |
+| Actions | The task's [task actions](/spaces/task-actions) checklist |
+
+<Note>
+A template's assignees, priority, tags and folder are plain values, not one Space's configured
+lists — there is no Space until the task is created from it. If a value doesn't match anything in
+the Space you create the task in, it's still applied; a stale priority or tag would render as
+nothing on the board the same way a hand-typed one would.
+</Note>
+
+Templates are created and edited by an admin from **Account → Specialization** (see
+[Account Settings](/essentials/account/account-settings#specialization)), not from inside a Space.
+A template's Knowledge-sourced document actions are added as normal, but a generator-sourced
+document action is skipped — generating that kind of document needs a source record the brand-new
+task doesn't have yet. You're told how many were skipped and can add them by hand.
+
+<Frame caption="The New task from template picker, opened with Use template in the task creation dialog.">
+  <img src="/images/spaces/task-template-picker.png" alt="The New task from template dialog with a search box, category filters and a list of templates, each showing its category and number of actions" />
+</Frame>
 
 ## Statuses, priorities and tags
 

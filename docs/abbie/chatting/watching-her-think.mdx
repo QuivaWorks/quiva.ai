@@ -1,43 +1,74 @@
 ---
 title: "Watching her think"
-description: "The stage strip that shows how Abbie is putting an answer together, live."
+description: "The run strip that shows how Abbie is putting an answer together, live, and the controls that decide how much work she puts in."
 icon: "diagram-project"
 ---
 
-While Abbie is working on a reply, a row of small pills appears above it: the stage strip. Each pill is a step in producing the answer, and it fills in live as that step finishes.
+While Abbie is working on a reply, a strip appears above it showing the run as it happens: a header bar you can expand, then one block per step of the work. Not every reply takes the same route through this — a quick factual question and a genuinely hard one look different in the strip, and you have some say in that yourself.
 
-## The stages
+## Fast, Auto and Thorough
 
-<Steps>
-  <Step title="Classify">
-    Abbie works out what you're actually asking, including whether it's more than one thing at once, in which case it gets split into parts before anything else happens.
-  </Step>
-  <Step title="Enrich">
-    She pulls in relevant memory and organisational context before drafting anything, so the answer is grounded in what she already knows about you and the account.
-  </Step>
-  <Step title="Router">
-    She decides how much firepower the request needs, and how many independent drafts to produce.
-  </Step>
-  <Step title="Experts">
-    One or more drafts get produced in parallel. On straightforward requests this is a single pass; on more demanding ones several run side by side and the strongest is chosen.
-  </Step>
-  <Step title="Judge">
-    When more than one draft was produced, an independent pass compares them and picks or combines the best answer.
-  </Step>
-  <Step title="Verify">
-    A final check reviews the answer against your preferences and the facts available before it's sent to you.
-  </Step>
-  <Step title="Output">
-    The finished reply.
-  </Step>
-</Steps>
+Next to the message box is a small chip showing the current mode and model. Selecting it opens a panel with three modes:
 
-A stage pill can show as running, done, retried, or answered by a fallback model when the preferred one wasn't available. Selecting a completed pill expands it to show which model handled it, how long it took, and, for a signed-in session, a link into the full [cognition log](/abbie/transparency/cognition-log) for that step.
+| Mode | What it does |
+|---|---|
+| **Fast** | Answers straight away. No separate check of the answer. |
+| **Auto** | Abbie decides how much checking the request needs. |
+| **Thorough** | Always checks the answer, and compares more candidates. Slower. |
+
+The same panel has a model picker: **Auto** lets Abbie pick the model, or you can pin any active provider, or one specific model.
+
+<Frame caption="The Mode and model panel, opened from the mode chip next to the composer.">
+  <img src="/images/abbie/chat-mode-model-panel.png" alt="The Mode and model panel with Fast, Auto and Thorough options, Auto selected, and a Model dropdown set to Auto, Abbie picks the model" />
+</Frame>
+
+A choice made here applies to every message you send in this chat until you change it again — it isn't a one-off for the next message alone. To make it stick beyond this browser and this sign-in, the chat's owner can select **Make this the default for this chat**, which saves it as this chat's own default in Hub; it still shows up as a per-chat override on top of your account's usual routing, so a chat that's been quietly running on a lighter setting doesn't read as "Abbie getting worse." That option only appears for the chat's owner, and is disabled until the chat's first message has been sent, or while only a provider (not a specific model) is pinned.
+
+## When a request splits into more than a few pieces
+
+Up to 6 independent pieces of work run automatically, without asking. Past that, Abbie shows a card
+first — "This splits into *N* pieces of work" — listing what those pieces are, with three options:
+
+- **Run all *N* in parallel**
+- **Run as *(a smaller capped number)***
+- **Don't run this**
+
+**Run as *N*** doesn't drop the extra pieces — it groups them: the pieces beyond the cap are folded
+into the last slot's task, so that slot's work covers more than one piece at once, rather than
+leaving any of them undone.
+
+Nothing runs until you answer. If the moment passes before you do, the card shows **No longer needed** instead.
+
+<Frame caption="A fan-out approval card. Nothing runs until you choose.">
+  <img src="/images/abbie/chat-fan-out-approval.png" alt="A card reading This splits into 8 pieces of work, listing eight research tasks, with Run all 8 in parallel, Run as 6 and Don't run this buttons" />
+</Frame>
+
+## The run strip
+
+Selecting the strip's header expands it into blocks, appended one at a time as the run progresses — a plan line, then one block per expert slot, then judge and verify where they ran. The line at the top summarises the plan itself, for example:
+
+> Split into 3 tasks · will be checked · running 3 in parallel
+
+or, for a request that's being answered several different ways at once rather than split into parts:
+
+> Comparing 3 models · will be checked · running 3 in parallel
+
+A one-task, fast-mode reply is plainer still — just **One task**, not checked. See [What each stage means](/abbie/transparency/pipeline-stages) for what's actually happening behind each block.
+
+Selecting a completed block expands it to show which model handled it, how long it took, and, for a signed-in session, a link into the full [cognition log](/abbie/transparency/cognition-log) for that step.
+
+<Frame caption="The top of an expanded run strip: its header line, then the plan line and its numbered task list.">
+  <img src="/images/abbie/chat-run-strip.png" alt="The header of an expanded run strip reading Thought for 176.4s, 9 steps, 301 credits, above a plan line reading Split into 3 tasks, will be checked, running 3 in parallel, and a numbered list of the three tasks" />
+</Frame>
+
+### What it cost
+
+Each run strip has a credit icon. Selecting it breaks down what that run was charged, grouped into what it actually paid for — answering the question, checking the answer, and working out what to do before anything started — rather than a single opaque per-run price. Checking your own work is charged like anything else, and the breakdown is there so that's visible rather than hidden inside one number.
 
 ## Collapsed and expanded
 
-While a run is fresh, the strip shows every stage in full. Once you've moved on to read older messages, it collapses to a one-line summary: how long the reply took, how many experts ran, and whether verification passed cleanly. Expand it again any time to see the detail.
+While a run is fresh, the strip shows every block in full. Once you've moved on to read older messages, it collapses to a one-line summary — for example, "Thought for 12s · 3 steps · 6 credits" — how long the reply took, how many steps it went through, and, once the run has ended and the cost is known, what it was charged. Expand it again any time to see the detail.
 
 <Note>
-If a run is taking a while, that's usually a harder request working through several draft attempts rather than something stuck. See [Confidence and verification](/abbie/transparency/confidence-and-verification) for what each stage is actually checking.
+If a run is taking a while, that's usually a harder request working through several draft attempts rather than something stuck. See [Confidence and verification](/abbie/transparency/confidence-and-verification) for what each stage is actually checking, and [Stopping a run](/abbie/chatting/stopping-a-run) if you'd rather cancel it.
 </Note>

@@ -9,6 +9,113 @@ month rather than by version. Where a change landed gradually over several weeks
 dated to the month it became generally available rather than to a single commit.
 </Note>
 
+<Update label="September 2026" description="Abbie's mode picker, footnoted citations, the account switcher, Entities & Contacts, and a hosted MCP server" tags={["Abbie", "Accounts", "Spaces", "Security", "Developers"]}>
+
+## Abbie's mode, model and run strip
+
+A chip next to the message box now shows the mode and model for your next message. **Fast**
+answers straight away with no separate check, **Auto** leaves it to Abbie to decide how much
+checking a request needs, and **Thorough** always checks the answer and compares more candidates.
+Pin a specific model yourself, or leave it on **Auto** and let Abbie choose. While she's working, a
+run strip appears above the reply with one block per step of the work, appended live and expandable
+right there in the transcript.
+
+When a request is big enough to fan out into several independent pieces of work, Abbie now shows a
+card first — how many pieces, and what they are — with the choice to run them all in parallel, run
+a smaller capped number, or skip it. Nothing runs until you answer.
+
+<Card title="Watching her think" icon="diagram-project" href="/abbie/chatting/watching-her-think">
+  The mode and model picker, the fan-out approval card, and reading the run strip.
+</Card>
+
+## Citations as footnotes
+
+An answer that draws on the web, or on something already in your account, now marks the claim with
+a footnote instead of just asserting it. Web sources link out with their host shown alongside;
+sources from your own account — a task, comment, record, file, meeting, memory, conversation or
+attachment — show as a badged reference instead of a raw link. If Abbie searched the web while
+drafting an answer but the draft came back uncited, a repair pass matches each claim to the sources
+she actually used and attaches the footnotes afterwards, and says so. Each step's cognition-log card
+also gained a **Provider-run web searches** panel, listing every search or page fetch the model ran
+natively, with its query or URL and what came back.
+
+<CardGroup cols={2}>
+  <Card title="Citations" icon="quote-right" href="/abbie/chatting/citations">
+    Footnotes, the source badges, and the uncited-answer repair pass.
+  </Card>
+  <Card title="What each stage means" icon="diagram-project" href="/abbie/transparency/pipeline-stages">
+    Where citation repair and the provider-run search panel fit in the pipeline.
+  </Card>
+</CardGroup>
+
+## Switching accounts
+
+If you belong to more than one account, a **Switch account** entry in the profile menu now opens an
+**Accounts** modal listing every account signed in on this browser, with the current one marked, so
+moving between them no longer means signing out and back in.
+
+<Card title="Working in more than one account" icon="right-left" href="/essentials/users/user-settings#working-in-more-than-one-account">
+  Where the current account is shown, the Accounts modal, and adding or removing a browser session.
+</Card>
+
+## Entities & Contacts, Modules and task templates
+
+A Space that anchors on a contact and an organisation now shows a folder-scoped **Contacts panel**
+(named after the Space's own contact record): browse to a folder and see the organisations and
+contacts filed there, open one and the panel narrows to what's inside it.
+
+Space owners can also turn a whole module off — Files, Tasks, Records, Chats or Meetings — removing
+its tab and Overview card at once, or withdraw individual tabs without touching the rest of the
+module, from **Edit space → General**. And a task can now be created from a **task template**, which
+pre-fills its fields and seeds a set of actions in one step.
+
+<CardGroup cols={2}>
+  <Card title="Entities & Contacts" icon="address-book" href="/spaces/entities-contacts">
+    The folder-scoped panel, and how a Space declares a contact and an organisation.
+  </Card>
+  <Card title="Tasks" icon="list-check" href="/spaces/tasks#task-templates">
+    Task templates, and everything else on a task.
+  </Card>
+</CardGroup>
+
+## Privacy: less kept, less logged
+
+Prompts, and the arguments of external tool calls Abbie makes through MCP, no longer reach
+QuivaWorks' own application logs. Requests to OpenAI models are also now sent with server-side
+storage turned off — Abbie resends the relevant history herself with every turn, so nothing needs
+to sit on the provider's side between turns.
+
+<Card title="Security Overview" icon="shield" href="/essentials/security/overview#content-sent-to-model-providers">
+  What's kept, what isn't, and how this differs from your own Data Retention setting.
+</Card>
+
+## Connect an AI assistant with MCP
+
+Quiva now hosts an MCP server at `https://api.quiva.ai/mcp`. Point Claude Code, Cursor, VS Code or
+Claude Desktop at it with an API key, and your AI assistant can build and manage flows, records,
+document templates, spaces, assistants and distribution directly on your account, with nothing to
+install. The servers can still be run locally if you prefer.
+
+<CardGroup cols={2}>
+  <Card title="Connect a client" icon="plug" href="/developers/mcp/remote-setup">
+    The URL, the API key header, and a config snippet for each client.
+  </Card>
+  <Card title="Tool reference" icon="list-check" href="/developers/mcp/tools">
+    Every tool the server exposes, grouped by area.
+  </Card>
+</CardGroup>
+
+## API reference
+
+The API reference gained its own **Assistants** group, documenting assistant endpoints directly
+rather than folding them into Hub Flows. Two corrections came back from that pass: the task action
+endpoints now match what the workspaces service actually accepts, and every document template path
+carries the `/file-generator` prefix the service has always required.
+
+</Update>
+
+---
+
 <Update label="August 2026" description="Client Portal, task actions, form flows, Abbie's name, and a round of flow and form corrections" tags={["Spaces", "Forms", "Client Portal", "Abbie", "Flows", "Rules"]}>
 
 ## Client Portal

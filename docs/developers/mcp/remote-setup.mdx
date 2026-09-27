@@ -1,0 +1,164 @@
+---
+title: "Connect a client to the remote server"
+description: "Point Claude Code, Cursor, VS Code or Claude Desktop at Quiva's hosted MCP endpoint"
+icon: "plug"
+---
+
+## Quick start
+
+The fastest path is Claude Code — one command. Cursor, VS Code and Claude Desktop follow the same shape; see [Connect your client](#connect-your-client) below.
+
+<Steps>
+  <Step title="Get an API key">
+    **Settings → API keys → Add**, name it, copy the key. See [API keys](/developers/mcp/api-keys) for scope and expiry.
+  </Step>
+  <Step title="Add the server">
+    ```sh
+    claude mcp add --transport http quiva https://api.quiva.ai/mcp \
+      --header "Authorization: Bearer <API_KEY>"
+    ```
+  </Step>
+  <Step title="Verify">
+    Run `/mcp` inside Claude Code. `quiva` should show as **Connected**, with tools loaded across all seven areas — flows, records, documents, workspaces, assistants, distribution, and Abbie.
+  </Step>
+  <Step title="Try it">
+    Start with something read-only:
+
+    - "List my spaces."
+    - "What record configs do I have?"
+    - "Show me my published flows."
+    - "List Abbie's skills."
+
+    None of these change anything on your account. When you ask for something that writes or deletes, the tool will refuse once and ask for `confirm: true` before it runs — that's deliberate, not a bug.
+  </Step>
+</Steps>
+
+<Info>
+**claude.ai in the browser** and **ChatGPT custom connectors** aren't supported — both only connect to remote MCP servers over OAuth, and this endpoint authenticates with an API key instead. Use Claude Code, Cursor, VS Code or Claude Desktop.
+</Info>
+
+## Endpoint
+
+```
+https://api.quiva.ai/mcp
+```
+
+Authenticate with a Quiva API key, sent as a bearer token:
+
+```
+Authorization: Bearer <API_KEY>
+```
+
+`X-Api-Key: <API_KEY>` also works. A request with neither gets `401`. If a request carries both
+headers, `Authorization` wins and `X-Api-Key` is ignored. See [API keys](/developers/mcp/api-keys)
+for how to create one.
+
+<Info>
+The server is stateless — it builds a client from the key on each request and never stores it. Nothing to install or run yourself.
+</Info>
+
+## Connect your client
+
+<Tabs>
+  <Tab title="Claude Code">
+    ```sh
+    claude mcp add --transport http quiva https://api.quiva.ai/mcp \
+      --header "Authorization: Bearer <API_KEY>"
+    ```
+
+    Add `--scope user` to make it available in every project rather than just the current one.
+
+    **Verify:** run `/mcp`. `quiva` should show as **Connected** with its tool count.
+  </Tab>
+  <Tab title="Cursor">
+    Add to `~/.cursor/mcp.json` for every project, or `.cursor/mcp.json` in one project:
+
+    ```json
+    {
+      "mcpServers": {
+        "quiva": {
+          "url": "https://api.quiva.ai/mcp",
+          "headers": { "Authorization": "Bearer <API_KEY>" }
+        }
+      }
+    }
+    ```
+
+    <Warning>
+    Don't commit `.cursor/mcp.json` with a real key in it. Keep the key in `~/.cursor/mcp.json` (outside any repo), not the project-scoped file.
+    </Warning>
+
+    **Verify:** open Cursor's MCP settings (Cursor Settings → MCP, under Customize) — `quiva` should show as connected with its tools listed. Then ask it to "list my spaces."
+  </Tab>
+  <Tab title="VS Code">
+    Add to `.vscode/mcp.json`. VS Code prompts for the key once and stores it securely, so it never sits in the file itself — safe to commit:
+
+    ```json
+    {
+      "inputs": [
+        {
+          "type": "promptString",
+          "id": "quiva-api-key",
+          "description": "Quiva API key",
+          "password": true
+        }
+      ],
+      "servers": {
+        "quiva": {
+          "type": "http",
+          "url": "https://api.quiva.ai/mcp",
+          "headers": { "Authorization": "Bearer ${input:quiva-api-key}" }
+        }
+      }
+    }
+    ```
+
+    **Verify:** in the Chat view, click **Configure Tools** — `quiva` should be listed with its tools. Then ask it to "list my spaces."
+  </Tab>
+  <Tab title="Claude Desktop">
+    Claude Desktop's configuration file launches local commands rather than connecting to a URL directly, so connect through the `mcp-remote` bridge (this needs Node.js installed). In **Settings → Developer → Edit Config**:
+
+    ```json
+    {
+      "mcpServers": {
+        "quiva": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "mcp-remote",
+            "https://api.quiva.ai/mcp",
+            "--header",
+            "Authorization:${QUIVA_AUTH}"
+          ],
+          "env": { "QUIVA_AUTH": "Bearer <API_KEY>" }
+        }
+      }
+    }
+    ```
+
+    <Note>
+    Keep the `--header` argument itself space-free (`Authorization:${QUIVA_AUTH}`, no space after the colon) and put `Bearer <API_KEY>` — space included — in the environment variable instead. Some hosts mangle spaces inside `args`; this sidesteps it.
+    </Note>
+
+    Restart Claude Desktop after saving.
+
+    **Verify:** in a new chat, click the hammer/tools icon at the bottom of the message box — `quiva` should be listed with its tool count. Then ask it to "list my spaces."
+  </Tab>
+</Tabs>
+
+## Troubleshooting
+
+| Response | Meaning |
+|---|---|
+| `401` on every call | No key was sent, or it doesn't parse as `Bearer <key>`. Check the header name and prefix. |
+| `401` or `403` from a specific tool | The key is expired or revoked, or — for a **restricted key** — it doesn't allow the endpoint that tool calls. Restricted keys are scoped to a fixed list of method/path pairs; widen the key's allowed endpoints or issue a less restricted one. See [API keys](/developers/mcp/api-keys). |
+| `403` on a flow write (`create_workflow`, `update_workflow`, `publish_workflow`, `delete_workflow`, or creating/deleting a collection) | The key's owning user doesn't hold the root, admin or developer role. Flow authoring is gated to those roles regardless of the key's own scope. |
+| `403 Origin not allowed` | A browser-based client is calling from an origin that isn't on the allowed list. Use a desktop or CLI client instead. |
+| `413` | The request body is over the 1 MiB default size limit. Split a large payload — a big flow config or document template — into smaller calls. |
+| `429` | Too many requests from your IP address. Wait for the number of seconds in the `Retry-After` response header, then retry. |
+| No tools appear (client shows 0 or fails to connect) | Check the URL is exactly `https://api.quiva.ai/mcp` and the header syntax matches your client's format above. Most clients only load MCP servers at startup — restart the client after any config change. |
+| Key leaked into a chat or a repo | Never paste an API key into a chat message — anyone who can read that conversation can act as your account. If a config file with a real key ends up committed (e.g. a project-scoped `.cursor/mcp.json`), rotate the key immediately (see [API keys](/developers/mcp/api-keys)) rather than just removing it from the file. |
+
+<Card title="API keys" icon="key" href="/developers/mcp/api-keys">
+  Create a key, choose its scope, and understand restricted keys
+</Card>

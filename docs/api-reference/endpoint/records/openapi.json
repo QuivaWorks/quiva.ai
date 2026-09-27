@@ -9,10 +9,6 @@
         {
             "url": "https://api.quiva.ai",
             "description": "Production API server"
-        },
-        {
-            "url": "https://api.microstrate.io",
-            "description": "Staging server"
         }
     ],
     "security": [
@@ -33,7 +29,17 @@
                     "Record Configs"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.get.configs",
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "query",
+                        "required": false,
+                        "description": "Comma-separated config IDs to fetch a specific subset. Omit to return all configurations.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of record configurations",
@@ -66,7 +72,6 @@
                     "Record Configs"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.post.config",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -142,7 +147,6 @@
                     "Record Configs"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.get.config",
                 "responses": {
                     "200": {
                         "description": "Record configuration",
@@ -195,7 +199,6 @@
                     "Record Configs"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.put.config",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -258,7 +261,6 @@
                     "Record Configs"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.put.config",
                 "responses": {
                     "200": {
                         "description": "Configuration deleted",
@@ -307,13 +309,12 @@
         "/records": {
             "get": {
                 "summary": "Query records",
-                "description": "Search for records across a folder or space. At least one of `folder` or `space_id` must be provided. Multiple conditions are combined with AND.",
+                "description": "Search for records across a folder or space (index-backed). At least one of `folder` or `space_id` must be provided; a Bearer JWT is required \u2014 an API key alone is rejected on this endpoint. `folder`/`space_id` conditions are ANDed. Results are sorted by `created_at`.",
                 "operationId": "queryRecords",
                 "tags": [
                     "Records"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.get.query-records",
                 "parameters": [
                     {
                         "name": "folder",
@@ -331,6 +332,33 @@
                         "description": "Space ID to filter records by. At least one of `folder` or `space_id` must be provided.",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "config_id",
+                        "in": "query",
+                        "required": false,
+                        "description": "Comma-separated config IDs to narrow the query. One ID is ANDed with the folder/space filter; multiple IDs form an OR group.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "description": "Maximum number of records to return.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "required": false,
+                        "description": "Number of records to skip (pagination).",
+                        "schema": {
+                            "type": "integer"
                         }
                     }
                 ],
@@ -399,7 +427,6 @@
                     "Records"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.get.records",
                 "responses": {
                     "200": {
                         "description": "List of records for the given configuration",
@@ -442,7 +469,6 @@
                     "Records"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.post.record",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -527,7 +553,6 @@
                     "Records"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.get.record",
                 "responses": {
                     "200": {
                         "description": "Record",
@@ -580,7 +605,6 @@
                     "Records"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.put.record",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -643,7 +667,6 @@
                     "Records"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.records.delete.record",
                 "responses": {
                     "200": {
                         "description": "Record deleted",
@@ -1010,13 +1033,20 @@
                         "items": {
                             "$ref": "#/components/schemas/ViewNode"
                         }
+                    },
+                    "rules": {
+                        "type": "array",
+                        "description": "Conditional rules for this container. Only the `visible` property is honoured on a grid.",
+                        "items": {
+                            "$ref": "#/components/schemas/ElementRule"
+                        }
                     }
                 },
                 "additionalProperties": false
             },
             "ViewFieldNode": {
                 "type": "object",
-                "description": "A leaf node that binds to a schema field via a dotted path.",
+                "description": "A leaf node that binds an input to a schema field via a dotted path. Input config lives here on the node \u2014 `inputType`, `props`, and `rules` \u2014 not on the schema, so one schema can back several forms with different configs. Omit `inputType` to accept the type default (string\u2192text, number/integer\u2192number, boolean\u2192toggle, array\u2192tags, object\u2192key-value).",
                 "required": [
                     "type",
                     "field"
@@ -1030,13 +1060,238 @@
                     },
                     "field": {
                         "type": "string",
-                        "description": "Dotted path to the schema field (e.g. \"name\", \"address.city\"). This MUST be `ref` — not `field`. Example: { \"type\": \"field\", \"field\": \"policyNumber\" }."
+                        "description": "Dotted path to the schema field (e.g. \"name\", \"address.city\"). The property key is `field` \u2014 a `ref` key is ignored."
+                    },
+                    "inputType": {
+                        "$ref": "#/components/schemas/InputType"
+                    },
+                    "props": {
+                        "$ref": "#/components/schemas/FieldProps"
+                    },
+                    "rules": {
+                        "type": "array",
+                        "description": "Conditional rules for this field. Field nodes support all five rule properties.",
+                        "items": {
+                            "$ref": "#/components/schemas/ElementRule"
+                        }
                     }
                 },
                 "additionalProperties": false,
                 "example": {
                     "type": "field",
-                    "field": "policyNumber"
+                    "field": "address.city",
+                    "inputType": "text",
+                    "props": {
+                        "label": "City"
+                    }
+                }
+            },
+            "FieldProps": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Display / configuration props forwarded to the input widget. `label` should always be set. Which props apply depends on the input type (e.g. `options`/`sort` for dropdown, `min`/`max`/`decimalPlace` for number/currency, `minDate`/`maxDate` for date, `includedCountries`/`showNativeName` for country, `maxItems` for multi-select).",
+                "properties": {
+                    "label": {
+                        "type": "string",
+                        "description": "Display label shown above/beside the input. Always set this."
+                    },
+                    "placeholder": {
+                        "type": "string",
+                        "description": "Placeholder text shown inside the input when empty."
+                    },
+                    "helpText": {
+                        "type": "object",
+                        "description": "Optional help text rendered below the input.",
+                        "properties": {
+                            "markdown": {
+                                "type": "string",
+                                "description": "Help text content in Markdown format."
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "options": {
+                        "type": "array",
+                        "description": "Choices for dropdown / multi-select / multi-toggle. Seed from the schema field's enum.",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "text",
+                                "value"
+                            ],
+                            "properties": {
+                                "text": {
+                                    "type": "string",
+                                    "description": "Human-readable label for the option."
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "description": "Machine value submitted when this option is selected."
+                                },
+                                "note": {
+                                    "type": "string",
+                                    "description": "Optional extra description shown alongside the option."
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "sort": {
+                        "type": "boolean",
+                        "description": "When `true`, options are sorted alphabetically before rendering."
+                    },
+                    "minDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Earliest selectable date (ISO 8601). Applies to `date` / `date-range` inputs."
+                    },
+                    "maxDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Latest selectable date (ISO 8601). Applies to `date` / `date-range` inputs."
+                    },
+                    "min": {
+                        "type": "number",
+                        "description": "Minimum allowed numeric value. Applies to `number` / `currency` / `slider` inputs."
+                    },
+                    "max": {
+                        "type": "number",
+                        "description": "Maximum allowed numeric value. Applies to `number` / `currency` / `slider` inputs."
+                    },
+                    "decimalPlace": {
+                        "type": "integer",
+                        "description": "Number of decimal places displayed. Applies to `number` / `currency` inputs."
+                    },
+                    "maxItems": {
+                        "type": "integer",
+                        "description": "Maximum number of selections. Applies to `multi-select`."
+                    },
+                    "includedCountries": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Restrict the country list to these ISO codes (e.g. [\"uk\",\"ua\"]). Applies to `country` / `multi-country`."
+                    },
+                    "showNativeName": {
+                        "type": "boolean",
+                        "description": "Show each country's native name. Applies to `country` / `multi-country`."
+                    }
+                }
+            },
+            "RuleProperty": {
+                "type": "string",
+                "description": "The element property a rule drives. Field nodes support all five; grid (container) nodes support `visible` only.",
+                "enum": [
+                    "visible",
+                    "required",
+                    "disabled",
+                    "readonly",
+                    "value"
+                ]
+            },
+            "ElementRule": {
+                "type": "object",
+                "description": "A conditional rule attached to a view node. `logic` is a json-logic-engine expression evaluated against the live form value (`{ \"var\": \"FieldPath\" }` reads another field; dotted paths allowed); at the form root it reads the whole record, and inside an array-field item it reads that item. `logic` may also be a bare boolean for an unconditional state. The result sets `property` (booleans are coerced; `value` keeps the raw computed value).",
+                "required": [
+                    "id",
+                    "property",
+                    "logic"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Convention \"<FieldPath>.<property>\", e.g. \"email.required\"."
+                    },
+                    "property": {
+                        "$ref": "#/components/schemas/RuleProperty"
+                    },
+                    "logic": {
+                        "description": "A json-logic-engine expression object, or a boolean.",
+                        "oneOf": [
+                            {
+                                "type": "object"
+                            },
+                            {
+                                "type": "boolean"
+                            }
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "One plain-English sentence describing the condition and outcome. Does not affect evaluation."
+                    }
+                },
+                "additionalProperties": true
+            },
+            "ViewArrayFieldNode": {
+                "type": "object",
+                "description": "A repeating container bound to an array-of-object schema field. `children` is a template of view nodes for one item; each child's `field` is element-relative \u2014 resolved against the array field's `items.properties`, not the top-level schema (e.g. for array field \"products\", a child field \"title\" means \"products[].title\", not \"products.title\"). `props` (label, required, minItems, maxItems, collapsible, defaultCollapsed) is UI-only and not enforced server-side; array size limits still come from the schema field's own JSON Schema `minItems`/`maxItems` if set there.",
+                "required": [
+                    "type",
+                    "field",
+                    "children"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "array-field"
+                        ]
+                    },
+                    "field": {
+                        "type": "string",
+                        "description": "Dotted path to an array-of-object schema field."
+                    },
+                    "props": {
+                        "type": "object",
+                        "description": "UI-only container config: label, required (at least one item), minItems, maxItems, collapsible, defaultCollapsed."
+                    },
+                    "children": {
+                        "type": "array",
+                        "description": "View nodes for one item, with element-relative `field` refs. Child field nodes carry their own node-level inputType/props/rules.",
+                        "items": {
+                            "$ref": "#/components/schemas/ViewNode"
+                        }
+                    },
+                    "rules": {
+                        "type": "array",
+                        "description": "Reserved \u2014 array-field rules are not evaluated yet. Put rules on the child field nodes instead.",
+                        "items": {
+                            "$ref": "#/components/schemas/ElementRule"
+                        }
+                    }
+                },
+                "additionalProperties": false,
+                "example": {
+                    "type": "array-field",
+                    "field": "products",
+                    "props": {
+                        "label": "Products",
+                        "itemLabel": "Product",
+                        "required": true,
+                        "minItems": 1
+                    },
+                    "children": [
+                        {
+                            "type": "field",
+                            "field": "title",
+                            "inputType": "text",
+                            "props": {
+                                "label": "Title"
+                            }
+                        },
+                        {
+                            "type": "field",
+                            "field": "price",
+                            "inputType": "currency",
+                            "props": {
+                                "label": "Price",
+                                "min": 0,
+                                "decimalPlace": 2
+                            }
+                        }
+                    ]
                 }
             },
             "ViewTableColumn": {
@@ -1082,7 +1337,7 @@
                 "additionalProperties": false
             },
             "ViewNode": {
-                "description": "A node in the view tree — either a grid container, a field leaf, or a table.",
+                "description": "A node in the view tree — a grid container, a field leaf, an array-field repeater, or a table.",
                 "oneOf": [
                     {
                         "$ref": "#/components/schemas/ViewGridNode"
@@ -1091,16 +1346,53 @@
                         "$ref": "#/components/schemas/ViewFieldNode"
                     },
                     {
+                        "$ref": "#/components/schemas/ViewArrayFieldNode"
+                    },
+                    {
                         "$ref": "#/components/schemas/ViewTableNode"
                     }
                 ]
             },
+            "RecordForm": {
+                "type": "object",
+                "description": "One named form for a config: metadata plus a grid layout tree. `id` is unique within the config and appears in the app URL; a migrated legacy single form always gets id \"default\".",
+                "required": [
+                    "id",
+                    "title",
+                    "layout"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique within the config."
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "layout": {
+                        "$ref": "#/components/schemas/ViewGridNode"
+                    }
+                },
+                "additionalProperties": false
+            },
             "RecordViews": {
                 "type": "object",
-                "description": "UI layout definitions for different rendering contexts.",
+                "description": "UI layout definitions for different rendering contexts. `forms` (multiple named forms) is the current model. `form` (singular) is a deprecated legacy single form \u2014 the server still accepts it, but it is migrated to `forms: [{ id: \"default\", ... }]` on read.",
                 "properties": {
+                    "forms": {
+                        "type": "array",
+                        "description": "Current model \u2014 multiple named forms per config.",
+                        "items": {
+                            "$ref": "#/components/schemas/RecordForm"
+                        }
+                    },
                     "form": {
-                        "$ref": "#/components/schemas/ViewGridNode"
+                        "$ref": "#/components/schemas/ViewGridNode",
+                        "deprecated": true,
+                        "description": "Deprecated legacy single form. Use `forms` instead."
                     },
                     "table": {
                         "$ref": "#/components/schemas/ViewTableNode"
@@ -1723,6 +2015,10 @@
                     "results_total": {
                         "type": "integer",
                         "description": "Total number of records for this configuration."
+                    },
+                    "total_hits": {
+                        "type": "integer",
+                        "description": "Total number of records matching the query, independent of `limit`/`offset` paging."
                     }
                 }
             },
