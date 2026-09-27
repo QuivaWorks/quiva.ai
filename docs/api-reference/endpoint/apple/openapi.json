@@ -51,7 +51,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.get.calendar-list",
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -120,7 +119,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.get.calendar",
                 "parameters": [
                     {
                         "name": "id",
@@ -193,7 +191,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.get.calendar-event-list",
                 "parameters": [
                     {
                         "name": "id",
@@ -345,7 +342,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.get.event",
                 "parameters": [
                     {
                         "name": "id",
@@ -461,7 +457,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.put.event",
                 "parameters": [
                     {
                         "name": "id",
@@ -531,7 +526,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.delete.event",
                 "parameters": [
                     {
                         "name": "id",
@@ -579,7 +573,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.post.event",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -678,7 +671,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.get.mailbox-list",
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -757,7 +749,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.get.mailbox",
                 "parameters": [
                     {
                         "name": "name",
@@ -829,7 +820,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.get.mailbox-email-list",
                 "parameters": [
                     {
                         "name": "name",
@@ -974,7 +964,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.get.mailbox-email-recent-list",
                 "parameters": [
                     {
                         "name": "name",
@@ -1073,7 +1062,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.get.email",
                 "parameters": [
                     {
                         "name": "name",
@@ -1182,7 +1170,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.delete.email",
                 "parameters": [
                     {
                         "name": "name",
@@ -1241,7 +1228,6 @@
                 ],
                 "x-is-public": true,
                 "x-resource-type": "service",
-                "x-resource": "microstrate.apple.post.email",
                 "requestBody": {
                     "required": true,
                     "content": {

@@ -198,7 +198,72 @@ There are no usage logs for API keys. If you need to know a key is no longer in 
 
 ## Working in more than one account
 
-An account is a separate tenancy with its own people, resources and billing. To move between accounts, sign out and sign in again with the other **account name** on the login page.
+An account is a separate tenancy with its own people, resources and billing. If you belong to more
+than one, you don't need to sign out to move between them — the account switcher keeps up to **6**
+sessions in this browser and lets you jump between them directly.
+
+### Where the account you're in is shown
+
+<CardGroup cols={2}>
+  <Card title="Sidebar avatar" icon="circle-user">
+    Your profile picture in the sidebar carries a small badge with the current account's initials.
+  </Card>
+  <Card title="Profile menu" icon="user">
+    Opening the profile menu heads with the account name, your email and your role, above **Switch
+    account**.
+  </Card>
+  <Card title="Browser tab title" icon="window-maximize">
+    Once this browser holds more than one session, the tab title names the current account.
+  </Card>
+  <Card title="The Accounts modal" icon="right-left">
+    Lists every account you can switch to — see below.
+  </Card>
+</CardGroup>
+
+<Frame caption="The profile menu, with the account name, your email and role, and Switch account.">
+  <img src="/images/essentials/profile-menu.png" alt="The profile menu open from the avatar, showing the account name, an email address and role, and Switch account, Settings and Logout" />
+</Frame>
+
+### The Accounts modal
+
+Choosing **Switch account** from the profile menu opens **Accounts**, laid out in sections:
+
+<Steps>
+  <Step title="Current account">
+    The session for this tab, marked with a **Current** pill. If this browser also has a **default**
+    session, it carries a **Default** pill; a session whose token has expired shows **Signed out**
+    instead.
+  </Step>
+  <Step title="Signed in on this browser">
+    Every other session stored in this browser. Click a row to switch to it directly, no sign-in
+    needed. A row for a lapsed session reads **Sign in again to &lt;account&gt;** instead.
+  </Step>
+  <Step title="Other accounts you belong to">
+    Accounts you're a member of but have no session for in this browser. Signing in to one of these
+    opens a new tab. This section shows your role on each account, and can fail to load — a
+    **Retry** button appears if it does.
+  </Step>
+</Steps>
+
+Each row's overflow menu (the **⋮** button) offers **Sign out** and **Open in new tab**.
+
+<Frame caption="The Accounts modal with a single signed-in account.">
+  <img src="/images/essentials/accounts-modal.png" alt="The Accounts modal showing the current account marked Current and Default, with Add account and Sign out of all buttons" />
+</Frame>
+
+### Adding and removing sessions
+
+- **Add account** opens the login page in a new tab so you can sign in to another account. It's
+  disabled once this browser holds 6 sessions — sign out of one first.
+- **Sign out of all** ends every session in this browser, current one included, after a
+  confirmation.
+- A row's own **Sign out** ends just that one session.
+
+<Note>
+These are separate from the sessions listed under **Settings → Sessions** ([Session
+Management](/essentials/security/sessions)), which cover every active login to one account across
+every device — not the handful of accounts this one browser happens to be signed in to.
+</Note>
 
 ## Troubleshooting
 

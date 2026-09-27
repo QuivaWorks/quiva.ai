@@ -1,0 +1,261 @@
+---
+title: "Tool reference"
+description: "Every tool each Quiva MCP server exposes, grouped by area, with what it does"
+icon: "list-check"
+---
+
+This is a generated reference, not hand-written — each server's tools are listed exactly as it registers them. Names are shown **without** their remote prefix (see [Tool prefixes](/developers/mcp/overview#tool-prefixes)); running a server locally, use the bare name.
+
+<Info>
+**Write** / **Delete** in the Notes column is a naming-convention heuristic (verbs like `create_`, `update_`, `delete_`, `publish_`), not a full side-effect audit — a handful of read-shaped tools still cause something to happen (`run_workflow` executes a flow, `invoke_agent` spends LLM tokens). `confirm: true` means the tool refuses to run until you pass that flag explicitly, because the change is broad, hard to undo, or costs money.
+</Info>
+
+{/* GENERATED_TOOLS_TABLE_START */}
+## Flows
+
+Prefix on the remote server: **`flows_`**. Build, publish, run and debug workflows.
+
+25 tools.
+
+| Tool | Purpose | Notes |
+|---|---|---|
+| `list_node_types` | List all workflow node types with one-line summaries, plus the JSONPath data-reference guide and known gotchas. | — |
+| `get_node_type_reference` | Get the full reference for one node type: required/optional payload props, node-level props, and a correct minimal example. | — |
+| `list_reference_topics` | List the queryable reference topics (rules-syntax, jsonpath, geometry, lifecycle, gotchas). | — |
+| `get_flows_reference` | Get a full reference topic. | — |
+| `list_examples` | List real published workflows bundled as reference examples (harvested from the platform, credentials redacted). | — |
+| `get_example` | Get a bundled reference example: the full config of a real published workflow, plus what it teaches. | — |
+| `validate_flow_config` | Validate a workflow config locally (no API call). | — |
+| `list_collections` | List workflow (or node) collections. | — |
+| `create_collection` | Create a new workflow collection. | Write |
+| `list_workflows` | List workflows, optionally filtered by collection topic (last segment of the collection subject) and draft/published version. | — |
+| `get_workflow` | Fetch a workflow (its config, nodes and edges) by subject. | — |
+| `create_workflow` | Create a new workflow (draft) in a collection. | Write |
+| `update_workflow` | Update a workflow (partial: name, description, config, archived, secrets). | Write |
+| `publish_workflow` | Publish a draft workflow, making it executable via run_workflow. | Write |
+| `delete_workflow` | Delete a workflow — both the draft and the published version by default. | Delete, `confirm: true` |
+| `get_workflow_history` | Get the version history of a workflow. | — |
+| `run_workflow` | Execute a published (or draft) workflow. | — |
+| `list_paused_workflows` | List workflow runs paused for human input (input / human-in-the-loop nodes). | — |
+| `list_errored_workflows` | List workflow runs that ended in an error, including the failing node and lookup state. | — |
+| `search_run_logs` | Search workflow run logs by indexed fields (run_id, flow_topic, collection_topic, status, session_id, error, draft). | — |
+| `list_functions` | List available compute (Hydra) functions — their subjects are what function nodes reference in data.subject. | — |
+| `list_quiva_endpoints` | List available Quiva endpoints — their subjects are what quiva-endpoint nodes reference in data.subject. | — |
+| `test_jsonpath` | Test a JSONPath expression against sample data using the real engine resolver. | — |
+| `test_eval` | Test an eval-node payload (JavaScript code + params) using the real engine evaluator. | — |
+| `test_http` | Test an http/integration-node request through the engine (supports a lookup object for JSONPath resolution). | — |
+
+## Records
+
+Prefix on the remote server: **`records_`**. Record configs (schema + form views) and the records in them.
+
+20 tools.
+
+| Tool | Purpose | Notes |
+|---|---|---|
+| `list_reference_topics` | List records reference topics (schema, views, form-builder, form-rules, table-views, flow, index-fields, config-source, record, bulk-operations, endpoints, f... | — |
+| `list_examples` | List bundled reference examples. | — |
+| `get_example` | Get one reference example in full: its schema, views (form layout with node-level inputType/props/rules), and what it demonstrates. | — |
+| `get_records_reference` | Get the full reference for one topic: shapes, allowed values, and a correct example. | — |
+| `validate_record_config` | Validate a record config locally (no API call). | — |
+| `list_record_configs` | List record configurations. | — |
+| `get_record_config` | Get one record configuration (its schema and views) by id. | — |
+| `create_record_config` | Create a record configuration. | Write |
+| `update_record_config` | Update a record configuration (PUT, partial — only the fields you pass are changed; each view key you pass replaces the stored one). | Write |
+| `delete_record_config` | Delete a record configuration AND all of its records (the records storage bucket is purged). | Delete, `confirm: true` |
+| `list_records` | List the records of one config (index-backed, via query-records). | — |
+| `query_records` | Search records (index-backed, GET /records). | — |
+| `get_record` | Get a single record by config id and record id. | — |
+| `create_record` | Create a record under a config. | Write |
+| `update_record` | Update a record (PUT). | Write |
+| `delete_record` | Permanently delete a single record by config id and record id. | Delete |
+| `upsert_record` | Create or merge a record found by IDENTITY rather than id (POST /records/upsert-record). | Write |
+| `csv_import` | Turn an already-uploaded CSV into records, synchronously (POST /records/csv-import). | Write |
+| `export_records` | Email a record set as a CSV or JSON attachment (POST /records/export-records). | `confirm: true` |
+| `purge_records` | DELETE a config's records in bulk, keeping the config (DELETE /records/`{config_id}`/purge). | Delete, `confirm: true` |
+
+## Documents
+
+Prefix on the remote server: **`documents_`**. Document templates, generated documents and e-signatures.
+
+22 tools.
+
+| Tool | Purpose | Notes |
+|---|---|---|
+| `list_reference_topics` | List documents reference topics (expressions, filters, template, output, signatories, sub-templates, pdf-templates, trigger, document, endpoints, gotchas) pl... | — |
+| `get_documents_reference` | Get the full reference for one topic: shapes, allowed values, and a correct example. | — |
+| `list_examples` | List bundled reference examples: real templates and generated-document records harvested off the platform, plus hand-written illustrations. | — |
+| `get_example` | Get one reference example in full (template config or document record, plus what it teaches). | — |
+| `validate_template_config` | Validate a template locally (no API call). | — |
+| `list_templates` | List templates. | — |
+| `get_template` | Get one template by key. | — |
+| `create_template` | Create a DRAFT template (POST). | Write |
+| `update_template` | Update a DRAFT template (PATCH, merge upsert — only the fields you pass are changed; untouched fields are preserved). | Write |
+| `publish_template` | Publish a draft template — promotes the current draft to the published version that trigger_templates uses. | Write |
+| `validate_docx` | Server-side validation of a base64-encoded template file. | — |
+| `unset_template_paths` | Remove specific fields from a DRAFT template by dot-notation path (e.g. | Write |
+| `delete_template` | Delete a template. | Delete |
+| `trigger_templates` | Generate documents from PUBLISHED templates (ASYNC). | Write |
+| `list_documents` | List documents matching a subject-stream query. | — |
+| `get_document` | Get one document by key (typically the output filepath, e.g. | — |
+| `update_document` | Create or update a document record directly (PATCH upsert) — e.g. | Write |
+| `unset_document_paths` | Remove specific fields from a document record by dot-notation path. | Write |
+| `delete_document` | Delete a document RECORD (poison-pill). | Delete |
+| `get_document_signature_url` | Generate an embedded HelloSign signing URL for a specific signature on a document. | — |
+| `list_assigned_files` | List documents and workspace files assigned to the current user (their whole assigned set, no query params). | — |
+| `extract_brand` | Read the fonts and colour scheme out of an Office document (.docx/.pptx/.xlsx, up to 16 MiB) already in an object store, to seed the account's document theme. | — |
+
+## Workspaces
+
+Prefix on the remote server: **`workspaces_`**. Spaces, tasks, comments and space files.
+
+39 tools.
+
+| Tool | Purpose | Notes |
+|---|---|---|
+| `list_reference_topics` | List workspaces reference topics (spaces, tasks, time-tracking, task-actions, contacts, task-templates, meetings, comments, reactions, identifiers, auth, end... | — |
+| `get_workspaces_reference` | Get the full reference for one topic: shapes, id rules, allowed values, filters, and correct examples. | — |
+| `list_examples` | List bundled reference examples: real spaces/tasks/comments harvested off the platform, plus hand-written WRITE payloads. | — |
+| `get_example` | Get one reference example in full, with what it teaches. | — |
+| `validate_payload` | Validate a workspaces payload locally (no API call). | — |
+| `list_spaces` | List all spaces for the authenticated account. | — |
+| `create_space` | Create a space. | Write |
+| `get_space` | Get one space by id. | — |
+| `update_space` | Update a space (PATCH). | Write |
+| `delete_space` | Delete a space by id (also purges its tasks, comments, and files). | Delete, `confirm: true` |
+| `list_tasks` | List tasks in a space (path `{space_id}`) with optional filters. | — |
+| `create_task` | Create a task. | Write |
+| `get_task` | Get one task by id. | — |
+| `update_task` | Update one task (PATCH merge). | Write |
+| `update_multi_task` | Batch-update tasks (PATCH /workspaces/tasks). | Write |
+| `delete_task` | Delete a task by id (also purges its comments and reactions). | Delete |
+| `add_time_log` | Log one time entry against a task (PUT /workspaces/task/`{task_id}`/time-log). | Write |
+| `list_time_logs` | List a task's time logs (GET /workspaces/task/`{task_id}`/time-log). | — |
+| `set_task_action` | Create or update a checklist action on a task (PUT /workspaces/task/`{task_id}`/action). | Write |
+| `delete_task_action` | Delete a checklist action from a task (DELETE /workspaces/task/`{task_id}`/action/`{id}`). | Delete |
+| `create_contact` | Create a contact in a space (POST /workspaces/client). | Write |
+| `list_task_templates` | List the account's task templates (GET /workspaces/task-templates). | — |
+| `get_task_template` | Get one task template by id (tt_`<random>`). | — |
+| `create_task_template` | Create a task template (POST /workspaces/task-template). | Write |
+| `update_task_template` | Update a task template (PATCH). | Write |
+| `delete_task_template` | Delete a task template. | Delete |
+| `list_meetings` | List meeting files a notetaker filed into a space (GET /workspaces/meetings). | — |
+| `get_meeting_transcript` | Read one meeting's transcript as text ("[mm:ss – mm:ss] Speaker: words" per turn). | — |
+| `create_comment` | Add a comment to a task (path `{task_id}`). | Write |
+| `list_comments` | List comments on a task (path `{task_id}`). | — |
+| `get_comment` | Get one comment on a task. | — |
+| `update_comment` | Update a comment (PATCH). | Write |
+| `delete_comment` | Delete a comment (soft delete — poison-pilled). | Delete |
+| `react_to_comment` | Add or remove an emoji reaction on a comment. | Write |
+| `list_files` | List a space's files and folders from the FILE INDEX — the same source vertical deployment iterates, so this is the authoritative "what is actually there". | — |
+| `create_folder` | Create a folder in a space. | Write |
+| `read_file` | Read one file's CONTENT by its dotted key. | — |
+| `write_file` | Write a config file into a space folder. | Write |
+| `list_users` | List active users in the current account (accounts-service, not workspaces). | — |
+
+## Assistants
+
+Prefix on the remote server: **`assistants_`**. Assistant configurations, invocation, and the MCP registry.
+
+14 tools.
+
+| Tool | Purpose | Notes |
+|---|---|---|
+| `list_reference_topics` | List assistants reference topics (agent-config, providers, invoke, cancel, identifiers, auth, endpoints, mcp-servers, gotchas) plus the known spec-vs-engine gotc... | — |
+| `get_agents_reference` | Get the full reference for one topic: shapes, allowed values, and a correct example. | — |
+| `list_examples` | List bundled reference examples. | — |
+| `get_example` | Get one reference example in full, with what it teaches. | — |
+| `validate_agent_config` | Validate an assistant definition locally (no API call). | — |
+| `list_agents` | List assistants. | — |
+| `get_agent` | Get one assistant by id or subject. | — |
+| `create_agent` | Create an assistant. | Write |
+| `update_agent` | Update an assistant (PUT /hub/agent/`{id}`). | Write |
+| `delete_agent` | Delete an assistant by id or subject (also removes its stored auth). | Delete, `confirm: true` |
+| `invoke_agent` | Run an assistant (POST /hub/agent/invoke). | Write |
+| `cancel_agent` | Cancel running assistant execution(s) registered under a cancel_token (POST /hub/agent/cancel). | Write |
+| `list_mcp_servers` | Browse the OFFICIAL public MCP registry (GET /hub/mcp/registry, registry.modelcontextprotocol.io) — NOT this account's own registered servers. | — |
+| `register_mcp_server` | Register a remote MCP server into THIS ACCOUNT'S OWN catalog (POST /hub/mcp/register). | Write |
+
+## Distribution
+
+Prefix on the remote server: **`distribution_`**. Products, product definitions, invitations and messages between publisher and distributor accounts.
+
+18 tools.
+
+| Tool | Purpose | Notes |
+|---|---|---|
+| `list_reference_topics` | List the distribution reference topics (concepts, roles-and-gates, envelope-and-refusals, grants, products, product-definitions, invites, messages, status-ch... | — |
+| `get_distribution_reference` | Get one reference topic in full: fields, allowed values, role gates, refusal codes and engine citations. | — |
+| `list_examples` | List bundled examples. | — |
+| `get_example` | Get one example in full, with what it teaches. | — |
+| `validate_payload` | Lint a write body locally, with no network. | — |
+| `list_distributions` | List this account's grants. | — |
+| `get_distribution` | Read one grant. | — |
+| `get_distribution_status` | Run the health checks for one grant. | — |
+| `amend_distribution` | Change a grant you PUBLISH: set status (active, suspended, revoked) and/or grant_products / withdraw_products. | Write, `confirm: true` |
+| `list_products` | List your own products, the latest version of each: `{ count, products }`. | — |
+| `get_product` | Read one of your products at the latest version, or at `version`: `{ code, product, versions[] }`. | — |
+| `create_product` | Publish version 1 of a new product. | Write |
+| `update_product` | Publish the NEXT version of an existing product. | Write |
+| `list_granted_products` | As a DISTRIBUTOR: the products you may work under one publisher, resolved to their buttons. | — |
+| `list_product_definition_versions` | List the catalogue versions of one of your published record-config schemas: `{ config_id, versions[], latest }`. | — |
+| `list_distribution_invites` | As a PUBLISHER: every invitation you minted, newest first, with its state (outstanding, redeemed, withdrawn, expired). | — |
+| `list_invite_inbox` | As a RECIPIENT: outstanding invitations from other accounts addressed to the signed-in user's confirmed email. | — |
+| `withdraw_distribution_invite` | Withdraw an outstanding invitation you minted, so its link stops working. | Write, `confirm: true` |
+
+## Abbie (coworker)
+
+Prefix on the remote server: **`coworker_`**. Abbie's skills, backlog, memory, profiles, corrections and environment.
+
+31 tools.
+
+| Tool | Purpose | Notes |
+|---|---|---|
+| `list_reference_topics` | List reference topics for Abbie's settings (surfaces, roles-and-gates, todos, skills, memory, profiles, corrections, env-and-secrets, models, not-exposed, en... | — |
+| `get_coworker_reference` | Get one reference topic in full: shapes, limits, gates and the traps each route carries. | — |
+| `list_examples` | List authored example write payloads. | — |
+| `get_example` | Get one authored example payload and what it teaches. | — |
+| `validate_payload` | Lint a write locally (no API call), with the same limits and refusals the write tools apply. | — |
+| `list_skills` | List Abbie's skills: builtins, the account's disabled builtins and its own skills. | — |
+| `test_skill_activation` | Dry-run which skills a message would activate (`activated`) or make available on request (`discoverable`). | — |
+| `list_skill_drafts` | List skills Abbie has proposed, with status pending\|approved\|rejected\|expired. | — |
+| `get_skill_exec` | Whether the account lets skills run scripts: `{ enabled, enabled_by, enabled_at }`. | — |
+| `list_todos` | List Abbie's backlog: the caller's own items and the organisation's, each tagged with `scope`. | — |
+| `update_todo` | Update one backlog item: status, content, details, follow_up_at (only with status awaiting_user) or acknowledge a delivered reminder. | Write, `confirm: true` |
+| `promote_todo_to_task` | Turn a backlog item into a workspace task and close the item (status done; its content gains "[Promoted to workspace task `<id>`]"). | Write |
+| `list_memories` | List Abbie's memories in one scope: `{ memories, total }`. | — |
+| `create_memory` | Add a memory. | Write, `confirm: true` |
+| `update_memory` | Change a memory's text, and its topics if given (stored topics are kept otherwise). | Write, `confirm: true` |
+| `delete_memory` | Delete a memory. | Delete, `confirm: true` |
+| `get_org_profile` | Read the organisation profile Abbie uses for every member: flat fields plus is_default and revision. | — |
+| `update_org_profile` | Change fields of the organisation profile. | Write, `confirm: true` |
+| `get_personal_profile` | Read the caller's own personal profile: about_me, how_i_work, constraints, is_default, revision. | — |
+| `update_personal_profile` | Change the caller's own personal profile. | Write |
+| `get_personality` | Read Abbie's voice for the account: `{ voice, is_default, revision }`. | — |
+| `list_corrections` | Read corrections: the caller's own (max 6), the organisation's, and drafts Abbie proposed for the caller. | — |
+| `update_corrections` | Add or remove the caller's own corrections ("in this situation, do this instead"). | Write |
+| `get_task_space` | The workspace space tasks Abbie creates land in: `{ space_id, updated }`. | — |
+| `set_task_space` | Change where every task Abbie creates for the account lands. | Write, `confirm: true` |
+| `list_env` | List Abbie's environment variables in one scope: `{ scope, vars, updated_at }`. | — |
+| `set_env` | Create or change one variable. | Write, `confirm: true` |
+| `delete_env` | Delete one variable. | Delete, `confirm: true` |
+| `get_model_catalog` | The models Abbie can use: `{ providers, partial }`. | — |
+| `get_model_pool` | The account's model routing settings, provider keys redacted. | — |
+| `get_memory_settings` | Whether Abbie consolidates memories for the account: `{ enabled, enabled_by, enabled_at }`. | — |
+{/* GENERATED_TOOLS_TABLE_END */}
+
+{/*
+## Regenerating this page
+
+The table above is generated, not typed by hand. A script imports each server's `registerTools` with a fake server object that records every `registerTool()` call, so it reflects whatever the servers actually export — not a description of them written from memory.
+
+```sh
+node extract-mcp-tools.mjs /path/to/mcp/repo > tools.json
+```
+
+Re-run it whenever a server's tools change, and update the tables between the `GENERATED_TOOLS_TABLE_START`/`END` markers above from the result.
+*/}
+
+<Card title="Tool prefixes and setup" icon="server" href="/developers/mcp/overview">
+  What each area covers, and how the prefix works on the hosted server
+</Card>

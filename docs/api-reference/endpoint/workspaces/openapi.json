@@ -9,10 +9,6 @@
     {
       "url": "https://api.quiva.ai",
       "description": "Production API server"
-    },
-    {
-      "url": "https://api.microstrate.io",
-      "description": "Staging server"
     }
   ],
   "security": [
@@ -27,9 +23,9 @@
     "/workspaces/spaces": {
       "get": {
         "summary": "List all spaces",
+        "description": "Returns every space in the account. The response always includes a built-in `ESCALATE` space (used for human-in-the-loop escalations from flows); it cannot be updated or deleted.",
         "operationId": "listSpaces",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.get.spaces",
         "responses": {
           "200": {
             "description": "List of spaces",
@@ -52,7 +48,6 @@
         "summary": "Create a space",
         "operationId": "createSpace",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.post.space",
         "requestBody": {
           "required": true,
           "content": {
@@ -85,7 +80,6 @@
         "summary": "Get a space by ID",
         "operationId": "getSpace",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.get.space",
         "parameters": [
           {
             "name": "id",
@@ -114,9 +108,9 @@
       },
       "patch": {
         "summary": "Update a space",
+        "description": "Merges the fields you send over the stored space \u2014 send only the fields you are changing. The built-in `ESCALATE` space cannot be updated and returns 403.",
         "operationId": "updateSpace",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.patch.space",
         "parameters": [
           {
             "name": "id",
@@ -148,8 +142,14 @@
               }
             }
           },
+          "202": {
+            "description": "Update accepted, with a background re-assignment queued. This happens when a priority you removed was still in use by existing tasks \u2014 those tasks are reassigned to the fallback priority (the space's default, or the first remaining one)."
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -158,9 +158,9 @@
       },
       "delete": {
         "summary": "Delete a space",
+        "description": "Deletes a space and purges its tasks, comments, and files. Irreversible. The built-in `ESCALATE` space cannot be deleted and returns 403.",
         "operationId": "deleteSpace",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.delete.space",
         "parameters": [
           {
             "name": "id",
@@ -175,6 +175,9 @@
           "200": {
             "description": "Space deleted"
           },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -186,7 +189,6 @@
         "summary": "List tasks in a space",
         "operationId": "listTasks",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.get.tasks",
         "parameters": [
                 {
                     "name": "space_id",
@@ -283,7 +285,7 @@
                     }
                 },
                 {
-                    "name": "asignees",
+                    "name": "assignees",
                     "in": "query",
                     "description": "Comma-separated assignee IDs; at least one must match",
                     "schema": {
@@ -344,7 +346,6 @@
         "summary": "Create a task",
         "operationId": "createTask",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.post.task",
         "requestBody": {
           "required": true,
           "content": {
@@ -377,7 +378,6 @@
         "summary": "Update multiple tasks",
         "operationId": "updateMultiTask",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.patch.tasks",
         "requestBody": {
           "required": true,
           "content": {
@@ -411,7 +411,6 @@
         "summary": "Get a task by ID",
         "operationId": "getTask",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.get.task",
         "parameters": [
           {
             "name": "id",
@@ -442,7 +441,6 @@
         "summary": "Update a task",
         "operationId": "updateTask",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.patch.task",
         "parameters": [
           {
             "name": "id",
@@ -486,7 +484,6 @@
         "summary": "Delete a task",
         "operationId": "deleteTask",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.delete.task",
         "parameters": [
           {
             "name": "id",
@@ -507,12 +504,147 @@
         }
       }
     },
+    "/workspaces/task/{task_id}/action": {
+      "put": {
+        "summary": "Create or update a task checklist action",
+        "description": "Upsert a checklist action on a task. There is no separate create endpoint \u2014 PUT is used for both create and update.\n\nOmit `id` to create a new action (the server assigns one); pass an existing `id` to update that action. `description` is required on every write, including updates that only change `done`.\n\nThe response echoes back the action as submitted, not the stored record \u2014 it does not reflect how a partial update merged with the existing action.",
+        "operationId": "setTaskAction",
+        "tags": [
+          "Task Actions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "Task id the action hangs off.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The action as submitted (echoed back, not read back from storage).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskAction"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "get": {
+        "summary": "List task checklist actions \u2014 currently unavailable",
+        "description": "Intended to return the checklist actions on a task, but this endpoint is currently misrouted server-side and always responds with a 400 validation error instead of a list.\n\nUntil this is fixed, checklist actions are write-only: keep track of the `id` you get back when you create or update an action, since it cannot be listed or read back afterward.",
+        "operationId": "listTaskActions",
+        "deprecated": true,
+        "tags": [
+          "Task Actions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "Task id the action hangs off.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of checklist actions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TaskAction"
+                      }
+                    },
+                    "results_total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/workspaces/task/{task_id}/action/{id}": {
+      "delete": {
+        "summary": "Delete a task checklist action",
+        "description": "Removes one checklist action. Returns `{ \"message\": \"success\" }` with a 200 status.",
+        "operationId": "deleteTaskAction",
+        "tags": [
+          "Task Actions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "Task id the action hangs off.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Action id (assigned by the server unless you supplied one on create).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Action deleted"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/workspaces/task/{task_id}/comment": {
       "post": {
         "summary": "Create a comment on a task",
         "operationId": "createComment",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.post.comment",
         "parameters": [
           {
             "name": "task_id",
@@ -558,7 +690,6 @@
         "summary": "List comments on a task",
         "operationId": "listComments",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.get.comments",
         "parameters": [
           {
             "name": "task_id",
@@ -591,7 +722,6 @@
         "summary": "Add or remove a reaction on a comment",
         "operationId": "reactToComment",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.post.comment-reaction",
         "parameters": [
           {
             "name": "task_id",
@@ -645,7 +775,6 @@
         "summary": "Get a comment by ID",
         "operationId": "getComment",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.get.comment",
         "parameters": [
           {
             "name": "task_id",
@@ -684,7 +813,6 @@
         "summary": "Update a comment",
         "operationId": "updateComment",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.patch.comment",
         "parameters": [
           {
             "name": "task_id",
@@ -736,7 +864,6 @@
         "summary": "Delete a comment",
         "operationId": "deleteComment",
         "x-resource-type": "service",
-        "x-resource": "microstrate.workspaces.delete.comment",
         "parameters": [
           {
             "name": "task_id",
@@ -835,11 +962,8 @@
       },
       "UpdateSpaceRequest": {
         "type": "object",
-        "required": ["id"],
+        "description": "Fields are merged over the stored space \u2014 send only what you are changing. The space id comes from the path, not the body.",
         "properties": {
-          "id": {
-            "type": "string"
-          },
           "name": {
             "type": "string"
           },
@@ -855,9 +979,6 @@
               "$ref": "#/components/schemas/SpaceStatus"
             }
           },
-          "owner": {
-            "type": "string"
-          },
           "record_config_ids": {
             "type": "array",
             "items": {
@@ -869,6 +990,50 @@
             "items": {
               "type": "string"
             }
+          },
+          "priorities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "default": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "description": "Task priority definitions. Removing a priority that tasks still reference queues a background re-assignment onto the fallback priority (the default, or the first), and the update returns 202 instead of 200."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "color": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Space-level tag definitions."
+          },
+          "logo": {
+            "type": "boolean",
+            "description": "Whether the space has a logo set."
+          },
+          "default_view": {
+            "type": "string",
+            "description": "Default board/list view for the space."
           }
         }
       },
@@ -961,12 +1126,13 @@
             "type": "string",
             "description": "Markdown / rich-text content"
           },
-          "asignees": {
+          "assignees": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "nullable": true
+            "nullable": true,
+            "description": "Assigned user IDs."
           },
           "attachments": {
             "type": "array",
@@ -1006,6 +1172,47 @@
           },
           "due_date": {
             "type": "string"
+          },
+          "scheduled_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 date-time at which the task is scheduled. Archiving the task clears it."
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "Whether the task is archived."
+          },
+          "order": {
+            "type": "number",
+            "description": "Sort order of the task within its column/board."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Free-form tag ids on the task."
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Arbitrary metadata bag stored on the task."
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "readOnly": true,
+            "description": "User ids watching the task. Only present on the get-task response, not stored on the task record."
+          },
+          "muted": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "readOnly": true,
+            "description": "User ids who muted the task. Only present on the get-task response."
           }
         }
       },
@@ -1020,12 +1227,13 @@
             "type": "string",
             "description": "Markdown / rich-text content"
           },
-          "asignees": {
+          "assignees": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "nullable": true
+            "nullable": true,
+            "description": "Assigned user IDs."
           },
           "attachments": {
             "type": "array",
@@ -1044,13 +1252,33 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Initial status id. If omitted and `space_id` is set, the task inherits the space's `default_status`."
           },
           "space_id": {
-            "type": "string"
+            "type": "string",
+            "description": "Parent space id. If omitted, the task lands in the default space. The task id is server-generated; any id you send is ignored."
           },
           "due_date": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 date-time. A date-only value can fail to round-trip."
+          },
+          "scheduled_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC3339 date-time to schedule the task."
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "Create the task in an archived state."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Free-form tag ids."
           }
         }
       },
@@ -1096,6 +1324,60 @@
           },
           "results_total": {
             "type": "integer"
+          }
+        }
+      },
+      "TaskAction": {
+        "type": "object",
+        "required": [
+          "description"
+        ],
+        "description": "A checklist item on a task. `description` is required on every write, not only on create \u2014 an update that only flips `done` still has to resend it.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Action id. Omit on create and the server assigns one; pass an existing id to update that action.",
+            "example": "ta_a1b2c3"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the action is. Required on every write.",
+            "example": "Confirm the report has been proofread"
+          },
+          "done": {
+            "type": "boolean",
+            "description": "Whether the item is ticked off."
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskActionResource"
+            },
+            "description": "Platform resources linked from this action."
+          }
+        }
+      },
+      "TaskActionResource": {
+        "type": "object",
+        "required": [
+          "resource_id",
+          "resource_type"
+        ],
+        "description": "A platform resource linked from a checklist action. Both fields are free-form strings \u2014 the resource is not validated to exist.",
+        "properties": {
+          "resource_id": {
+            "type": "string",
+            "example": "onboarding-checklist"
+          },
+          "resource_type": {
+            "type": "string",
+            "example": "record-config"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Free-form metadata carried alongside the link."
           }
         }
       },
@@ -1245,6 +1527,21 @@
       },
       "NotFound": {
         "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden",
         "content": {
           "application/json": {
             "schema": {

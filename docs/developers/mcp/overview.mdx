@@ -1,0 +1,83 @@
+---
+title: "Quiva MCP servers"
+description: "Let an AI coding assistant build flows, records, document templates and more directly on your Quiva account"
+icon: "server"
+---
+
+{/* UNPUBLISHED until https://api.quiva.ai/mcp is live — re-add the Developers group to docs.json */}
+
+Quiva exposes its own build surface — flows, records, document templates, spaces and tasks, assistants, distribution, and Abbie's settings — as a set of [MCP](https://modelcontextprotocol.io) servers. Point an MCP-aware client at them and it can create and change real configuration on your account, with reference documentation and local validation built in so it doesn't have to guess at payload shapes.
+
+<Note>
+This is the other direction from [Tools & Connectors](/assistants/tools-and-connectors), which is about your **assistants** calling out to external MCP servers. This page is about **your own AI coding tool** (Claude Code, Cursor, VS Code, Claude Desktop) calling into **Quiva**.
+</Note>
+
+## What you can build with it
+
+<CardGroup cols={2}>
+  <Card title="Flows" icon="diagram-project">
+    Create, publish, run and debug [workflows](/flows/overview) — every node type, with the rules-engine DSL and JSONPath data references explained.
+  </Card>
+  <Card title="Records" icon="table">
+    Define [record configs](/spaces/records) (schema and form views) and manage the records in them.
+  </Card>
+  <Card title="Document templates" icon="file-lines">
+    Build DOCX and PDF templates, generate documents from them, and request e-signatures.
+  </Card>
+  <Card title="Spaces & tasks" icon="folder-tree">
+    Create spaces, tasks, comments and files, and manage time logs and task templates.
+  </Card>
+  <Card title="Assistants" icon="robot">
+    Define assistant configurations and invoke them — the same objects you build in the Assistants tab.
+  </Card>
+  <Card title="Distribution" icon="handshake">
+    Manage products, product definitions, invitations and messages between publisher and distributor accounts.
+  </Card>
+  <Card title="Abbie's settings" icon="sparkles">
+    Read, and carefully change, Abbie's organisation profile, backlog, memory, corrections and environment variables.
+  </Card>
+</CardGroup>
+
+## Hosted remote vs. running it yourself
+
+<CardGroup cols={2}>
+  <Card title="Hosted (recommended)" icon="cloud" href="/developers/mcp/remote-setup">
+    One URL — `https://api.quiva.ai/mcp` — authenticated with an API key. Nothing to install or run. Works with Claude Code, Cursor, VS Code and Claude Desktop — not claude.ai in the browser or a ChatGPT custom connector, which need OAuth and aren't supported here.
+  </Card>
+  <Card title="Run it locally" icon="terminal" href="/developers/mcp/local-setup">
+    Clone the servers and run them as local stdio processes, one per area of the platform. Useful for development on the servers themselves, or where a hosted connection isn't an option.
+  </Card>
+</CardGroup>
+
+Both connect to the same production API and understand the same tools. The hosted server is stateless: it builds a fresh client for every request from whatever credential you send, and never stores one.
+
+## Tool prefixes
+
+The hosted server composes every area of the platform into one endpoint, so tool names carry a prefix to keep them from colliding (each area separately exposes `list_examples`, `get_example` and `list_reference_topics`). Running a server locally, the same tools appear unprefixed since only one is loaded at a time.
+
+| Prefix | Covers |
+|---|---|
+| `flows_` | Workflows: build, validate, publish, run and debug |
+| `records_` | Record configs (schema and form views) and records |
+| `documents_` | Document templates, generated documents and e-signatures |
+| `workspaces_` | Spaces, tasks, comments and space files |
+| `assistants_` | Assistant configurations, and invoking an assistant |
+| `distribution_` | Distribution: products, product definitions, invites and messages |
+| `coworker_` | Abbie, your AI coworker: skills, todos, organisation memory, profile and corrections |
+
+Each area has its own `list_reference_topics` tool. Point your client at it before it builds anything — the reference topics describe how the platform actually behaves, including the cases where a request succeeds but quietly does nothing.
+
+<CardGroup cols={2}>
+  <Card title="Connect a client" icon="plug" href="/developers/mcp/remote-setup">
+    Claude Code, Cursor, VS Code and Claude Desktop, step by step
+  </Card>
+  <Card title="API keys" icon="key" href="/developers/mcp/api-keys">
+    Create and scope the key your client authenticates with
+  </Card>
+  <Card title="Run it locally" icon="terminal" href="/developers/mcp/local-setup">
+    Clone the servers and run them as stdio processes
+  </Card>
+  <Card title="Tool reference" icon="list-check" href="/developers/mcp/tools">
+    Every tool, by area, with what it does
+  </Card>
+</CardGroup>

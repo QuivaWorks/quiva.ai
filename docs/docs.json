@@ -29,6 +29,7 @@
             "icon": "folder-tree",
             "pages": [
               "spaces/spaces",
+              "spaces/entities-contacts",
               "spaces/tasks",
               "spaces/task-actions",
               "spaces/records",
@@ -214,6 +215,22 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "Developers",
+            "pages": [
+              {
+                "group": "MCP",
+                "icon": "server",
+                "pages": [
+                  "developers/mcp/overview",
+                  "developers/mcp/remote-setup",
+                  "developers/mcp/api-keys",
+                  "developers/mcp/local-setup",
+                  "developers/mcp/tools"
+                ]
+              }
+            ]
           }
         ]
       },
@@ -236,6 +253,7 @@
             "pages": [
               "abbie/chatting/chat-surface",
               "abbie/chatting/watching-her-think",
+              "abbie/chatting/citations",
               "abbie/chatting/sessions-and-history",
               "abbie/chatting/deep-links",
               "abbie/chatting/attachments-and-images",
@@ -341,6 +359,12 @@
             "group": "Hub Flows",
             "openapi": {
               "source": "api-reference/endpoint/hub-flows/openapi.json"
+            }
+          },
+          {
+            "group": "Assistants",
+            "openapi": {
+              "source": "api-reference/endpoint/assistants/openapi.json"
             }
           },
           {

@@ -1,0 +1,59 @@
+---
+title: "API keys for MCP"
+description: "Create the key your MCP client authenticates with, and scope it correctly"
+icon: "key"
+---
+
+An MCP client authenticates as a Quiva API key — there's no separate credential type for MCP. This page covers what matters for that specific use; for everything else (rotation, storage, incident response) see the full [API Keys](/essentials/security/api-keys) reference.
+
+## Creating a key
+
+<Steps>
+  <Step title="Open the API keys tab">
+    Open **Settings** from your user menu, then the **API keys** tab.
+
+    <Frame caption="Settings → API keys: the list of keys on the account, with only their last 4 characters shown.">
+      <img src="/images/developers/api-keys-list.png" alt="The Settings sidebar with API keys selected, and a table of existing keys showing Name, Account, Last 4 Characters, Created and Expires columns" />
+    </Frame>
+  </Step>
+  <Step title="Add a new key">
+    Click **Add**. Name it for what's using it — "Claude Code", "Cursor — laptop" — since the name and last four characters are all you'll have to identify it later.
+  </Step>
+  <Step title="Copy it once">
+    The key is shown once, with **Copy** and **Download Credentials** buttons. Put it straight into your client's config or a secret store — see [Connect a client](/developers/mcp/remote-setup).
+  </Step>
+</Steps>
+
+<Frame caption="Settings → API keys → Add. The dialog asks only for a name.">
+  <img src="/images/developers/api-key-create.png" alt="The Create API Key dialog with a single Name field and Add and Cancel buttons" />
+</Frame>
+
+## Scope and expiry
+
+The Settings screen creates a **user-scoped** key: your MCP client acts with your own role and permissions. That's the right choice for a personal coding tool. An **account-scoped** key (root/admin only, created through the API) is rarely what you want for MCP — it broadens the blast radius of a leaked key for no benefit here.
+
+A key created in Settings expires after **90 days**; the dialog has no expiry option. A key with a different lifetime can only be created through the API (`POST /accounts/api-key` with `expiry_days`). A shared CI or automation credential that calls Quiva through MCP should get its own key, not a personal one you might delete without warning.
+
+## Restricted keys
+
+A **restricted key** (the `msr-` prefix) is pinned to a fixed list of HTTP method/path pairs, and refuses anything outside it. This is the safer choice for an MCP client that only ever needs one area of the platform.
+
+The catch: the restriction is enforced on the underlying HTTP call, not on the MCP tool name. A restricted key has to allow every endpoint the tools you'll use actually call — not just the ones that look obviously related.
+
+<Warning>
+A single tool can call more than one endpoint behind the scenes — a reference or validation tool that also fetches examples, say — so the obvious "this tool needs that one path" mapping isn't always complete. If a call fails with `403` straight from the API (as opposed to a role-based refusal — see [Connect a client](/developers/mcp/remote-setup) for that case), the most likely cause is a restricted key missing one of the endpoints its tool needs. Use an unrestricted key during development, watch which paths your session actually calls, then narrow to a restricted key once you know the full list.
+</Warning>
+
+A restricted key has no downloadable credentials file — use the key value itself.
+
+## Rotating and revoking
+
+There's no in-place rotation: create the replacement key, update your MCP client's configuration to use it, confirm the connection still works, then delete the old key. **Settings → API keys → Delete Key** revokes a key immediately — anything using it stops working at once, so deploy the replacement first.
+
+<Warning>
+**Treat this key like a password.** It authenticates as you (or, for an account-scoped key, as your account) for every tool your MCP client calls, including writes. Never paste it into a shared config file, a chat message or a public repository.
+</Warning>
+
+<Card title="Full API keys reference" icon="key" href="/essentials/security/api-keys">
+  Prefixes, expiry emails, downloading credentials, and what to do if a key is compromised
+</Card>

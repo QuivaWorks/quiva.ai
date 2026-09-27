@@ -1,0 +1,114 @@
+---
+title: "Entities & Contacts"
+description: "What a contact and an organisation are, how they anchor a Space's work, and the folder-scoped Contacts panel"
+icon: "address-book"
+---
+
+An **entity** is a contact or an organisation record that a Space's work is tracked against. When a
+Space declares one, every task, file and conversation under a contact's folder is gathered in one
+place — instead of being scattered across the Space with no owner.
+
+<Note>
+Not every Space has entities. Whether a Space anchors on a contact — and what it calls one — is set
+under **Edit Space → Records → Base record**. See [Configuring a Space](/spaces/spaces#configuring-a-space).
+</Note>
+
+## Contacts and organisations
+
+A Space can declare up to two anchors:
+
+| Anchor | What it is | Configured as |
+|---|---|---|
+| **Contact** | The person a Space's work is tracked against. Every button that adds or invites one uses the Space's own word for it — "Client", "Customer", "Member" — instead of a fixed label. | Base record |
+| **Organisation** | The firm a contact belongs to. Optional — leave it unset and contacts stand alone, not grouped under anything. | Organisation record |
+
+Each anchor points at one of the Space's attached record configs, so the fields you fill in when
+creating one — and the schema they're validated against — come from that config, not from a fixed
+form. Each also carries its own icon, shown wherever that kind of entity is listed: on its avatar,
+in the entity list, and above its folder.
+
+## Where entities show up
+
+### The Contacts panel
+
+A Space with a contact anchor shows a panel in its panel row named after that record —
+**Contacts** by default, or whatever the Space calls one instead (for example, **Clients**) — see
+[Spaces Overview](/spaces/spaces#the-panel-model). What it looks like depends on whether the Space
+also declares an organisation:
+
+<Tabs>
+  <Tab title="Contact only">
+    One flat list of every contact in the Space. There is no organisation grouping.
+  </Tab>
+  <Tab title="Contact + organisation">
+    A **folder-scoped panel**: it shows the organisations and contacts filed in whatever folder
+    you're currently browsing, the same way the Files panel shows files and folders for that
+    location.
+
+    - At the Space root or inside a plain folder, you see every organisation and every
+      contact filed there.
+    - Open an organisation and the panel narrows to that organisation's own contacts.
+    - Open a contact and the panel disappears — a contact doesn't hold further entities.
+  </Tab>
+</Tabs>
+
+<Frame caption="The Contacts panel at a Space root: every organisation and contact filed there.">
+  <img src="/images/spaces/entities-panel.png" alt="A Space Contacts panel with an Organisations card listing one organisation and a Contacts card listing five contacts, each with its organisation or No organisation" />
+</Frame>
+
+<Note>
+Contacts and organisations created before folder scoping existed still show up: they're classified
+by the record config their folder marker points at, falling back to the old literal label it was
+created with. Nothing is lost by the switch to the newer panel.
+</Note>
+
+### The Folder field on a task
+
+A task's **Folder** field is a picker of the Space's contacts — not a filing tree. Assigning a task
+to a contact's identity (an email address, for example) files it under that contact automatically.
+See [Folders and contacts](/spaces/tasks#folders-and-contacts) for the full behaviour, including
+what happens when the link can't be made.
+
+## Creating a contact
+
+From the Contacts panel (or the client actions menu on the Files and Tasks panels), choose
+**New &lt;contact label&gt;**. The form is generated from the Space's base record configuration, so
+the fields you see match whatever schema that config defines.
+
+Creating a contact:
+
+- Mints the contact's own folder, keyed on its identity fields (the fields the Space uses to tell
+  one contact from another — usually an email address).
+- Does **not**, by itself, give the contact a sign-in to the client portal. That's a separate,
+  deliberate step — see [Client Portal](/spaces/client-portal#getting-a-client-into-the-portal).
+
+If the Space declares an organisation, a **New &lt;organisation label&gt;** option creates one the
+same way, using the organisation record's own configuration and identity fields.
+
+<Note>
+A contact filed under an organisation is created from inside that organisation's folder, or by
+picking the organisation on the contact's own form — whichever the Space's layout offers.
+</Note>
+
+## Searching and filtering
+
+The folder-scoped panel has its own search box, scoped to the folder you're in — it matches
+contacts and organisations filed there, not the whole Space. Clearing the search returns to the
+full listing for that folder.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Spaces Overview" icon="folder-tree" href="/spaces/spaces#configuring-a-space">
+    Setting a Space's base record and organisation record.
+  </Card>
+  <Card title="Tasks" icon="list-check" href="/spaces/tasks#folders-and-contacts">
+    How a task's Folder field relates to contacts.
+  </Card>
+  <Card title="Client Portal" icon="user-lock" href="/spaces/client-portal">
+    Giving a contact a sign-in, and what they see once they have one.
+  </Card>
+  <Card title="Records" icon="database" href="/spaces/records">
+    The record sets a Space attaches, including the ones its entities are built from.
+  </Card>
+</CardGroup>

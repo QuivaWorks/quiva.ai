@@ -210,6 +210,20 @@ If you receive a notification for something you didn't do, work through the [inc
 
 How QuivaWorks collects, uses and retains personal data is set out in the privacy policy.
 
+### Content sent to model providers
+
+Prompts, and the arguments of external (MCP) tool calls Abbie makes while handling a conversation,
+are not written into QuivaWorks' own application logs.
+
+For requests to OpenAI models, server-side storage is also turned off: Abbie resends the relevant
+conversation history itself with every turn, so nothing needs to be kept on the provider's side
+between turns.
+
+<Note>
+This is separate from **Data Retention**, which controls how long QuivaWorks itself keeps your
+conversation history and is yours to set — see [Account Settings](/essentials/account/account-settings#data-retention).
+</Note>
+
 <CardGroup cols={2}>
   <Card title="Privacy Policy" icon="file-contract" href="https://quiva.ai/legal.html#privacy">
     What we collect, how it's used, and your rights

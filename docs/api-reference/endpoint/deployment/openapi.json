@@ -264,7 +264,6 @@
                     "Stacks"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.get.stack-list",
                 "responses": {
                     "200": {
                         "description": "Successfully retrieved list of stacks",
@@ -340,7 +339,6 @@
                     "Stacks"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.post.deploy-stack",
                 "requestBody": {
                     "description": "Stack configuration details",
                     "required": true,
@@ -475,7 +473,6 @@
                     "Stacks"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.get.stack",
                 "parameters": [
                     {
                         "name": "name",
@@ -609,7 +606,6 @@
                     "Stacks"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.patch.stack",
                 "parameters": [
                     {
                         "name": "name",
@@ -725,7 +721,6 @@
                     "Stacks"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.delete.stack",
                 "parameters": [
                     {
                         "name": "name",
@@ -808,7 +803,6 @@
                     "Stacks"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.get.stack-history",
                 "parameters": [
                     {
                         "name": "name",
@@ -980,7 +974,6 @@
                     "Stacks"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.post.redeploy-stack",
                 "parameters": [
                     {
                         "name": "name",
@@ -1079,7 +1072,6 @@
                     "Resources"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.patch.attach-resources",
                 "parameters": [
                     {
                         "name": "name",
@@ -1197,7 +1189,6 @@
                     "Resources"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.get.stack-resource",
                 "parameters": [
                     {
                         "name": "name",
@@ -1325,7 +1316,6 @@
                     "Resources"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.delete.stack-resource",
                 "parameters": [
                     {
                         "name": "name",
@@ -1399,7 +1389,6 @@
                     "Resources"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.patch.detach-stack-resource",
                 "parameters": [
                     {
                         "name": "name",
@@ -1475,7 +1464,6 @@
                     "Resources"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.get.stack-resource-history",
                 "parameters": [
                     {
                         "name": "name",
@@ -1645,7 +1633,6 @@
                     "Resources"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.post.redeploy-stack-resource",
                 "parameters": [
                     {
                         "name": "name",
@@ -1754,7 +1741,6 @@
                     "OpenAPI"
                 ],
                 "x-resource-type": "service",
-                "x-resource": "microstrate.deployment.post.deploy-openapi",
                 "requestBody": {
                     "description": "OpenAPI specification with extensions",
                     "required": true,
