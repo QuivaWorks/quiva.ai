@@ -133,6 +133,22 @@ To verify signed events inside the flow instead, for a scheme the check does not
 
 ---
 
+## Example: sync a tracker's events
+
+A tracker usually posts several changes in one signed delivery. Use a signature check, split the delivery into items, and apply each item in its own run. This is the same sequence a [connected tracker](/essentials/account/connections) runs for you with no flow, so build it only when you want your own steps in the middle.
+
+| Step | Configure |
+|---|---|
+| 1. Webhook trigger | Add a [signature check](#verifying-a-signature) with the tracker's scheme and your stored secret |
+| 2. [Connector](/flows/steps/connector) | `sync_normalise` with `event` set to `$.trigger`. It returns `items` and writes nothing. |
+| 3. [Condition](/flows/steps/condition) | Skip the next step when `items` is empty |
+| 4. Quiva Endpoint | Subject `microstrate.hub.post.workflow-run` with `{"subject": "<child flow>", "triggers": "$.NORMALISE.items"}`. One child run starts per item. |
+| 5. Child flow: [Connector](/flows/steps/connector) | `sync_apply` with `item` set to `$.trigger`. Creates or updates the task. |
+
+Because the signature is checked before step 2, only deliveries signed with your secret get this far. The sync is safe to repeat: applying an item that is already in step writes nothing.
+
+---
+
 ## Reading the request
 
 `$.trigger` is the raw request body, unwrapped and with nothing added.
@@ -264,6 +280,10 @@ This differs from most other triggers, which bind to whichever version was open 
 <CardGroup cols={2}>
   <Card title="HTTP Request Trigger" icon="globe" href="/flows/triggers/http-request">
     The same endpoint with the settings exposed
+  </Card>
+
+  <Card title="Connector Step" icon="plug" href="/flows/steps/connector">
+    Normalise and apply a tracker's events
   </Card>
 
   <Card title="Condition Step" icon="code-branch" href="/flows/steps/condition">

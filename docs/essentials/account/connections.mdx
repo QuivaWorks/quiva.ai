@@ -1,0 +1,128 @@
+---
+title: "Connect a tracker"
+description: "Keep an outside item tracker and a Space in step, both ways, from Account, Connections"
+icon: "plug"
+---
+
+Some trackers are offered as a ready-made **sync**. Connect one and the tasks in a Space and the items in the tracker stay in step in both directions: titles, statuses, assignees, comments and more. You set it up in a short wizard. There is nothing to build, and no flow is needed.
+
+Connecting is for admin and root users. It lives under **Account**, then **Connections**, in the **Connectors** section. A tracker you can connect appears as a card marked **Available to connect**.
+
+<Info>
+This is different from an [API integration](/essentials/account/api-integrations), which is a set of credentials you hand to your own client to read and write tasks. Connecting a tracker creates and manages an integration for you, and you never see its secret. If you want to build the sync yourself, use [task sync](/spaces/task-sync) with an integration. To add your own steps around a connected tracker, see the [Connector step](/flows/steps/connector).
+</Info>
+
+## Connect a tracker
+
+Click **Connect** on the tracker's card. The wizard shows the steps for that tracker. The exact steps and help text come from the tracker's own setup, but they follow the same shape.
+
+<Steps>
+  <Step title="Token">
+    Paste the tracker's API token. The tracker's help text tells you where to get it. Create a dedicated member in the tracker for the connection and generate the token as that member, so the connection's writes are attributed to it and your own edits are never mistaken for echoes. Click **Test connection** to check the token before you go on.
+  </Step>
+
+  <Step title="Space">
+    Choose the Space to keep in step. A connection covers one Space.
+  </Step>
+
+  <Step title="Choices">
+    Pick what to sync, such as the workflow or project, and an optional team to narrow it further. Only items in that scope sync.
+  </Step>
+
+  <Step title="Status map">
+    Map each state in the tracker to one of your Space's statuses. Each status role then maps back to one tracker state, so a task moved on either side lands somewhere sensible. Every state needs a status, and the Space needs a status for each role the sync uses.
+  </Step>
+
+  <Step title="Owners">
+    Owners are matched by email. A member with no match stays unmapped and their ownership is not synced.
+  </Step>
+
+  <Step title="Priority and estimate">
+    Priority is matched by name, and the tracker's estimate becomes a time estimate using the conversion the step asks for. If the tracker has no priority field to match, priority is not synced.
+  </Step>
+
+  <Step title="Connect">
+    Review the summary and click **Connect**. Everything is set up in one go: an integration for the sync, the tracker's webhook, and a task subscription.
+  </Step>
+</Steps>
+
+<Note>
+The first connection on an account can take up to five minutes while your gateway is prepared. Keep the wizard open. If it takes longer, close it and check the card in a few minutes.
+</Note>
+
+If a step fails, the wizard says which one. **Repair** re-runs the setup from the step that failed and repeats nothing that already worked.
+
+## The connection card
+
+A connected tracker shows a card with a status pill:
+
+| Status | Meaning |
+|---|---|
+| **Setting up** | Setup is still running |
+| **Connected** | Syncing is on |
+| **Needs repair** | A setup step did not finish. The card names it. |
+| **Reinstall needed** | The connection was made by an older version and cannot be repaired. See [Reinstall needed](#reinstall-needed). |
+| **Disconnecting**, **Disconnect incomplete** | A disconnect is running, or did not finish |
+| **Update available** | A newer version of the sync is ready to apply |
+
+The card shows the workspace and member the connection acts as, and the Space it syncs.
+
+### Activity
+
+| Line | What it shows |
+|---|---|
+| **Last sync in** | When the tracker last changed a task successfully, or **Nothing yet** |
+| **Last sync out** | When a task change last reached the tracker |
+| **Last run failed** | Shown beside either line when the most recent run failed, with the error |
+| **Refused calls** | How many calls to the connection's webhook address were refused (a bad or missing signature, for example) and when the last one was. Appears only when there are some. |
+
+A refused call is not a failed sync. The call was rejected before anything ran, so the tracker was not changed. If your tracker's changes are not arriving and the count keeps going up, try **Repair**.
+
+### Logs and actions
+
+| Button | What it does |
+|---|---|
+| **Test connection** | Checks the saved token against the tracker |
+| **Run log** | The latest syncs in both directions, newest first, with each outcome and reason. See [Outcomes and reasons](/developers/connectors/sync#outcomes-and-reasons). Runs are kept for 30 days. |
+| **Delivery log** | The task subscription's deliveries to the sync: attempts, status codes and retries. See [Task webhooks](/spaces/task-webhooks). |
+| **Resume** | Appears when sending task changes to the tracker has been paused, with the reason. Resume it once the cause is fixed. |
+| **Edit maps** | Change the status, owner and priority maps. Saving re-applies them. |
+| **Repair** | Re-runs setup, repeating only what is missing or broken |
+| **Upgrade** | Applies a newer version of the sync when **Update available** shows |
+| **Disconnect** | Stops syncing. See below. |
+
+## Repair
+
+Use **Repair** when the card says **Needs repair**, or when changes stop flowing and **Test connection** passes. It is safe to run at any time: each setup step first checks whether it is already done and only redoes what is missing, such as a webhook someone deleted in the tracker.
+
+## Disconnect
+
+**Disconnect** stops syncing and removes the tracker's webhook, the task subscription and the integration. Tasks and items already synced are kept on both sides, and the API token stays saved. If the disconnect does not finish, the card says **Disconnect incomplete** and the button becomes **Retry disconnect**.
+
+## Reinstall needed
+
+A connection made before the sync engine was introduced was built from flows and cannot be repaired or upgraded. The card says **Reinstall needed**. Click **Disconnect**, then connect again. Tasks and items already synced are kept on both sides.
+
+<Note>
+The new connection does not use flows. Any sync flows an older connection created are no longer needed once you disconnect it.
+</Note>
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Task sync" icon="rotate" href="/spaces/task-sync">
+    Build your own sync with the API, or compare with the no-code option.
+  </Card>
+
+  <Card title="Connector step" icon="plug" href="/flows/steps/connector">
+    Add your own steps around a sync.
+  </Card>
+
+  <Card title="API integrations" icon="key" href="/essentials/account/api-integrations">
+    Credentials for your own client.
+  </Card>
+
+  <Card title="Author a tracker definition" icon="gears" href="/developers/connectors/definition">
+    Teach the platform a new tracker.
+  </Card>
+</CardGroup>

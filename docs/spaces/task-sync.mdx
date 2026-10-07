@@ -228,11 +228,28 @@ async function push(space, item) {
 
 Run `pull` on a timer, or trigger it from a [webhook](/spaces/task-webhooks). Test the whole loop against a [staging Space](/spaces/staging-spaces) first.
 
+## Connector sync engine
+
+If your other system is an item tracker, you may not need to write a sync at all. A connector with a `sync` block keeps a Space and the tracker in step in both directions, using these same features underneath: external ids, versioned writes, the changes feed and signed webhooks.
+
+| You want to | Use |
+|---|---|
+| Keep a supported tracker in step with no code | [Connect a tracker](/essentials/account/connections) under **Account**, **Connections** |
+| Add your own steps around a tracker sync | The [Connector step](/flows/steps/connector) in a flow |
+| Support a tracker that is not offered yet | A [connector definition](/developers/connectors/definition) with a [`sync` block](/developers/connectors/sync) |
+| Sync a system that is not a tracker, or control every write | The API on this page, with an [integration](/essentials/account/api-integrations) |
+
+A connected tracker has its own integration and task subscription, which you can see in the integration's delivery log. A task subscription can deliver to a connector's sync address instead of your own endpoint; the engine verifies it and runs the push for you.
+
 ## Related
 
 <CardGroup cols={2}>
   <Card title="Task webhooks" icon="webhook" href="/spaces/task-webhooks">
     Push the same events to your endpoint, signed.
+  </Card>
+
+  <Card title="Connect a tracker" icon="plug" href="/essentials/account/connections">
+    The no-code option for a supported tracker.
   </Card>
 
   <Card title="Errors and limits" icon="triangle-exclamation" href="/api-reference/task-sync-errors">

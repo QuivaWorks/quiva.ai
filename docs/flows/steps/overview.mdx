@@ -25,6 +25,7 @@ A flow is a graph of steps. A trigger starts a run; the runner then works throug
 | [Rules](/flows/steps/rules) | Derives values from a rule set |
 | [HTTP Request](/flows/steps/http-request) | Calls an external API |
 | [Integration](/flows/steps/api-integrations) | Calls one action on a connected integration |
+| [Connector](/flows/steps/connector) | Runs an operation of a connected tracker, or one step of a task sync |
 | [Function](/flows/steps/functions) | Runs one of the platform's built-in functions |
 | [Nested flow](/flows/steps/nested-flows) | Runs another flow |
 | [Checkpoint](/flows/steps/human-in-the-loop) | Pauses the run for a person to action |
@@ -73,7 +74,7 @@ Most step types can reshape their own result before it is stored, using a **Resp
 
 The step then stores exactly that, so downstream steps read `$.MY_STEP.id` rather than digging through the original shape. Leave it empty and the result is stored unchanged.
 
-It is offered, and applied, on **HTTP Request**, **Integration**, **Function**, **Nested flow**, **Rules**, **Task**, **Verify Challenge** and **Quiva Endpoint** steps. A **Condition** step stores no result at all, so it has none.
+It is offered, and applied, on **HTTP Request**, **Integration**, **Connector**, **Function**, **Nested flow**, **Rules**, **Task**, **Verify Challenge** and **Quiva Endpoint** steps. A **Condition** step stores no result at all, so it has none.
 
 ---
 

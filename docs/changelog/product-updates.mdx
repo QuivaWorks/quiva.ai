@@ -42,6 +42,22 @@ Each integration can subscribe endpoints to task events. Deliveries are signed w
   Verify signatures, handle retries and replay missed events.
 </Card>
 
+## Connect a tracker
+
+Admin and root users can now connect an item tracker under **Account**, **Connections**, **Connectors**. A short wizard asks for the tracker's token, a Space and how statuses, owners and priority map, then sets up the webhook and task subscription for you. Tasks and tracker items stay in step in both directions, with no flow to build. The card shows the last sync in and out, refused calls and a run log, and offers **Repair** and **Disconnect**. Flows gain a **Connector** step, and developers can describe a new tracker with a connector definition and its `sync` block.
+
+<CardGroup cols={2}>
+  <Card title="Connect a tracker" icon="plug" href="/essentials/account/connections">
+    The wizard, the connection card, Repair and Disconnect.
+  </Card>
+  <Card title="Connector step" icon="plug" href="/flows/steps/connector">
+    Normalise, apply and push from a flow.
+  </Card>
+  <Card title="The sync block" icon="gears" href="/developers/connectors/sync">
+    Field rules, outcomes and reasons.
+  </Card>
+</CardGroup>
+
 ## Verify signatures on webhook and HTTP Request triggers
 
 A webhook or HTTP Request trigger can now check a signature before the flow starts. It supports HMAC SHA-256, including GitHub-style and Slack-style presets, and Standard Webhooks. A request that fails the check gets a 401 and no run is created. The `eval` step also gains a small `crypto` object for HMAC, SHA-256 and constant-time comparison.

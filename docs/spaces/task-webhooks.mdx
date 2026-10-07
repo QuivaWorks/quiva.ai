@@ -8,6 +8,10 @@ A webhook subscription pushes task events from your Spaces to an HTTPS endpoint 
 
 Subscriptions belong to an [API integration](/essentials/account/api-integrations), so they can only cover Spaces where that integration holds `tasks:read`. The events are the same ones the [changes feed](/spaces/task-sync#read-the-changes-feed) returns.
 
+<Note>
+A subscription's endpoint does not have to be yours. When you [connect a tracker](/essentials/account/connections), the connection creates a subscription whose URL is its own signed sync address on your gateway, and the sync engine receives each event, verifies it and pushes the change to the tracker. Those subscriptions appear under the connection's integration and in its **Delivery log**. Leave them as they are.
+</Note>
+
 ## Create a subscription
 
 <Steps>
