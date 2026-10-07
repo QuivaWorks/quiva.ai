@@ -1,0 +1,123 @@
+---
+title: "Service desk"
+description: "Connect client accounts to one central board, so work items and comments move both ways"
+icon: "headset"
+---
+
+{/* DRAFT: do not merge until the service desk distribution is deployed to production. Held back from the rest of the task sync pages on purpose. Not registered in docs.json. */}
+
+A **service desk** connects other QuivaWorks accounts to one central board. Each client works in a Space of their own, and tickets they raise appear on your central board, tagged with the client. When your team changes a ticket or replies, the client sees it on their side.
+
+It is built on distribution, the way two accounts are paired. The central account is the **publisher**. Each client account is a **distributor**. Each pair is one grant, and every grant keeps its own history.
+
+## How it fits together
+
+| Side | Who | What they see |
+|---|---|---|
+| Central desk | You | One board with a ticket from every connected client. A **Client** filter on the toolbar lists each connected account by name. |
+| Client desk | Each client | Their own Space, with only their tickets. They cannot see the central Space or any other client's tickets. |
+
+What stays in sync, in both directions:
+
+| Syncs | Does not sync |
+|---|---|
+| Title, description, status, priority, due date, archived | Assignees, tags, attachments, folder, metadata |
+| Comments from either side | Internal comments, which never leave the account that wrote them |
+
+A ticket's **status** crosses by *role*, not by name. Each stage has a role, so a client can name their columns differently from yours.
+
+| Role | In the default client template |
+|---|---|
+| `intake` | New |
+| `acknowledged` | Acknowledged |
+| `working` | In progress |
+| `done` | Resolved |
+
+## Connect a client
+
+<Steps>
+  <Step title="Send an invitation">
+    In your central Space's **Distribution** tab, create an invitation for the service desk product. Choose the status mapping for this client: where each of their stages lands on your board.
+  </Step>
+
+  <Step title="The client accepts">
+    The client opens the link, signs in as a root or admin user of their account, and chooses how to connect.
+  </Step>
+
+  <Step title="Tickets start flowing">
+    The client appears in your **Client** filter, and their tickets land in the column their status maps to.
+  </Step>
+</Steps>
+
+The client chooses one of two ways to connect.
+
+| Choice | What happens |
+|---|---|
+| **Set up a new desk** | A Space is created for them from the service desk template, with the four statuses above. It is not locked, so they can rename and recolour columns. |
+| **Link an existing space** | They pick a Space they already use and map each stage to one of its statuses. Every stage must be mapped before they can continue. Only tasks created after linking sync. |
+
+A client account can have only one connection with your account. A client with no QuivaWorks account yet signs up first, then opens the invitation link again.
+
+### Edit the status mapping
+
+On the central side, open the client's row in the **Distribution** tab, then **Distributions**, and choose **Edit status mapping**. The new mapping applies to later moves.
+
+<Note>
+You cannot delete a status that a mapping points to, or the only status that carries a required role. Renaming and recolouring columns is always allowed.
+</Note>
+
+## Raise and work a ticket
+
+1. A client creates a task in their desk Space. Within about ten seconds it appears on your central board in the column its status maps to, in that client's folder.
+2. Your team moves it, edits it or comments. The client sees the change on their board.
+3. Either side can comment at any time. Both comments appear on both sides, with the author's name and account shown on the other side.
+
+A comment can only be edited or deleted by the side that wrote it.
+
+A task that existed before a Space was linked does not sync. To send one across, patch it with `"distribution_share": true`.
+
+## Conflicts
+
+Every ticket has one shared version number. If both sides edit the same ticket at the same moment, QuivaWorks does not overwrite either edit. It marks the ticket with a **Sync conflict** badge, and the task shows who edited it and the incoming change.
+
+| Choice | Result |
+|---|---|
+| **Keep mine** | Your version stands. The other side receives it and its conflict clears. |
+| **Take theirs** | The incoming change is applied to your copy. Both sides converge on it. |
+
+Comments never conflict. Adding a comment on both sides at once keeps both.
+
+## Find a client's tickets
+
+On the central board, choose a client from the **Client** filter. Each synced ticket's `folder` is the id of that client's grant, so you can do the same through the API.
+
+```bash
+curl "https://api.quiva.ai/workspaces/space/DESK/tasks?folder=D0F3A91B22C4" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Integrations work on a connected Space like any other. A change that arrives from a client appears in the [changes feed](/spaces/task-sync#read-the-changes-feed) and to webhooks with `origin.kind` set to `distribution`.
+
+## Pause or end a connection
+
+| Action | Effect |
+|---|---|
+| **Suspend** | Changes stop crossing. Edits are retried, and arrive after you **Restore**. |
+| **Restore** | The connection resumes and held changes arrive without duplicates. |
+| **Revoke** | Ends the connection permanently. A revoked connection cannot be restored, and each side keeps its tasks. Changes that can no longer be delivered are recorded as undelivered. |
+
+<Warning>
+Deleting a ticket on one side does not delete it on the other. The other side keeps its copy.
+</Warning>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Task sync" icon="rotate" href="/spaces/task-sync">
+    Versions, the changes feed and the upsert.
+  </Card>
+
+  <Card title="Tasks" icon="list-check" href="/spaces/tasks">
+    Fields on a task.
+  </Card>
+</CardGroup>

@@ -89,9 +89,47 @@ There is no regenerate. Rotating means deleting the key and generating a new one
 An [HTTP Request trigger](/flows/triggers/http-request) starts authenticated rather than public. If the endpoint should be private, that is the safer default to begin from.
 </Tip>
 
+<Info>
+A webhook does not check who is calling unless you add a **signature check**. Turn it on under [Verifying a signature](#verifying-a-signature) so only requests signed with your shared secret start the flow.
+</Info>
+
 <Warning>
-There is **no signature verification** — no Stripe, GitHub, Slack or custom HMAC checking, and no secret field. There is also no event filtering: every request that reaches the URL starts the flow, and you filter on `$.trigger` in a [Condition](/flows/steps/condition) step if you only want some of them. Nothing responds to a service's URL-verification challenge either.
+There is no event filtering: every request that reaches the URL, and passes any signature check, starts the flow. Filter on `$.trigger` in a [Condition](/flows/steps/condition) step if you only want some of them. Nothing responds to a service's URL-verification challenge either.
 </Warning>
+
+---
+
+## Verifying a signature
+
+Many services sign each request with a secret you share. A signature check lets the trigger refuse any request that was not signed with that secret, **before** the flow starts.
+
+Open the trigger node and expand **Verify signature**, then click **Add signature check**.
+
+| Field | What it does |
+|---|---|
+| **Preset** | Fills the fields for a common sender: GitHub-style, Slack-style, plain body HMAC (hex) or Standard Webhooks. |
+| **Scheme** | `HMAC SHA-256` signs the raw body (optionally with a template). `Standard Webhooks` follows the [Standard Webhooks](https://www.standardwebhooks.com) scheme. |
+| **Secret** | A `SECRET::name::` reference to a secret you have stored. Only the reference is saved, never the value. |
+| **Signature header** | The header that carries the signature. Required for HMAC SHA-256. Standard Webhooks defaults to `webhook-signature`. |
+| **Encoding** | `Hex` (default) or `Base64`. HMAC SHA-256 only. |
+| **Prefix** | Text before the signature, such as `sha256=`. HMAC SHA-256 only. |
+| **Timestamp header** | A header with the send time in unix seconds. Standard Webhooks defaults to `webhook-timestamp`. |
+| **Tolerance (seconds)** | How far the timestamp may differ from now, in either direction. 0 means 300 seconds. The maximum is 3600. |
+| **Signed payload** (under **Advanced**) | What HMAC SHA-256 signs. The default is `{body}`. A template such as `v0:{timestamp}:{body}` signs the timestamp too. Use `{body}` exactly once. |
+
+How it behaves:
+
+- The check runs on the **raw request bytes** and compares in constant time. The flow then sees exactly the bytes that were verified. The body must be JSON.
+- A request that fails the check gets **401** before anything runs. No run is recorded and nothing is queued. The logs name the check that failed, never the secret or the body.
+- A request that passes is **not deduplicated**. Within the tolerance window, the same signed request starts the flow again, so build the flow to be safe to run twice.
+- **Signed bodies are limited to 4 MiB.** A signed trigger refuses a larger body with 401. Flows without a signature check accept bodies up to the gateway's own limit.
+- The check applies to calls that arrive through the gateway URL. It applies once the flow is published, and test runs are not verified.
+- If you set a **Timestamp header** on HMAC SHA-256, the signed payload must include `{timestamp}`, and the reverse. Otherwise the timestamp would be checked but not signed, and an old request could be replayed with a fresh timestamp. The editor refuses that combination.
+- Standard Webhooks takes no prefix or signed-payload template. Its secret is `whsec_` followed by base64, and it needs a `webhook-id` header. It accepts up to four `v1,` signatures, and any match passes.
+
+<Tip>
+To verify signed events inside the flow instead, for a scheme the check does not cover, use the `crypto` helpers in an [Eval step](/flows/steps/eval#crypto-helpers).
+</Tip>
 
 ---
 
@@ -199,7 +237,7 @@ This differs from most other triggers, which bind to whichever version was open 
   </Accordion>
 
   <Accordion title="401 or 403">
-    The webhook is secured and the caller is not sending `x-api-key`, or the key has expired. Keys default to a 365-day expiry.
+    The webhook is secured and the caller is not sending `x-api-key`, or the key has expired. Keys default to a 365-day expiry. A **401** with no run recorded can also mean the [signature check](#verifying-a-signature) failed: check the secret, the header name, the encoding and the clock, and that the body is under 4 MiB.
   </Accordion>
 
   <Accordion title="The URL 404s">

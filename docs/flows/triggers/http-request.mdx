@@ -80,6 +80,10 @@ To issue a key, open the trigger node, expand **Security**, set **Expiry (days)*
 
 There is no regenerate button. Rotating means deleting the key and generating a new one, which invalidates the old one immediately.
 
+### Verifying a signature
+
+An HTTP Request trigger can also check a signature on each request, so only callers who hold your shared secret can start the flow. Open the trigger node, expand **Verify signature** and add a check. The fields, schemes and limits (including the 4 MiB cap on signed bodies and the 401 for a failed check) are the same as on the [Webhook trigger](/flows/triggers/webhook#verifying-a-signature).
+
 ### Allowed Hosts
 
 The **Allowed Hosts** section on the trigger node edits your account's gateway CORS allowlist. It is what lets a browser on your own site call the endpoint.

@@ -36,6 +36,9 @@ the prefix is what tells them apart.
 | **Parent** | Set when the task is a subtask of another. |
 | **Time tracking** | An estimate, plus individual logged entries. |
 | **Archived** | Archived tasks are kept but hidden from the active list. |
+| **Version** | A counter that is 1 on creation and goes up by one on every write to the task. Used by the API to refuse stale writes. |
+| **External id** | An optional id from another system, set through the API. See [Task sync](/spaces/task-sync). |
+| **Activity at** | When anything last happened on the task, including comments, time logs and actions. Set by QuivaWorks. |
 
 The author, created date and updated date are stamped by QuivaWorks and shown in the task's
 details popover.
@@ -342,8 +345,15 @@ will not appear there.
 The task list endpoint accepts `status` (comma-separated for several at once), `priority`,
 `assignees` (comma-separated, any match), `reporter`, `created_by`, `title` (a term search),
 `folder`, `source`, `parent`, `archived`, `scheduled`, `exclude_subtasks`, `created_at`,
-`updated_at` and `scheduled_at`, plus `limit`, `offset`, `sort_by` and `sort_order`. The date
+`updated_at` and `scheduled_at`, plus `external_id` (an exact match), `limit`, `offset`, `sort_by`
+and `sort_order`. `sort_by` accepts `activity_at` as well as `created_at` and `updated_at`. The date
 parameters take a single start date or a `{start},{end}` range.
+
+The list returns `results` and `results_total`, which counts the tasks on this page rather than
+all matching tasks. When another page exists the response also carries `has_more: true`.
+
+To keep tasks in step with another system, with external ids, versions, the changes feed and
+webhooks, see [Task sync](/spaces/task-sync).
 
 Subtasks are always fetched alongside their parents and nested under them; `exclude_subtasks` only
 drops them from the top level of the list.

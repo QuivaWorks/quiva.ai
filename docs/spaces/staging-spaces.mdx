@@ -1,0 +1,103 @@
+---
+title: "Staging Spaces"
+description: "Test a task sync against a copy of your workflow, and reset it between runs"
+icon: "flask"
+---
+
+A **staging Space** is an ordinary Space with a `staging` flag, meant for testing an integration before it touches live work. You copy your real Space's workflow into it, point a separate integration at it, and reset it whenever you want a clean slate.
+
+Staging Spaces live in the same account as your real ones. The flag is a label for people and for the reset route. It does not isolate anything on its own. The isolation comes from scoping: give your test integration access to the staging Space only.
+
+<Note>
+Setting up and resetting staging Spaces is done through the API. There is no staging toggle in the app. Setting `staging` is limited to root and admin users.
+</Note>
+
+## Set up a sandbox
+
+<Steps>
+  <Step title="Copy the structure">
+    Copy your live Space's workflow into a new staging Space with one call.
+  </Step>
+
+  <Step title="Create a test integration">
+    In **Account**, **Connections**, **API integrations**, [create an integration](/essentials/account/api-integrations) with scopes on the staging Space only, and a subscription if you use [webhooks](/spaces/task-webhooks).
+  </Step>
+
+  <Step title="Run your sync">
+    Point your client at the staging Space's id and run it end to end.
+  </Step>
+
+  <Step title="Reset and repeat">
+    Reset the Space to clear the tasks and the external ids, then run the sync again.
+  </Step>
+</Steps>
+
+## Copy structure
+
+```bash
+curl -X POST https://api.quiva.ai/workspaces/space/OPS/copy-structure \
+  -H "Authorization: Bearer $USER_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Ops staging", "id": "OPS_STG", "staging": true}'
+```
+
+This copies the default status, statuses, priorities, tags and folders. It does **not** copy tasks, the description, record sets or bindings.
+
+| Field | Rule |
+|---|---|
+| `name` | The new Space's name. |
+| `id` | Optional. Defaults to the upper-cased name with each run of non-word characters replaced by `_`, up to 32 characters. |
+| `staging` | `true` marks the copy as staging. This needs a root or admin user. |
+
+Any member can copy a Space, but only a root or admin user can set `staging: true`. You can also create a staging Space directly with `POST /workspaces/space` and `"staging": true`, or set the flag later with `PATCH /workspaces/space`.
+
+| Answer | Meaning |
+|---|---|
+| `404 space_not_found` | The source Space does not exist. |
+| `502` | The Space was created but a folder failed to copy. |
+
+## Reset
+
+```bash
+curl -X POST https://api.quiva.ai/workspaces/space/OPS_STG/reset \
+  -H "Authorization: Bearer $USER_TOKEN"
+```
+
+Reset deletes tasks in a staging Space, live and archived, one by one through the normal delete path. That means each deletion is published to the [changes feed](/spaces/task-sync#read-the-changes-feed) and to webhooks. Once the whole Space has been cleared, it also clears the Space's external-id map, **including deleted ids**, so you can upsert the same ids again.
+
+```json
+{ "space_id": "OPS_STG", "deleted": 120, "failed": 0, "remaining": 0, "external_ids_cleared": 120 }
+```
+
+| Field | Meaning |
+|---|---|
+| `deleted` | Tasks removed by this call. |
+| `failed` | Tasks that could not be removed. |
+| `remaining` | `failed` plus any tasks beyond the per-call cap of 2,000. |
+| `external_ids_cleared` | Ids cleared from the map. It stays 0 while tasks remain. |
+
+Call reset again until `remaining` is 0.
+
+| Refusal | Meaning |
+|---|---|
+| `409 space_not_staging` | Only staging Spaces can be reset. |
+| `409 space_bound` | The Space is connected to another account and cannot be reset. |
+| `404 space_not_found` | No such Space. |
+
+<Warning>
+Reset deletes tasks permanently. It works only on Spaces with the staging flag, so check the id twice, and never give an integration that syncs live work a scope on a staging Space by accident.
+</Warning>
+
+Integration tokens are refused on copy and reset. Run them as a root or admin user.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Task sync" icon="rotate" href="/spaces/task-sync">
+    The calls you are testing.
+  </Card>
+
+  <Card title="API integrations" icon="plug" href="/essentials/account/api-integrations">
+    Scope a test integration to the staging Space.
+  </Card>
+</CardGroup>

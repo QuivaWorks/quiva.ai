@@ -1,0 +1,130 @@
+---
+title: "Task sync authentication"
+description: "Exchange an integration's client credentials for a one-hour bearer token"
+icon: "key"
+---
+
+Task sync clients authenticate with the **client credentials** flow. You create an [API integration](/essentials/account/api-integrations), keep its client ID and secret on your server, and exchange them for a short-lived bearer token.
+
+| Item | Value |
+|---|---|
+| Token URL | `https://api.quiva.ai/oauth/token` |
+| Grant | `client_credentials` |
+| Token lifetime | 1 hour (`expires_in: 3600`) |
+| Refresh token | None. Mint a new token. |
+| Sending the token | `Authorization: Bearer <access_token>` |
+
+The token works on the task routes in the [Workspaces API](/api-reference/endpoint/workspaces/openapi). It is not an API key: sending it as `x-api-key` is refused, and anywhere outside the task routes the gateway answers `403 integration_not_allowed`. An integration cannot open a WebSocket.
+
+## Get a token
+
+<CodeGroup>
+
+```bash curl
+curl -X POST https://api.quiva.ai/oauth/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "I1a2b3c4d5e6f",
+    "client_secret": "qis_..."
+  }'
+```
+
+```bash curl (form-encoded)
+curl -X POST https://api.quiva.ai/oauth/token \
+  -d grant_type=client_credentials \
+  -d client_id=I1a2b3c4d5e6f \
+  -d client_secret=qis_...
+```
+
+```js Node
+const res = await fetch("https://api.quiva.ai/oauth/token", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    grant_type: "client_credentials",
+    client_id: process.env.QUIVA_CLIENT_ID,
+    client_secret: process.env.QUIVA_CLIENT_SECRET,
+  }),
+});
+const { access_token, expires_in } = await res.json();
+```
+
+</CodeGroup>
+
+A successful call returns the token directly. This route is not wrapped in `{"data": ...}`.
+
+```json
+{ "access_token": "eyJ...", "token_type": "Bearer", "expires_in": 3600 }
+```
+
+<Warning>
+Send **no `Authorization` header** on this request, and do not use HTTP Basic. The gateway rejects any bearer it cannot resolve before the token endpoint sees the call, so an `Authorization` header makes a valid request fail. Put the credentials in the body.
+</Warning>
+
+### Token errors
+
+| Status | Code | Meaning |
+|---|---|---|
+| 400 | `invalid_request` | Wrong `grant_type`, a missing field, or a body that cannot be read. |
+| 401 | `invalid_client` | Unknown client ID, a wrong, revoked or retired secret, or a disabled integration. The message never says which. |
+| 503 | `temporarily_unavailable` | Storage is not reachable. Retry shortly. |
+
+Errors have the shape `{"error": "<text>", "code": "<code>"}`.
+
+## Cache the token
+
+Every mint creates a session. A client that mints a token for each request wastes sessions and slows every call. Mint once and reuse the token until about 60 seconds before `expires_in` runs out.
+
+```js
+let cached = { token: null, expiresAt: 0 };
+
+async function getToken() {
+  if (cached.token && Date.now() < cached.expiresAt - 60_000) return cached.token;
+  const res = await fetch("https://api.quiva.ai/oauth/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      grant_type: "client_credentials",
+      client_id: process.env.QUIVA_CLIENT_ID,
+      client_secret: process.env.QUIVA_CLIENT_SECRET,
+    }),
+  });
+  if (!res.ok) throw new Error(`token mint failed: ${res.status} ${await res.text()}`);
+  const body = await res.json();
+  cached = { token: body.access_token, expiresAt: Date.now() + body.expires_in * 1000 };
+  return cached.token;
+}
+```
+
+## Handle revocation
+
+A token stops working as soon as an admin edits the integration's scopes, disables it, deletes it or revokes a secret. Calls then answer `401`: with code `token_revoked` when the call reaches the task service, or with an empty body when the gateway has already dropped the session (a revoked secret, a deleted integration, or a token past its hour). Treat every `401` the same way. Scope changes take up to 30 seconds to reach every service.
+
+| You see | Do this |
+|---|---|
+| `401` on a task call, with code `token_revoked` or no body | Mint one new token and retry the call once. |
+| `401 invalid_client` on that mint | The integration or its secret is gone. Stop, and alert someone. Do not retry in a loop. |
+| `403 scope_denied` | The integration lacks the scope on that Space, or the route is not open to integrations. Ask an admin to change its access. |
+| `403 integration_not_allowed` | You called something other than a task route with an integration token. |
+
+## Scopes
+
+| Scope | Covers |
+|---|---|
+| `tasks:read` | Read a task or list tasks, the [changes feed](/spaces/task-sync#read-the-changes-feed), actions, time logs and comments. |
+| `tasks:write` | Create, update and delete tasks, the external-id upsert, actions and time logs. |
+| `comments:write` | Create, edit and delete comments, and reactions. |
+| `space:configure` | Update a Space's workflow lists. |
+
+Scopes are granted per Space. Space ids are upper case, so `ops` is stored as `OPS`. `GET /workspaces/spaces` lists only the Spaces where the integration holds a scope.
+
+<CardGroup cols={2}>
+  <Card title="Task sync" icon="rotate" href="/spaces/task-sync">
+    Use the token to keep tasks in step with your system.
+  </Card>
+
+  <Card title="Errors and limits" icon="triangle-exclamation" href="/api-reference/task-sync-errors">
+    Every error code and limit.
+  </Card>
+</CardGroup>

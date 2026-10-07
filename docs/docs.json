@@ -36,7 +36,10 @@
               "spaces/file-management",
               "spaces/scheduling",
               "spaces/escalations",
-              "spaces/client-portal"
+              "spaces/client-portal",
+              "spaces/task-sync",
+              "spaces/task-webhooks",
+              "spaces/staging-spaces"
             ]
           },
           {
@@ -163,6 +166,7 @@
                   "essentials/account/creating-account",
                   "essentials/account/account-settings",
                   "essentials/account/global-admin-branding-settings",
+                  "essentials/account/api-integrations",
                   "essentials/account/billing-subscriptions",
                   "essentials/account/closing-account"
                 ]
@@ -347,6 +351,19 @@
             "group": "Accounts",
             "openapi": {
               "source": "api-reference/endpoint/accounts/openapi.json"
+            }
+          },
+          {
+            "group": "Task sync",
+            "pages": [
+              "api-reference/task-sync-auth",
+              "api-reference/task-sync-errors"
+            ]
+          },
+          {
+            "group": "Workspaces",
+            "openapi": {
+              "source": "api-reference/endpoint/workspaces/openapi.json"
             }
           },
           {

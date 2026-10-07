@@ -108,7 +108,7 @@
       },
       "patch": {
         "summary": "Update a space",
-        "description": "Merges the fields you send over the stored space \u2014 send only the fields you are changing. The built-in `ESCALATE` space cannot be updated and returns 403.",
+        "description": "Merges the fields you send over the stored space — send only the fields you are changing. The built-in `ESCALATE` space cannot be updated and returns 403.",
         "operationId": "updateSpace",
         "x-resource-type": "service",
         "parameters": [
@@ -143,7 +143,7 @@
             }
           },
           "202": {
-            "description": "Update accepted, with a background re-assignment queued. This happens when a priority you removed was still in use by existing tasks \u2014 those tasks are reassigned to the fallback priority (the space's default, or the first remaining one)."
+            "description": "Update accepted, with a background re-assignment queued. This happens when a priority you removed was still in use by existing tasks — those tasks are reassigned to the fallback priority (the space's default, or the first remaining one)."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -190,139 +190,148 @@
         "operationId": "listTasks",
         "x-resource-type": "service",
         "parameters": [
-                {
-                    "name": "space_id",
-                    "in": "path",
-                    "required": true,
-                    "schema": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "name": "archived",
-                    "in": "query",
-                    "schema": {
-                        "type": "boolean"
-                    }
-                },
-                {
-                    "name": "scheduled",
-                    "in": "query",
-                    "schema": {
-                        "type": "boolean"
-                    }
-                },
-                {
-                    "name": "limit",
-                    "in": "query",
-                    "description": "How many maximum results should be returned",
-                    "schema": {
-                        "type": "integer",
-                        "default": 300
-                    }
-                },
-                {
-                    "name": "offset",
-                    "in": "query",
-                    "description": "If there are more results than the limit, offset can be used to get to the next batch of results",
-                    "schema": {
-                        "type": "integer",
-                        "default": 0
-                    }
-                },
-                {
-                    "name": "sort_by",
-                    "in": "query",
-                    "description": "Name of the field used for sorting the list of results",
-                    "schema": {
-                        "type": "string",
-                        "default": "created_at"
-                    }
-                },
-                {
-                    "name": "sort_order",
-                    "in": "query",
-                    "description":"Should the results be sorted in ascending or descending order relative to sort_by field",
-                    "schema": {
-                        "type": "string",
-                        "enum": [
-                            "asc",
-                            "desc"
-                        ],
-                        "default": "asc"
-                    }
-                },
-                {
-                    "name": "created_by",
-                    "in": "query",
-                    "description": "Exact match on the user ID of the task creator",
-                    "schema": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "name": "priority",
-                    "in": "query",
-                    "description": "Exact match on priority; comma-separated values to filter by priority",
-                    "schema": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "name": "status",
-                    "in": "query",
-                    "description": "Exact match on status; comma-separated values to filter by multiple statuses",
-                    "schema": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "name": "title",
-                    "in": "query",
-                    "description": "Term search on task title",
-                    "schema": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "name": "assignees",
-                    "in": "query",
-                    "description": "Comma-separated assignee IDs; at least one must match",
-                    "schema": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "name": "reporter",
-                    "in": "query",
-                    "schema": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "name": "created_at",
-                    "in": "query",
-                    "description": "Filter by creation date. Use a single date or a range as `{start_date},{end_date}`",
-                    "schema": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "name": "updated_at",
-                    "in": "query",
-                    "description": "Filter by last-updated date. Use a single date or a range as `{start_date},{end_date}`",
-                    "schema": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "name": "scheduled_at",
-                    "in": "query",
-                    "description": "Filter by scheduled date. Use a single date or a range as `{start_date},{end_date}`",
-                    "schema": {
-                        "type": "string"
-                    }
-                }
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "scheduled",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "How many results to return at most. `has_more` tells you whether another page exists.",
+            "schema": {
+              "type": "integer",
+              "default": 300
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "If there are more results than the limit, offset can be used to get to the next batch of results",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Name of the field used for sorting, such as `created_at`, `updated_at` or `activity_at`.",
+            "schema": {
+              "type": "string",
+              "default": "created_at"
+            }
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "description": "Should the results be sorted in ascending or descending order relative to sort_by field",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            }
+          },
+          {
+            "name": "created_by",
+            "in": "query",
+            "description": "Exact match on the user ID of the task creator",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "description": "Exact match on priority; comma-separated values to filter by priority",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Exact match on status; comma-separated values to filter by multiple statuses",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "description": "Term search on task title",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "assignees",
+            "in": "query",
+            "description": "Comma-separated assignee IDs; at least one must match",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reporter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "created_at",
+            "in": "query",
+            "description": "Filter by creation date. Use a single date or a range as `{start_date},{end_date}`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updated_at",
+            "in": "query",
+            "description": "Filter by last-updated date. Use a single date or a range as `{start_date},{end_date}`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scheduled_at",
+            "in": "query",
+            "description": "Filter by scheduled date. Use a single date or a range as `{start_date},{end_date}`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "external_id",
+            "in": "query",
+            "required": false,
+            "description": "Exact match.",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -337,8 +346,29 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "description": "Not authenticated, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Changed: `external_id` exact-match filter, `has_more` on the reply, and `sort_by=activity_at`. The other filters are unchanged."
       }
     },
     "/workspaces/task": {
@@ -362,15 +392,36 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Task"
+                  "$ref": "#/components/schemas/CreateTaskResponse"
                 }
               }
             }
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "description": "Not authenticated, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Changed: accepts `external_id`, which is a plain indexed attribute here (no uniqueness, no map entry; use the upsert route for that). Integration callers get strict ids."
       }
     },
     "/workspaces/tasks": {
@@ -434,8 +485,29 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "401": {
+            "description": "Not authenticated, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "The reply carries `version`, `external_id` and `activity_at`. Subtasks the caller cannot read are left out."
       },
       "patch": {
         "summary": "Update a task",
@@ -448,6 +520,16 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "description": "Optional task version. A mismatch returns 409 `version_conflict`; a non-integer returns 400 `bad_if_match`. `0` matches a legacy task with no version.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
             }
           }
         ],
@@ -473,12 +555,54 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequest"
+            "description": "Bad request: unreadable body, missing `id`, an invalid `If-Match`, or a task that does not exist (the service answers 400, not 404). A rejected field carries a `code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
+          "401": {
+            "description": "Not authenticated, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`version_conflict` (with `task`) or `external_id_immutable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VersionConflict"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    }
+                  ]
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Changed: optional `If-Match`. Compare-and-set: a lost race is re-checked up to 3 times, then 409 with the current task. Changing or clearing the `external_id` of a mapped task answers `409 external_id_immutable`. A `parent` needs `tasks:read` on the parent's space."
       },
       "delete": {
         "summary": "Delete a task",
@@ -492,6 +616,25 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "description": "Optional task version. A mismatch returns 409 `version_conflict`; a non-integer returns 400 `bad_if_match`. `0` matches a legacy task with no version.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "delete_subtasks",
+            "in": "query",
+            "required": false,
+            "description": "`true` also deletes subtasks.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -500,14 +643,62 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "400": {
+            "description": "`bad_if_match`, or the delete failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`version_conflict` (with `task`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VersionConflict"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    }
+                  ]
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Changed: optional `If-Match`. Check-then-purge, with no compare-and-set. Publishes `task-deleted` and tombstones the task's external ids. With `delete_subtasks=true`, subtasks in spaces the caller cannot write are left behind."
       }
     },
     "/workspaces/task/{task_id}/action": {
       "put": {
         "summary": "Create or update a task checklist action",
-        "description": "Upsert a checklist action on a task. There is no separate create endpoint \u2014 PUT is used for both create and update.\n\nOmit `id` to create a new action (the server assigns one); pass an existing `id` to update that action. `description` is required on every write, including updates that only change `done`.\n\nThe response echoes back the action as submitted, not the stored record \u2014 it does not reflect how a partial update merged with the existing action.",
+        "description": "Upsert a checklist action on a task. There is no separate create endpoint — PUT is used for both create and update.\n\nOmit `id` to create a new action (the server assigns one); pass an existing `id` to update that action. `description` is required on every write, including updates that only change `done`.\n\nThe response echoes back the action as submitted, not the stored record — it does not reflect how a partial update merged with the existing action.",
         "operationId": "setTaskAction",
         "tags": [
           "Task Actions"
@@ -554,7 +745,7 @@
         }
       },
       "get": {
-        "summary": "List task checklist actions \u2014 currently unavailable",
+        "summary": "List task checklist actions — currently unavailable",
         "description": "Intended to return the checklist actions on a task, but this endpoint is currently misrouted server-side and always responds with a 400 validation error instead of a list.\n\nUntil this is fixed, checklist actions are write-only: keep track of the `id` you get back when you create or update an action, since it cannot be listed or read back afterward.",
         "operationId": "listTaskActions",
         "deprecated": true,
@@ -891,13 +1082,838 @@
           }
         }
       }
+    },
+    "/workspaces/space/{space_id}/tasks/external/{external_id}": {
+      "put": {
+        "summary": "Create or update a task by external id",
+        "tags": [
+          "Tasks"
+        ],
+        "description": "Idempotent. Creates (201) when the id is new in this space and namespace, otherwise updates (200). Needs `tasks:write` on the space. A deleted task's id answers 410 forever. Percent-encode the external id.",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "description": "Space id. Case-insensitive; canonical form is upper case.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "external_id",
+            "in": "path",
+            "required": true,
+            "description": "Caller's id, at most 256 bytes of UTF-8, any characters except `/` (`400 invalid_request`). Percent-encode it; an encoded `/` never reaches the service because the gateway decodes it before routing.",
+            "schema": {
+              "type": "string",
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "description": "Optional task version. A mismatch returns 409 `version_conflict`; a non-integer returns 400 `bad_if_match`. `0` matches a legacy task with no version.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskWrite"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTaskResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. `invalid_request` for a bad `external_id` or `bad_if_match` for a non-integer `If-Match`; other failures carry no `code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`version_conflict` (with `task`), `external_id_pending`, or `external_id_immutable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VersionConflict"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "`task_deleted`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The integration check could not run. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/space/{space_id}/changes": {
+      "get": {
+        "summary": "Read the changes feed",
+        "tags": [
+          "Changes"
+        ],
+        "description": "Every task, comment and action write in the space, deletes included, for 30 days. The feed does not hide the caller's own writes: filter on `origin`. Needs `tasks:read`.",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "description": "Space id. Case-insensitive; canonical form is upper case.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Opaque; the `next_cursor` of the previous page.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "1 to 500. Default 100.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "description": "RFC 3339. Used only when there is no cursor.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangesPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`invalid_cursor`, or `invalid_request` for a bad `limit` or `since`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "`cursor_expired`: the cursor is older than retention. Resume from `next_cursor`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CursorExpired"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. A feed read failure carries no `code`; `storage_unavailable` is set only when the integration check could not run.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/space/{space_id}/copy-structure": {
+      "post": {
+        "summary": "Copy a space's structure",
+        "tags": [
+          "Sandbox"
+        ],
+        "description": "Creates a space with the source's default status, statuses, priorities, tags and folders. Not tasks, description, record configs or bindings. People only: integration tokens are refused. `staging: true` needs an account root or admin.",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "description": "Space id. Case-insensitive; canonical form is upper case.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyStructureRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The new space.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Space"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: `name` or `space_id` missing, or an unreadable body. No `code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, `integration_not_allowed` for an integration bearer outside workspaces, the new id is a system Space id, or `staging: true` was sent by a caller who is not root or admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`space_not_found`: the source does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`space exists`: a Space with the new id already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "The space was created but not every folder was copied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The source space could not be read. Retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/space/{space_id}/reset": {
+      "post": {
+        "summary": "Reset a staging space",
+        "tags": [
+          "Sandbox"
+        ],
+        "description": "Account root or admin only. Deletes up to 2000 live and archived tasks per call through the normal delete path (events are published, external ids tombstoned). Call again until `remaining` is 0.",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "description": "Space id. Case-insensitive; canonical form is upper case.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Progress.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceResetResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`space_not_found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`space_not_staging` or `space_bound`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "The task list could not be read.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The space could not be read. Retry. No `code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/task/{task_id}/time-log": {
+      "get": {
+        "summary": "List a task's time logs",
+        "operationId": "listTimeLogs",
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "Task id, such as `OPS-7`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Time logs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeLogList"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "summary": "Log time against a task",
+        "description": "Logs one entry per call. The server sets the id, the user and `created_at`, and ignores any value you send for them. There is no route to edit or delete a log: log a correcting entry instead. Returns the task's whole `time_tracking`.",
+        "operationId": "addTimeLog",
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "Task id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeLog"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The task's time tracking, with totals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeTracking"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/workspaces/task-templates": {
+      "get": {
+        "summary": "List task templates",
+        "operationId": "listTaskTemplates",
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "vertical",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task templates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskTemplateList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/task-template": {
+      "post": {
+        "summary": "Create a task template",
+        "description": "Seeds priority, tags, folder, reporter, assignees, estimate and actions onto a task made from it. It never seeds status or due date.",
+        "operationId": "createTaskTemplate",
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/workspaces/task-template/{id}": {
+      "get": {
+        "summary": "Get a task template",
+        "operationId": "getTaskTemplate",
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Template id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Template",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskTemplate"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a task template",
+        "description": "Tags, assignees and actions replace the stored list when sent.",
+        "operationId": "updateTaskTemplate",
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Template id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTaskTemplateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a task template",
+        "operationId": "deleteTaskTemplate",
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Template id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/workspaces/client": {
+      "post": {
+        "summary": "Create a contact",
+        "description": "Creates a contact in a Space: a record keyed on the Space's base record identity fields, plus a contact folder. An existing folder returns 409. If the Space's base record is set to create sign-ins, a client-role user may also be created for the contact's email; the response says `login_created` or `login_skipped`.",
+        "operationId": "createContact",
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContactRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created contact record, with `login_created` and, when no sign-in was made, `login_skipped`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "login_created": {
+                      "type": "boolean"
+                    },
+                    "login_skipped": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "description": "`space_id` does not name an existing Space.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/workspaces/meetings": {
+      "get": {
+        "summary": "List meeting files in a Space",
+        "description": "One entry per file: video, audio, transcript or summary. An empty list can also mean the meetings index did not answer.",
+        "operationId": "listMeetings",
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "video",
+                "audio",
+                "transcript",
+                "summary"
+              ]
+            }
+          },
+          {
+            "name": "recording_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "folder",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Meeting files",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeetingFileList"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
       "SpaceStatus": {
         "type": "object",
-        "required": ["id", "name"],
+        "required": [
+          "id",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "string"
@@ -920,12 +1936,19 @@
             "type": "boolean",
             "description": "If true, when a task reaches this state, it will not be considered overdue past the due date.",
             "example": true
+          },
+          "role": {
+            "type": "string",
+            "description": "What the status means, such as `intake`, `acknowledged`, `working` or `done`. Used to map statuses between connected accounts."
           }
         }
       },
       "CreateSpaceRequest": {
         "type": "object",
-        "required": ["id", "name"],
+        "required": [
+          "id",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -957,12 +1980,16 @@
             "items": {
               "type": "string"
             }
+          },
+          "staging": {
+            "type": "boolean",
+            "description": "Marks a Space for testing so it can be reset. Only root and admin users can set it."
           }
         }
       },
       "UpdateSpaceRequest": {
         "type": "object",
-        "description": "Fields are merged over the stored space \u2014 send only what you are changing. The space id comes from the path, not the body.",
+        "description": "Fields are merged over the stored space — send only what you are changing. The space id comes from the path, not the body.",
         "properties": {
           "name": {
             "type": "string"
@@ -1034,6 +2061,10 @@
           "default_view": {
             "type": "string",
             "description": "Default board/list view for the space."
+          },
+          "staging": {
+            "type": "boolean",
+            "description": "Marks a Space for testing so it can be reset. Only root and admin users can set it."
           }
         }
       },
@@ -1089,6 +2120,73 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          },
+          "priorities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "staging": {
+            "type": "boolean",
+            "description": "Marks a space for testing. Only root and admin users can set it. Staging spaces can be reset."
+          },
+          "distribution_bindings": {
+            "type": "array",
+            "readOnly": true,
+            "description": "Connections to other accounts. Present on a space connected through distribution.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "distribution_id": {
+                  "type": "string"
+                },
+                "product_id": {
+                  "type": "string"
+                },
+                "side": {
+                  "type": "string",
+                  "enum": [
+                    "publisher",
+                    "distributor"
+                  ]
+                },
+                "counterparty_account_id": {
+                  "type": "string"
+                },
+                "counterparty_name": {
+                  "type": "string"
+                },
+                "folder": {
+                  "type": "string"
+                },
+                "required_roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "status_map": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "bound_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
             }
           }
         }
@@ -1165,13 +2263,15 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "A status id of the space."
           },
           "space_id": {
             "type": "string"
           },
           "due_date": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "scheduled_at": {
             "type": "string",
@@ -1213,12 +2313,87 @@
             },
             "readOnly": true,
             "description": "User ids who muted the task. Only present on the get-task response."
+          },
+          "parent": {
+            "type": "string",
+            "description": "Id of the parent task, when this is a subtask. Setting it needs read access to the parent's space."
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_detail": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "expected_close": {
+            "type": "string"
+          },
+          "time_tracking": {
+            "$ref": "#/components/schemas/TimeTracking"
+          },
+          "version": {
+            "type": "integer",
+            "readOnly": true,
+            "description": "1 on create, +1 on every task write. Comments, time logs and activity stamps never bump it."
+          },
+          "sync_key": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Set when the task is shared with a connected account. Its version then belongs to that shared lineage."
+          },
+          "sync_conflict": {
+            "type": "object",
+            "additionalProperties": true,
+            "readOnly": true,
+            "description": "Present when an incoming change from a connected account conflicted with a local edit."
+          },
+          "external_id": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Your own id for the task, at most 256 bytes of UTF-8."
+          },
+          "activity_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Moves on task, comment, time-log and action writes."
+          },
+          "subtasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "readOnly": true,
+            "description": "Present on list and get responses."
+          },
+          "task_actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskAction"
+            },
+            "readOnly": true
+          },
+          "implementation_date": {
+            "type": "string",
+            "description": "Estimated go-live date, ISO. Stored only; nothing schedules on it."
+          },
+          "assigned_qa": {
+            "type": "string",
+            "description": "User id, offered from the Space's assigned QA users. Not validated against them."
           }
         }
       },
       "CreateTaskRequest": {
         "type": "object",
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "properties": {
           "title": {
             "type": "string"
@@ -1279,6 +2454,61 @@
               "type": "string"
             },
             "description": "Free-form tag ids."
+          },
+          "parent": {
+            "type": "string",
+            "description": "Id of the parent task, when this is a subtask. Setting it needs read access to the parent's space."
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_detail": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "expected_close": {
+            "type": "string"
+          },
+          "external_id": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Your own id for the task, at most 256 bytes of UTF-8."
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Arbitrary metadata bag stored on the task."
+          },
+          "time_tracking": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Set `estimate` only, as `{\"estimate\": {\"time_in_seconds\": n}}`. Logged time goes through the time-log route."
+          },
+          "order": {
+            "type": "number",
+            "description": "Sort order of the task within its column/board."
+          },
+          "identity": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Keys the Space's base record, for example `{\"email\": \"jo@example.com\"}`. Request-only. If the contact link cannot be made the task is still created and the response carries `base_record_skipped`."
+          },
+          "suppress_events": {
+            "type": "boolean",
+            "description": "Hides the write from flow task triggers. The changes feed and webhooks still see it."
+          },
+          "implementation_date": {
+            "type": "string"
+          },
+          "assigned_qa": {
+            "type": "string"
           }
         }
       },
@@ -1289,13 +2519,27 @@
           },
           {
             "type": "object",
-            "required": ["id"],
+            "required": [
+              "id"
+            ],
             "properties": {
               "id": {
                 "type": "string"
               },
               "archived": {
                 "type": "boolean"
+              },
+              "resolve_conflict": {
+                "type": "string",
+                "enum": [
+                  "keep_mine",
+                  "take_theirs"
+                ],
+                "description": "Settles a sync conflict raised by a connected account. `no_conflict` (400) if there is none."
+              },
+              "distribution_share": {
+                "type": "boolean",
+                "description": "Shares a task that existed before its space was connected, with the connected account."
               }
             }
           }
@@ -1303,7 +2547,9 @@
       },
       "UpdateMultiTaskRequest": {
         "type": "object",
-        "required": ["tasks"],
+        "required": [
+          "tasks"
+        ],
         "properties": {
           "tasks": {
             "type": "array",
@@ -1323,7 +2569,12 @@
             }
           },
           "results_total": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Number of results on this page. It is not a total across pages."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "True when another page exists. Left out when false."
           }
         }
       },
@@ -1332,7 +2583,7 @@
         "required": [
           "description"
         ],
-        "description": "A checklist item on a task. `description` is required on every write, not only on create \u2014 an update that only flips `done` still has to resend it.",
+        "description": "A checklist item on a task. `description` is required on every write, not only on create — an update that only flips `done` still has to resend it.",
         "properties": {
           "id": {
             "type": "string",
@@ -1364,7 +2615,7 @@
           "resource_id",
           "resource_type"
         ],
-        "description": "A platform resource linked from a checklist action. Both fields are free-form strings \u2014 the resource is not validated to exist.",
+        "description": "A platform resource linked from a checklist action. Both fields are free-form strings — the resource is not validated to exist.",
         "properties": {
           "resource_id": {
             "type": "string",
@@ -1427,12 +2678,17 @@
             "type": "string",
             "format": "date-time",
             "readOnly": true
+          },
+          "external_author": {
+            "$ref": "#/components/schemas/ExternalAuthor"
           }
         }
       },
       "CreateCommentRequest": {
         "type": "object",
-        "required": ["body"],
+        "required": [
+          "body"
+        ],
         "properties": {
           "body": {
             "type": "string",
@@ -1480,7 +2736,9 @@
       },
       "CommentReactionRequest": {
         "type": "object",
-        "required": ["reaction"],
+        "required": [
+          "reaction"
+        ],
         "properties": {
           "reaction": {
             "type": "object",
@@ -1507,6 +2765,760 @@
             "type": "integer"
           }
         }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "description": "Stable machine code. Branch on this, not on `error`."
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "VersionConflict": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "version_conflict"
+            ]
+          },
+          "task": {
+            "$ref": "#/components/schemas/Task"
+          }
+        },
+        "required": [
+          "error",
+          "code",
+          "task"
+        ]
+      },
+      "CursorExpired": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "cursor_expired"
+            ]
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Resume from here."
+          },
+          "retention_days": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "error",
+          "code",
+          "next_cursor"
+        ]
+      },
+      "ExternalAuthor": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "description": "The person in the other system a comment speaks for. Integration callers only; cleared for everyone else."
+      },
+      "TaskWrite": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "priority": {
+            "type": "string"
+          },
+          "folder": {
+            "type": "string"
+          },
+          "reporter": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "A status id of the space."
+          },
+          "space_id": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scheduled_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "order": {
+            "type": "number"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "time_tracking": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "parent": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_detail": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "expected_close": {
+            "type": "string"
+          },
+          "external_id": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Caller's id, at most 256 bytes of UTF-8."
+          },
+          "suppress_events": {
+            "type": "boolean",
+            "description": "Hides the write from flow task triggers. The changes feed and webhooks still see it."
+          }
+        },
+        "description": "Task fields. On the upsert route, `space_id` and `external_id` come from the path and any body value is ignored."
+      },
+      "CreateTaskResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Task"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "base_record_skipped": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ChangeEvent": {
+        "type": "object",
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "description": "`<account_id>-<stream_sequence>`. Equals the `webhook-id` header of a delivery."
+          },
+          "event_type": {
+            "type": "string",
+            "enum": [
+              "task-created",
+              "task-updated",
+              "task-status-changed",
+              "task-moved",
+              "task-deleted",
+              "task-action-added",
+              "task-action-completed",
+              "task-action-deleted",
+              "comment-created",
+              "comment-updated",
+              "comment-deleted"
+            ]
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "account_id": {
+            "type": "string"
+          },
+          "space_id": {
+            "type": "string"
+          },
+          "folder": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "user",
+                  "integration",
+                  "api_key",
+                  "flow",
+                  "distribution",
+                  "system"
+                ]
+              },
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "id"
+            ]
+          },
+          "actor": {
+            "type": "string"
+          },
+          "task": {
+            "$ref": "#/components/schemas/Task"
+          },
+          "changed_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status_from": {
+            "type": "string",
+            "description": "Set only on a status change."
+          },
+          "old_space_id": {
+            "type": "string",
+            "description": "Set only on a move."
+          },
+          "comment": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true
+          },
+          "action": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true
+          },
+          "old_folder": {
+            "type": "string",
+            "description": "Set only when a task moved between folders."
+          }
+        },
+        "required": [
+          "event_id",
+          "event_type",
+          "occurred_at",
+          "account_id",
+          "space_id",
+          "origin",
+          "task"
+        ]
+      },
+      "ChangesPage": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChangeEvent"
+            }
+          },
+          "next_cursor": {
+            "type": "string"
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "retention_days": {
+            "type": "integer",
+            "enum": [
+              30
+            ]
+          }
+        },
+        "required": [
+          "events",
+          "next_cursor",
+          "has_more",
+          "retention_days"
+        ]
+      },
+      "CopyStructureRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "id": {
+            "type": "string",
+            "description": "Defaults to the upper-cased name with non-word runs replaced by `_`, at most 32 characters."
+          },
+          "staging": {
+            "type": "boolean",
+            "description": "Needs an account root or admin."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "SpaceResetResponse": {
+        "type": "object",
+        "properties": {
+          "space_id": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "integer"
+          },
+          "failed": {
+            "type": "integer",
+            "description": "Tasks in this batch that could not be deleted."
+          },
+          "remaining": {
+            "type": "integer",
+            "description": "Failed plus anything past the cap. Call again until 0. A lower bound when past the cap."
+          },
+          "external_ids_cleared": {
+            "type": "integer",
+            "description": "External-id map entries removed for the space. 0 while tasks remain past the cap; the map is cleared once the space is fully listed."
+          }
+        },
+        "required": [
+          "space_id",
+          "deleted",
+          "failed",
+          "remaining",
+          "external_ids_cleared"
+        ]
+      },
+      "TimeLog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Server-minted, `tl_` followed by random characters."
+          },
+          "time_spent": {
+            "type": "object",
+            "required": [
+              "time_in_seconds"
+            ],
+            "properties": {
+              "time_in_seconds": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "readOnly": true,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "time_spent",
+          "started_at"
+        ]
+      },
+      "TimeTracking": {
+        "type": "object",
+        "properties": {
+          "estimate": {
+            "type": "object",
+            "properties": {
+              "time_in_seconds": {
+                "type": "integer"
+              }
+            }
+          },
+          "logs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimeLog"
+            }
+          },
+          "spent": {
+            "type": "object",
+            "properties": {
+              "time_in_seconds": {
+                "type": "integer"
+              }
+            }
+          },
+          "remaining": {
+            "type": "object",
+            "properties": {
+              "time_in_seconds": {
+                "type": "integer"
+              }
+            }
+          },
+          "progress_percent": {
+            "type": "number"
+          }
+        }
+      },
+      "TaskTemplate": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Server-minted, `tt_` followed by random characters."
+          },
+          "name": {
+            "type": "string",
+            "description": "Shown in the template picker and used as the new task's title."
+          },
+          "description": {
+            "type": "string"
+          },
+          "vertical": {
+            "type": "string",
+            "description": "Groups templates. Empty means generic."
+          },
+          "priority": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "folder": {
+            "type": "string"
+          },
+          "reporter": {
+            "type": "string"
+          },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "estimate": {
+            "type": "object",
+            "properties": {
+              "time_in_seconds": {
+                "type": "integer"
+              }
+            }
+          },
+          "task_actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "kind",
+                "description"
+              ],
+              "description": "A form, document or chat action seeded onto the new task.",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "form",
+                    "document",
+                    "chat"
+                  ]
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        }
+      },
+      "CreateContactRequest": {
+        "type": "object",
+        "required": [
+          "space_id"
+        ],
+        "properties": {
+          "space_id": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "parent_folder": {
+            "type": "string",
+            "description": "Folder of the organisation the contact belongs to."
+          },
+          "config_id": {
+            "type": "string",
+            "description": "Writes the Space's organisation record config instead of its base record."
+          },
+          "extra_data": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "description": "Fields depend on the Space's base record configuration."
+      },
+      "MeetingFile": {
+        "type": "object",
+        "properties": {
+          "space_id": {
+            "type": "string"
+          },
+          "folder": {
+            "type": "string"
+          },
+          "file_type": {
+            "type": "string",
+            "enum": [
+              "video",
+              "audio",
+              "transcript",
+              "summary"
+            ]
+          },
+          "recording_id": {
+            "type": "string"
+          },
+          "bot_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "file": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "mtime": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "TimeLogList": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimeLog"
+            }
+          },
+          "results_total": {
+            "type": "integer"
+          }
+        }
+      },
+      "TaskTemplateList": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskTemplate"
+            }
+          },
+          "results_total": {
+            "type": "integer"
+          }
+        }
+      },
+      "MeetingFileList": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MeetingFile"
+            }
+          },
+          "results_total": {
+            "type": "integer"
+          }
+        }
+      },
+      "UpdateTaskTemplateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Shown in the template picker and used as the new task's title."
+          },
+          "description": {
+            "type": "string"
+          },
+          "vertical": {
+            "type": "string",
+            "description": "Groups templates. Empty means generic."
+          },
+          "priority": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "folder": {
+            "type": "string"
+          },
+          "reporter": {
+            "type": "string"
+          },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "estimate": {
+            "type": "object",
+            "properties": {
+              "time_in_seconds": {
+                "type": "integer"
+              }
+            }
+          },
+          "task_actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "kind",
+                "description"
+              ],
+              "description": "A form, document or chat action seeded onto the new task.",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "form",
+                    "document",
+                    "chat"
+                  ]
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "description": "Every field is optional. Tags, assignees and `task_actions` replace the stored list when sent."
       }
     },
     "responses": {
@@ -1515,12 +3527,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string"
-                }
-              }
+              "$ref": "#/components/schemas/Error"
             }
           }
         }
@@ -1530,12 +3537,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string"
-                }
-              }
+              "$ref": "#/components/schemas/Error"
             }
           }
         }
@@ -1545,12 +3547,17 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string"
-                }
-              }
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
             }
           }
         }

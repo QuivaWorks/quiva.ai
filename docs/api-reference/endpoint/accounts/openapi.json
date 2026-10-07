@@ -1142,6 +1142,620 @@
           "file",
           "content_type"
         ]
+      },
+      "IntegrationError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "description": "Stable machine code. Branch on this, not on `error`."
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "IntegrationScopes": {
+        "type": "object",
+        "description": "Space id to scopes. Space ids are upper-cased on write and match `^\\w{1,64}$`. At most 500 spaces.",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "tasks:read",
+              "tasks:write",
+              "comments:write",
+              "space:configure"
+            ]
+          }
+        }
+      },
+      "IntegrationSecretView": {
+        "type": "object",
+        "properties": {
+          "secret_id": {
+            "type": "string"
+          },
+          "last_4": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "retires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "revoked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_used_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "secret_id",
+          "last_4",
+          "created_at",
+          "created_by"
+        ]
+      },
+      "Integration": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Also the OAuth `client_id`."
+          },
+          "account_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "user_id": {
+            "type": "string",
+            "description": "The principal user that writes are attributed to."
+          },
+          "environment": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Label only in this release."
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/IntegrationScopes"
+          },
+          "secrets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntegrationSecretView"
+            }
+          },
+          "token_epoch": {
+            "type": "integer"
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "account_id",
+          "name",
+          "user_id",
+          "environment",
+          "scopes",
+          "secrets",
+          "token_epoch",
+          "disabled"
+        ]
+      },
+      "CreateIntegrationRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "environment": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/IntegrationScopes"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateIntegrationRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "environment": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/IntegrationScopes"
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        },
+        "description": "A scope or `disabled` change bumps the token epoch: outstanding tokens answer 401 within 30 seconds."
+      },
+      "RotateSecretRequest": {
+        "type": "object",
+        "properties": {
+          "grace_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2592000,
+            "description": "Default 604800 (7 days). 0 retires the old secret immediately."
+          }
+        }
+      },
+      "IntegrationCreated": {
+        "type": "object",
+        "properties": {
+          "integration": {
+            "$ref": "#/components/schemas/Integration"
+          },
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "Shown once."
+          }
+        },
+        "required": [
+          "integration",
+          "client_id",
+          "client_secret"
+        ]
+      },
+      "SecretRotated": {
+        "type": "object",
+        "properties": {
+          "integration": {
+            "$ref": "#/components/schemas/Integration"
+          },
+          "secret_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "Shown once."
+          }
+        },
+        "required": [
+          "integration",
+          "secret_id",
+          "client_secret"
+        ]
+      },
+      "OAuthTokenRequest": {
+        "type": "object",
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "enum": [
+              "client_credentials"
+            ]
+          },
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "grant_type",
+          "client_id",
+          "client_secret"
+        ],
+        "description": "Also accepted form-encoded. Send no Authorization header: the gateway refuses one it cannot resolve before this endpoint runs."
+      },
+      "OAuthTokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "token_type": {
+            "type": "string",
+            "enum": [
+              "Bearer"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Seconds. Cache the token for this long."
+          }
+        },
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in"
+        ]
+      },
+      "TaskSubscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "account_id": {
+            "type": "string"
+          },
+          "integration_id": {
+            "type": "string"
+          },
+          "spaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "event_kinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "task-created",
+                "task-updated",
+                "task-status-changed",
+                "task-moved",
+                "task-deleted",
+                "task-action-added",
+                "task-action-completed",
+                "task-action-deleted",
+                "comment-created",
+                "comment-updated",
+                "comment-deleted"
+              ]
+            },
+            "description": "Empty means all kinds."
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "previous_secret_until": {
+            "type": "string",
+            "format": "date-time",
+            "description": "While in the future, deliveries carry a second signature from the previous secret."
+          },
+          "environment": {
+            "type": "string"
+          },
+          "paused": {
+            "type": "boolean"
+          },
+          "paused_reason": {
+            "type": "string",
+            "enum": [
+              "",
+              "endpoint_gone",
+              "consecutive_failures",
+              "failing_for_24h",
+              "integration_disabled",
+              "scope_removed"
+            ]
+          },
+          "paused_at": {
+            "type": "string"
+          },
+          "consecutive_failures": {
+            "type": "integer"
+          },
+          "failing_since": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "account_id",
+          "integration_id",
+          "spaces",
+          "event_kinds",
+          "url",
+          "paused"
+        ]
+      },
+      "CreateSubscriptionRequest": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048,
+            "description": "https only. Private, loopback and link-local hosts are refused."
+          },
+          "spaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "description": "Each space needs `tasks:read` on the integration."
+          },
+          "event_kinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "task-created",
+                "task-updated",
+                "task-status-changed",
+                "task-moved",
+                "task-deleted",
+                "task-action-added",
+                "task-action-completed",
+                "task-action-deleted",
+                "comment-created",
+                "comment-updated",
+                "comment-deleted"
+              ]
+            }
+          }
+        },
+        "required": [
+          "url",
+          "spaces"
+        ]
+      },
+      "UpdateSubscriptionRequest": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048,
+            "description": "https only. Private, loopback and link-local hosts are refused."
+          },
+          "spaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "description": "Each space needs `tasks:read` on the integration."
+          },
+          "event_kinds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "task-created",
+                "task-updated",
+                "task-status-changed",
+                "task-moved",
+                "task-deleted",
+                "task-action-added",
+                "task-action-completed",
+                "task-action-deleted",
+                "comment-created",
+                "comment-updated",
+                "comment-deleted"
+              ]
+            }
+          },
+          "paused": {
+            "type": "boolean",
+            "enum": [
+              false
+            ],
+            "description": "Only `false` is accepted: it resumes and clears the failure counters. The delivery worker does the pausing."
+          },
+          "rotate_secret": {
+            "type": "boolean",
+            "description": "Issues a new secret, returned once. The previous secret keeps signing for 24 hours."
+          }
+        }
+      },
+      "SubscriptionCreated": {
+        "type": "object",
+        "properties": {
+          "subscription": {
+            "$ref": "#/components/schemas/TaskSubscription"
+          },
+          "secret": {
+            "type": "string",
+            "description": "`whsec_` + base64 of 32 bytes. Shown once."
+          }
+        },
+        "required": [
+          "subscription",
+          "secret"
+        ]
+      },
+      "SubscriptionUpdated": {
+        "type": "object",
+        "properties": {
+          "subscription": {
+            "$ref": "#/components/schemas/TaskSubscription"
+          },
+          "secret": {
+            "type": "string",
+            "description": "Present only when `rotate_secret` was true."
+          }
+        },
+        "required": [
+          "subscription"
+        ]
+      },
+      "ReplayRequest": {
+        "type": "object",
+        "properties": {
+          "from_cursor": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              }
+            ],
+            "description": "Exclusive start. Required unless `test` is true."
+          },
+          "to_cursor": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              }
+            ],
+            "description": "Inclusive end. Omit or 0 for the end of the stream. Must be greater than `from_cursor`."
+          },
+          "test": {
+            "type": "boolean",
+            "description": "Send a synthetic `test` event instead. Works on a paused subscription."
+          }
+        }
+      },
+      "ReplayAccepted": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "replay",
+              "test"
+            ]
+          }
+        },
+        "required": [
+          "request_id",
+          "type"
+        ]
+      },
+      "TaskDelivery": {
+        "type": "object",
+        "properties": {
+          "stream_seq": {
+            "type": "integer",
+            "description": "0 is the latest test event."
+          },
+          "event_id": {
+            "type": "string"
+          },
+          "event_type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "sending",
+              "delivered",
+              "retrying",
+              "failed"
+            ]
+          },
+          "attempts": {
+            "type": "integer"
+          },
+          "last_status_code": {
+            "type": "integer"
+          },
+          "latency_ms": {
+            "type": "integer"
+          },
+          "response_excerpt": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "delivered_at": {
+            "type": "string"
+          },
+          "last_error": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "stream_seq",
+          "event_id",
+          "status"
+        ]
+      },
+      "DeliveryPage": {
+        "type": "object",
+        "properties": {
+          "deliveries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskDelivery"
+            }
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Empty when there is no next page."
+          },
+          "has_more": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "deliveries",
+          "next_cursor",
+          "has_more"
+        ]
       }
     }
   },
@@ -1173,6 +1787,14 @@
     {
       "name": "Mesh Nodes",
       "description": "Operations related to mesh node management"
+    },
+    {
+      "name": "Integrations",
+      "description": "Machine identities and client credentials for task sync"
+    },
+    {
+      "name": "Task Subscriptions",
+      "description": "Webhook subscriptions that push task events to your endpoint"
     }
   ],
   "paths": {
@@ -5581,6 +6203,1308 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oauth/token": {
+      "post": {
+        "summary": "Mint an integration token",
+        "tags": [
+          "Authentication"
+        ],
+        "security": [],
+        "description": "Public. Cache the token for `expires_in`: every mint creates a session. The reply is not wrapped in `data`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthTokenRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthTokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthTokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`invalid_request`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "`invalid_client`. The text is the same for every cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "`temporarily_unavailable`. Retry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/integrations": {
+      "post": {
+        "summary": "Create an integration",
+        "tags": [
+          "Integrations"
+        ],
+        "description": "Account root or admin. Returns the first `client_secret` once.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIntegrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/IntegrationCreated"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. `code` names the cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List integrations",
+        "tags": [
+          "Integrations"
+        ],
+        "description": "Deleted records are included with `deleted_at`.",
+        "responses": {
+          "200": {
+            "description": "Integrations, oldest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Integration"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/integrations/{id}": {
+      "get": {
+        "summary": "Read an integration",
+        "tags": [
+          "Integrations"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The integration. Never carries a secret or hash.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Integration"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update or disable an integration",
+        "tags": [
+          "Integrations"
+        ],
+        "description": "A scope or `disabled` change bumps the token epoch and prunes subscriptions that cover spaces no longer readable.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIntegrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Integration"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. `code` names the cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an integration",
+        "tags": [
+          "Integrations"
+        ],
+        "description": "Keeps the record for attribution. Revokes every secret, disables it, drops its sessions and pauses its subscriptions.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Integration"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/integrations/{id}/secrets": {
+      "post": {
+        "summary": "Rotate the client secret",
+        "tags": [
+          "Integrations"
+        ],
+        "description": "Issues a new secret, shown once. The previous live secret retires after `grace_seconds`. At most two secrets are live.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RotateSecretRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rotated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SecretRotated"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. `code` names the cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`two_secrets_live`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/integrations/{id}/secrets/{secret_id}": {
+      "delete": {
+        "summary": "Revoke a client secret",
+        "tags": [
+          "Integrations"
+        ],
+        "description": "Immediate. Bumps the token epoch and drops the integration's sessions.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "secret_id",
+            "in": "path",
+            "required": true,
+            "description": "Secret id (`S` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The integration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Integration"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/integrations/{id}/subscriptions": {
+      "post": {
+        "summary": "Create a webhook subscription",
+        "tags": [
+          "Task Subscriptions"
+        ],
+        "description": "Up to 25 per integration. `400 bad_url`, `400 space_not_in_scope`, `409 subscription_limit`, `409 integration_disabled`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscriptionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SubscriptionCreated"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. `code` names the cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict. `code` names the cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List webhook subscriptions",
+        "tags": [
+          "Task Subscriptions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscriptions, oldest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TaskSubscription"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/integrations/{id}/subscriptions/{sid}": {
+      "patch": {
+        "summary": "Update, resume or rotate a subscription",
+        "tags": [
+          "Task Subscriptions"
+        ],
+        "description": "`paused: false` resumes and answers `409 integration_disabled` while the integration is disabled.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "description": "Subscription id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubscriptionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SubscriptionUpdated"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. `code` names the cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict. `code` names the cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a subscription",
+        "tags": [
+          "Task Subscriptions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "description": "Subscription id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "deleted": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/integrations/{id}/subscriptions/{sid}/replay": {
+      "post": {
+        "summary": "Replay events or send a test event",
+        "tags": [
+          "Task Subscriptions"
+        ],
+        "description": "Queued in the background; read the outcome in the delivery log. Replay covers `from < sequence <= to`, ignores delivered markers, keeps kind and echo filters, and is capped at 10 000 events. A paused subscription refuses replay (`409 subscription_paused`) but accepts a test.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "description": "Subscription id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplayRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ReplayAccepted"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. `code` names the cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict. `code` names the cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/integrations/{id}/subscriptions/{sid}/deliveries": {
+      "get": {
+        "summary": "Read the delivery log",
+        "tags": [
+          "Task Subscriptions"
+        ],
+        "description": "Newest first. Rows are kept 30 days.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Integration id (`I` + 12 hex).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "description": "Subscription id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "`next_cursor` from the previous page.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "1 to 200. Default 50.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DeliveryPage"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. `code` names the cause.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated, the caller is not a root or admin user, or the integration token was revoked (`token_revoked`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: `scope_denied`, or `integration_not_allowed` for an integration bearer outside workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A backing store is unreachable. Retry. `code` is `storage_unavailable`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationError"
                 }
               }
             }
