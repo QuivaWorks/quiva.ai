@@ -1,0 +1,127 @@
+---
+title: 'Connector definitions'
+description: 'The JSON document that teaches the platform to talk to a tracker or data source'
+icon: 'file-code'
+---
+
+A **connector definition** describes an outside service: where it lives, how to sign in, which operations you can call, and how errors are handled. The platform runs every call from the definition, so there is no code to deploy. A definition with a [`sync` block](/developers/connectors/sync) can also keep that service's items and a Space in step.
+
+Most people never write one. [Connecting a tracker](/essentials/account/connections) uses a definition that already ships, such as the one for Shortcut. Read on if you are adding a tracker that is not offered yet.
+
+## Where definitions live
+
+Store a definition with `PUT /connector/definition` on your account's gateway, as an admin or root user. The definition is validated when you store it, and one with problems is refused with a list of them. Run `GET /connector/definitions` to list what your account has.
+
+## Top-level keys
+
+| Key | Required | Meaning |
+|---|---|---|
+| `id` | Yes | Short id, such as `acme-tracker`. Operations and bindings refer to it as the `connection`. |
+| `version` | Yes | Integer you increase when you change the definition |
+| `label`, `description`, `icon` | No | What people see. `icon` is a generic icon name, never a URL. |
+| `hosts` | Yes | `primary` base URL, optional `failover` URLs, and `params` for placeholders such as a workspace name in the host |
+| `auth` | Yes | How calls sign in. See below. |
+| `credentials` | Yes | `source`: `account` uses a secret the account stored; `platform_opt_in` lets an account use a platform-held credential |
+| `limits` | Yes | `timeout_ms`, `max_response_bytes`, `concurrency` and `rate_per_minute` |
+| `errors` | Yes | Rules that turn responses into error kinds, and which kinds retry or fail over |
+| `binding` | No | The parameters one link of this connection takes, such as which workflow to sync |
+| `probe` | No | An operation that identifies the connection's own member; its values feed `$probe.*` in a sync |
+| `operations` | Yes | The calls the connection can make |
+| `sync` | No | Makes the connection a [task sync](/developers/connectors/sync) |
+
+Secret values never appear in a definition. A definition names a secret, such as `ACME_API_TOKEN`, and the account stores its value in the secrets manager.
+
+### Authentication
+
+`auth.type` is one of the following.
+
+| Type | Sends credentials as |
+|---|---|
+| `none` | Nothing |
+| `bearer` | An `Authorization: Bearer` header from `secret` |
+| `api_key` | A header or query parameter, named by `in` and `name`, from `secret` |
+| `basic` | Basic auth from `username` and `password` secrets |
+| `params` | Named request parameters, each from a secret |
+| `token_grant` | A token minted from a `token_url` with a `password` or `client_credentials` grant, then cached |
+
+### Errors
+
+`errors.classify` is an ordered list of rules. Each matches a `status` (a number, a list, or `4xx`/`5xx`) and optionally a `body` pattern, and gives a `kind` such as `credentials_rejected`, `not_found`, `rate_limited` or `server_error`. `retry_on` lists the kinds that are retried, and `failover_on` the kinds that move to the next host.
+
+### Operations
+
+Each operation is one call.
+
+| Key | Meaning |
+|---|---|
+| `id` | Name other parts of the definition use, such as `read_item` |
+| `method`, `path` | The HTTP call. `path` may hold `{placeholders}` filled from `path_params`. |
+| `query`, `headers`, `request` | What to send. `request.encoding` is `json`, `form` or `xml`, with a `body` template. |
+| `response` | `parse` is `json`, `xml` or `text` |
+| `map` | Reshapes the parsed response into the result |
+| `roles` | Which roles may run it |
+| `retry`, `cache`, `assert`, `timeout_ms` | Per-operation tuning |
+
+Templates are a literal, a JSONPath beginning with `$`, or a directive object (`path`, `const`, `transform`). Operation inputs are on `$.params`, and the parsed reply is on `$.body`.
+
+### A small example
+
+```json
+{
+  "id": "acme-tracker",
+  "version": 1,
+  "label": "Acme Tracker",
+  "hosts": { "primary": "https://api.acme-tracker.example" },
+  "auth": { "type": "api_key", "in": "header", "name": "X-Api-Token", "secret": "ACME_API_TOKEN" },
+  "credentials": { "source": "account" },
+  "limits": { "timeout_ms": 10000, "concurrency": 4, "rate_per_minute": 200 },
+  "errors": {
+    "classify": [
+      { "status": 401, "kind": "credentials_rejected" },
+      { "status": 404, "kind": "not_found" },
+      { "status": 429, "kind": "rate_limited" },
+      { "status": "5xx", "kind": "server_error" }
+    ],
+    "retry_on": ["rate_limited", "server_error"]
+  },
+  "probe": "whoami",
+  "operations": [
+    {
+      "id": "whoami",
+      "method": "GET",
+      "path": "/v1/me",
+      "response": { "parse": "json" },
+      "map": { "id": "$.body.id", "name": "$.body.name" }
+    },
+    {
+      "id": "read_item",
+      "method": "GET",
+      "path": "/v1/tickets/{id}",
+      "path_params": { "id": "$.params.id" },
+      "response": { "parse": "json" }
+    }
+  ]
+}
+```
+
+## Making it sync
+
+Add a `sync` block that names the operations to read, create and update an item, maps each field, and says how to read the tracker's webhook. The [sync block reference](/developers/connectors/sync) covers every key.
+
+A definition that ships with the platform adds a setup package: a manifest that tells the Connect wizard which secrets to ask for, which choices to offer and which status, owner and priority maps to show. The help text in the manifest is what the wizard displays.
+
+<Note>
+Escape hatches that run JavaScript, the `eval` field rule and `sync.extensions`, are refused in a definition you store yourself. They are available only to definitions that ship with the platform.
+</Note>
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="The sync block" icon="gears" href="/developers/connectors/sync">
+    Field rules, event normalisation, outcomes and reasons.
+  </Card>
+
+  <Card title="Connect a tracker" icon="plug" href="/essentials/account/connections">
+    What people see when they connect one.
+  </Card>
+</CardGroup>

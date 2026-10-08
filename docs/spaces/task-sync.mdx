@@ -1,0 +1,266 @@
+---
+title: "Task sync"
+description: "Keep Quiva tasks and another system in step using external ids, versions and the changes feed"
+icon: "rotate"
+---
+
+Task sync is a set of API features for keeping tasks in a Space and the same work in another system consistent in both directions. You write to Quiva with an idempotent upsert, protect against lost updates with a version, and read what changed with a cursor-based feed or signed webhooks.
+
+Everything on this page uses the base URL `https://api.quiva.ai` and JSON bodies. Authenticate with an [integration token](/api-reference/task-sync-auth).
+
+<Note>
+The task routes return the object itself, for example a task or `{"results": [...]}`. Only the accounts routes for managing integrations wrap success in `{"data": ...}`. Every error is `{"error": "<text>", "code": "<code>"}`.
+</Note>
+
+## The pieces
+
+| Piece | What it gives you |
+|---|---|
+| **External id** | Your own id on a task, so you can find and update it without storing Quiva's id. |
+| **Upsert** | One idempotent call that creates the task or updates it. |
+| **`version`** | A counter on every task. Send it back as `If-Match` to refuse a stale write. |
+| **`activity_at`** | When anything happened on a task, including comments and time logs. |
+| **Changes feed** | Every task, comment and action write in a Space, in order, with a cursor. |
+| **Webhooks** | The same events pushed to your endpoint. See [Task webhooks](/spaces/task-webhooks). |
+
+## Versions and conditional writes
+
+Every task has an integer `version`. It is 1 when the task is created and goes up by one on every write to the task, including a status change made by ticking a [task action](/spaces/task-actions). It appears in every response and every event.
+
+Comments, time logs, adding or deleting an action and activity stamps do **not** change `version`. They move `activity_at` instead.
+
+Send `If-Match: <version>` on `PATCH` or `DELETE` of a task, or on the upsert, to say "only apply this if the task is still at the version I read".
+
+| Result | Response |
+|---|---|
+| The version matches, or you sent no header | The write goes ahead. With no header the last writer wins. |
+| The version is stale | `409 version_conflict`, with the current `task` in the body. Re-read, merge and retry. |
+| The header is not an integer | `400 bad_if_match` |
+
+```bash
+curl -X PATCH https://api.quiva.ai/workspaces/task/OPS-7 \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "If-Match: 4" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "in_progress"}'
+```
+
+A quoted value such as `"4"` is accepted, and `If-Match: 0` matches an older task that has no version yet.
+
+<Warning>
+Without `If-Match`, a write that keeps losing to concurrent writers can still answer `409 version_conflict` after five attempts. Retry it. A conditional `DELETE` checks the version and then deletes, so a delete that races an update can win. Use `If-Match` to protect updates, not as a lock around deletes.
+</Warning>
+
+## External ids and the upsert
+
+An `external_id` is your id for a task: up to 256 bytes of UTF-8, any characters except `/`. Characters such as `:` and `.` are fine. Percent-encode the id in the URL path.
+
+```bash
+curl -X PUT "https://api.quiva.ai/workspaces/space/OPS/tasks/external/ticket-9041" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Printer on floor 2 is jammed",
+    "status": "todo",
+    "priority": "high"
+  }'
+```
+
+The body is the same as creating or updating a task. The space and external id come from the path, and a body value for either is ignored.
+
+| State | Response |
+|---|---|
+| No task has this id in this Space | The task is created. `201`, with the task as the body. |
+| A task already has it | The task is updated. `200`. Honours `If-Match`. |
+| Another request is creating it right now | `409 external_id_pending` after a short wait. Retry. |
+| The task was deleted | `410 task_deleted`, permanently. |
+
+- The id belongs to one Space. The same external id in another Space is a different task.
+- An integration has its own namespace of ids. Callers that are not integrations share one.
+- A task that is mapped keeps its external id. A `PATCH` that changes or clears it returns `409 external_id_immutable`. Sending the same value is harmless.
+- You can find a task by id: `GET /workspaces/space/OPS/tasks?external_id=ticket-9041` is an exact match.
+- Setting `external_id` on a task through create or `PATCH` without the upsert stores a plain attribute. It does not claim the id and is not unique.
+
+<Warning>
+Deleting a task, by anyone, marks its external ids as deleted for good. Upserting that id again returns `410 task_deleted` and never recreates the task. Use a new id, or create the task with `POST /workspaces/task`. Resetting a [staging Space](/spaces/staging-spaces) is the one exception.
+</Warning>
+
+### Strict ids for integrations
+
+When an integration writes, a status, priority or tag that the Space does not define is refused with `400 unknown_status`, `unknown_priority` or `unknown_tag`. Ids are compared, not names. An empty value clears the field. On a move, the destination Space's lists apply.
+
+## Activity and listing
+
+`activity_at` equals `updated_at` after a task write, and also moves when a comment, time log or action is written. Sort by it to find recent work:
+
+```bash
+curl "https://api.quiva.ai/workspaces/space/OPS/tasks?sort_by=activity_at&sort_order=desc&limit=50" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+The list returns `{"results": [...], "results_total": n}`. `results_total` is the number of tasks on this page, not a total. When more tasks exist, the response includes `"has_more": true`. The field is left out when there are no more, so treat a missing `has_more` as false. Page with `offset`. The default `limit` is 300.
+
+## Read the changes feed
+
+`GET /workspaces/space/{space_id}/changes` returns every task, comment and action write in a Space, deletes included, in order. It needs `tasks:read`.
+
+```bash
+curl "https://api.quiva.ai/workspaces/space/OPS/changes?cursor=1842&limit=100" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+```json
+{
+  "events": [
+    {
+      "event_id": "A1B2C3-1843",
+      "event_type": "task-status-changed",
+      "occurred_at": "2026-10-06T09:15:00Z",
+      "space_id": "OPS",
+      "origin": { "kind": "user", "id": "u_82f1" },
+      "task": { "id": "OPS-7", "version": 4, "external_id": "ticket-9041", "status": "done" },
+      "changed_fields": ["status"],
+      "status_from": "in_progress"
+    }
+  ],
+  "next_cursor": "1843",
+  "has_more": false,
+  "retention_days": 30
+}
+```
+
+| Parameter | Rule |
+|---|---|
+| `cursor` | The `next_cursor` from your previous call. Wins over `since`. A value that is not a number returns `400 invalid_cursor`. |
+| `limit` | 1 to 500. Default 100. |
+| `since` | An RFC 3339 time, used only when there is no cursor. With neither, the feed starts at the oldest event kept. |
+
+- `task` is always the whole task after the change, never a delta.
+- When `has_more` is true, call again straight away with `next_cursor`.
+- An empty page still returns a `next_cursor`. Store it, so an idle Space's cursor stays inside the retention window.
+- History is kept for 30 days. An older cursor returns `410 cursor_expired` with a fresh `next_cursor` and `retention_days`. The events in the gap are gone, so list the Space to catch up, then resume from the new cursor.
+- The feed does not hide your own writes. Skip events whose `origin` is your integration.
+- A feed scoped to a Space also receives `task-moved` when a task leaves it.
+
+### Event types
+
+| `event_type` | When |
+|---|---|
+| `task-created`, `task-updated` | A task was created or edited. A time log is a `task-updated` with `time_tracking` in `changed_fields`. |
+| `task-status-changed` | The status changed. `status_from` holds the old status. |
+| `task-moved` | The task moved to another Space. `old_space_id` is set. |
+| `task-deleted` | The task was deleted. There is no separate tombstone query. |
+| `task-action-added`, `task-action-completed`, `task-action-deleted` | A [task action](/spaces/task-actions) changed. |
+| `comment-created`, `comment-updated`, `comment-deleted` | A comment changed. |
+
+### Who made the change
+
+`origin` says where a write came from, which lets you ignore your own.
+
+| `origin.kind` | `origin.id` | Meaning |
+|---|---|---|
+| `integration` | The integration id | An integration wrote it. |
+| `user` | The user id | A person, or a schedule acting for its owner. |
+| `api_key` | The key id, or empty | An API key wrote it. |
+| `flow` | The run id | A flow run wrote it. |
+| `distribution` | The distribution id | A change arrived from a connected account through distribution. |
+| `system` | Empty | No bearer was involved. |
+
+## A minimal sync loop
+
+This loop pulls changes from Quiva, pushes your system's changes with the upsert, and avoids echoing its own writes.
+
+```js
+const BASE = "https://api.quiva.ai";
+const ME = process.env.QUIVA_CLIENT_ID;
+
+async function api(path, init = {}) {
+  const res = await fetch(BASE + path, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${await getToken()}`, // see Task sync authentication
+      "Content-Type": "application/json",
+      ...init.headers,
+    },
+  });
+  if (res.status === 401) throw new Error("re-mint the token once and retry");
+  return res;
+}
+
+// Quiva to your system
+async function pull(space, cursor) {
+  for (;;) {
+    const res = await api(`/workspaces/space/${space}/changes?limit=200` + (cursor ? `&cursor=${cursor}` : ""));
+    if (res.status === 410) {
+      const gone = await res.json();
+      await fullResync(space);   // events in the gap are lost: list the Space
+      cursor = gone.next_cursor;
+      continue;
+    }
+    const page = await res.json();
+    for (const ev of page.events) {
+      if (ev.origin?.kind === "integration" && ev.origin.id === ME) continue; // our own write
+      await applyToMySystem(ev); // apply only if ev.task.version is newer than what you hold
+    }
+    cursor = page.next_cursor;
+    saveCursor(space, cursor);
+    if (!page.has_more) return cursor;
+  }
+}
+
+// Your system to Quiva
+async function push(space, item) {
+  const id = encodeURIComponent(item.id);
+  const res = await api(`/workspaces/space/${space}/tasks/external/${id}`, {
+    method: "PUT",
+    headers: item.quivaVersion ? { "If-Match": String(item.quivaVersion) } : {},
+    body: JSON.stringify({ title: item.title, status: item.statusId }),
+  });
+  if (res.status === 409) {
+    const body = await res.json();
+    if (body.code === "version_conflict") return resolve(item, body.task);
+    if (body.code === "external_id_pending") return retryLater(item);
+  }
+  if (res.status === 410) return markDeletedInMySystem(item); // deleted in Quiva: never recreated
+  return res.json(); // keep task.version for the next If-Match
+}
+```
+
+Run `pull` on a timer, or trigger it from a [webhook](/spaces/task-webhooks). Test the whole loop against a [staging Space](/spaces/staging-spaces) first.
+
+## Connector sync engine
+
+If your other system is an item tracker, you may not need to write a sync at all. A connector with a `sync` block keeps a Space and the tracker in step in both directions, using these same features underneath: external ids, versioned writes, the changes feed and signed webhooks.
+
+| You want to | Use |
+|---|---|
+| Keep a supported tracker in step with no code | [Connect a tracker](/essentials/account/connections) under **Account**, **Connections** |
+| Add your own steps around a tracker sync | The [Connector step](/flows/steps/connector) in a flow |
+| Support a tracker that is not offered yet | A [connector definition](/developers/connectors/definition) with a [`sync` block](/developers/connectors/sync) |
+| Sync a system that is not a tracker, or control every write | The API on this page, with an [integration](/essentials/account/api-integrations) |
+
+A connected tracker has its own integration and task subscription, which you can see in the integration's delivery log. A task subscription can deliver to a connector's sync address instead of your own endpoint; the engine verifies it and runs the push for you.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Task webhooks" icon="webhook" href="/spaces/task-webhooks">
+    Push the same events to your endpoint, signed.
+  </Card>
+
+  <Card title="Connect a tracker" icon="plug" href="/essentials/account/connections">
+    The no-code option for a supported tracker.
+  </Card>
+
+  <Card title="Errors and limits" icon="triangle-exclamation" href="/api-reference/task-sync-errors">
+    Every code the sync routes return.
+  </Card>
+
+  <Card title="Workspaces API" icon="book" href="/api-reference/endpoint/workspaces/openapi">
+    The full route reference.
+  </Card>
+
+  <Card title="Tasks" icon="list-check" href="/spaces/tasks">
+    Fields on a task and how they work in the app.
+  </Card>
+</CardGroup>

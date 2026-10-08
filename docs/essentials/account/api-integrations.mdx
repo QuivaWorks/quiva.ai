@@ -1,0 +1,118 @@
+---
+title: "API Integrations"
+description: "Give an outside system its own credentials to read and write tasks in the Spaces you choose"
+icon: "plug"
+---
+
+An **API integration** is a named identity for a machine client: a backend service, a script, or a flow that keeps your tasks in step with another tool. It has its own credentials, it can only reach the Spaces you give it, and every change it makes is attributed to the integration by name, not to a person.
+
+Integrations are for root and admin users. They live under **Account**, then **Connections**, in the **API integrations** section.
+
+<Info>
+An integration is not an [API key](/essentials/security/api-keys). An API key acts as the user who made it. An integration is its own principal, takes no seat, never appears in the members list, and cannot be used to sign in. Its tokens last one hour and only work on task routes.
+</Info>
+
+## What an integration can do
+
+| You want to | Give it |
+|---|---|
+| Read tasks, the change feed and comments in a Space | `tasks:read` |
+| Create, update and delete tasks, run the upsert, log time | `tasks:write` |
+| Write, edit and delete its own comments, and add reactions | `comments:write` |
+| Edit a Space's statuses, priorities and tags | `space:configure` |
+
+Scopes are granted **per Space**. A Space with nothing ticked is out of reach: the integration cannot list it, read it or write to it. An integration can hold scopes on up to 500 Spaces.
+
+<Note>
+Moving a task to another Space needs `tasks:write` on the destination as well as the source.
+</Note>
+
+`space:configure` is deliberately narrow. It covers the Space's name, description, default status, statuses, priorities and tags. Anything else about a Space (its owner, record sets, modules, views, logo and staging flag) is refused.
+
+When an integration writes, an unknown status, priority or tag is rejected rather than created. Create the status in the Space first, then send its id.
+
+## Create an integration
+
+<Steps>
+  <Step title="Open API integrations">
+    Go to **Account**, then **Connections**, and find **API integrations**. Click **Add**.
+  </Step>
+
+  <Step title="Name it">
+    Use a name that says what the system is, such as "Ticket sync". The name appears on every task and comment the integration writes.
+  </Step>
+
+  <Step title="Choose Space access">
+    Each Space is listed with a checkbox for each scope. Tick only what the client needs. Click **Create**.
+  </Step>
+
+  <Step title="Copy the client secret">
+    A dialog shows the integration's **client ID** and its first **client secret**. The secret is shown once. Copy it into your secret store before you click **I have saved it**.
+  </Step>
+</Steps>
+
+<Warning>
+The client secret cannot be shown again. If you lose it, rotate to issue a new one.
+</Warning>
+
+| Credential | Format |
+|---|---|
+| Client ID | The letter `I` followed by 12 hex characters. It never changes. |
+| Client secret | Starts with `qis_`. At most two are live at once. |
+
+Your client then exchanges the pair for a one-hour token. See [Task sync authentication](/api-reference/task-sync-auth).
+
+## Rotate a secret
+
+Open the integration and use **Rotate** in the **Secrets** card. A new secret is issued and shown once. The old secret keeps working for a **grace period**, so you can switch your client over without downtime.
+
+| Setting | Value |
+|---|---|
+| Grace period | Set in days. The default is 7 days, the maximum is 30, and 0 retires the old secret immediately. |
+| Live secrets | Two at most. You can rotate again only when one is already retiring or revoked. |
+| Age warning | A secret over 90 days old is flagged in the card. |
+| Retiring secret still in use | Admins get one email if a retiring secret is used in the last 24 hours before it stops working. |
+
+Each secret shows when it was last used, which helps you confirm the old one is idle before it retires. A token minted from a retiring secret keeps working until it expires, at most an hour later.
+
+To stop a secret at once, use **Revoke now** on its row. Revoking ends every session the integration has open, and the next call from your client fails.
+
+## Disable, edit and delete
+
+| Action | Effect |
+|---|---|
+| **Edit** | Change the name or the Space access. Changes reach every service within 30 seconds, and tokens already issued stop working. Your client mints a new one. |
+| **Disable** | Tokens are rejected and the integration's webhook subscriptions are paused. **Enable** it again, then resume each subscription. Enabling does not resume them for you. |
+| **Delete** | Secrets stop working and subscriptions are paused. The integration record is kept so past activity stays attributed to it. |
+
+## Webhook subscriptions
+
+Each integration can send task events to your own endpoints. Open the integration and use **Subscriptions** to add an endpoint, choose the Spaces and event types, and see the signing secret. The integration needs `tasks:read` on a Space before you can subscribe to it.
+
+<Card title="Task webhooks" icon="webhook" href="/spaces/task-webhooks">
+  Verify signatures, handle retries and replay missed events.
+</Card>
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Task sync" icon="rotate" href="/spaces/task-sync">
+    Keep tasks in step with another system using external ids, versions and the change feed.
+  </Card>
+
+  <Card title="Task sync authentication" icon="key" href="/api-reference/task-sync-auth">
+    Mint and cache an integration token.
+  </Card>
+
+  <Card title="Staging Spaces" icon="flask" href="/spaces/staging-spaces">
+    Test a sync against a copy of your workflow.
+  </Card>
+
+  <Card title="Connect a tracker" icon="plug" href="/essentials/account/connections">
+    Let the platform create and manage an integration for a supported tracker.
+  </Card>
+
+  <Card title="API keys" icon="code" href="/essentials/security/api-keys">
+    Programmatic access that acts as a person.
+  </Card>
+</CardGroup>

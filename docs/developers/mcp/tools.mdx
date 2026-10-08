@@ -109,7 +109,7 @@ Prefix on the remote server: **`documents_`**. Document templates, generated doc
 
 Prefix on the remote server: **`workspaces_`**. Spaces, tasks, comments and space files.
 
-39 tools.
+41 tools.
 
 | Tool | Purpose | Notes |
 |---|---|---|
@@ -127,13 +127,15 @@ Prefix on the remote server: **`workspaces_`**. Spaces, tasks, comments and spac
 | `create_task` | Create a task. | Write |
 | `get_task` | Get one task by id. | — |
 | `update_task` | Update one task (PATCH merge). | Write |
+| `upsert_task_by_external_id` | Create or update a task keyed by YOUR id (PUT /workspaces/space/`{space_id}`/tasks/external/`{external_id}`). | Write |
+| `list_space_changes` | Read a space's change feed (GET /workspaces/space/`{space_id}`/changes). | — |
 | `update_multi_task` | Batch-update tasks (PATCH /workspaces/tasks). | Write |
 | `delete_task` | Delete a task by id (also purges its comments and reactions). | Delete |
 | `add_time_log` | Log one time entry against a task (PUT /workspaces/task/`{task_id}`/time-log). | Write |
 | `list_time_logs` | List a task's time logs (GET /workspaces/task/`{task_id}`/time-log). | — |
 | `set_task_action` | Create or update a checklist action on a task (PUT /workspaces/task/`{task_id}`/action). | Write |
 | `delete_task_action` | Delete a checklist action from a task (DELETE /workspaces/task/`{task_id}`/action/`{id}`). | Delete |
-| `create_contact` | Create a contact in a space (POST /workspaces/client). | Write |
+| `create_contact` | Create a contact in a space (POST /workspaces/client): a record keyed on the space's base_record identity fields (an upsert — the same person lands on one fo... | Write |
 | `list_task_templates` | List the account's task templates (GET /workspaces/task-templates). | — |
 | `get_task_template` | Get one task template by id (tt_`<random>`). | — |
 | `create_task_template` | Create a task template (POST /workspaces/task-template). | Write |

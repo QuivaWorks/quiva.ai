@@ -57,11 +57,11 @@ Total attempts, not additional ones. `1` or `0` means no retry. Values above `5`
 </ParamField>
 
 <ParamField path="backoff_ms" type="integer">
-Milliseconds to wait between attempts. It is a **constant** wait — there is no exponential backoff and no jitter.
+Milliseconds to wait before the second attempt (default 500). The wait **doubles** on each further attempt and is capped at 30 seconds. A `Retry-After` header giving a number of seconds is honoured when it is longer, up to the same cap.
 </ParamField>
 
 <ParamField path="ignore_response_codes" type="array">
-Response codes that must not trigger a retry.
+Response codes that must not trigger a retry. A step that ends on one of these codes **completes with a result** instead of failing the run, so a [Condition](/flows/steps/condition) step can branch on `$.<step>.status_code`.
 </ParamField>
 
 <ParamField path="timeout" type="integer">
@@ -70,9 +70,9 @@ Per-step timeout in milliseconds.
 
 Only four step types retry: **Function**, **HTTP Request**, **Integration** and **nested flow**. Setting `attempts` on a Map, Eval, Rules or Condition step does nothing — those either work or they do not.
 
-<Warning>
-**"Ignore Response Codes" does not ignore the error.** A code in that list is logged, the retry is skipped, and the step still fails the run. There is no setting that lets a flow continue past a 4xx or 5xx from an HTTP Request step. If a non-2xx response is a normal outcome for your integration, call it through a Function step and branch on the body instead.
-</Warning>
+<Note>
+Retries run **inside** the step: it completes once, with the final result, and the steps after it run once. An HTTP Request step retries transport errors, `5xx`, `408` and `429`, not other `4xx`. A nested flow retried with `attempts` starts the child flow again from the beginning, so only use it on children that are safe to run twice.
+</Note>
 
 A retry re-runs the step from the beginning, including its side effect. A step that publishes a message, writes a key or posts to an API will do it again.
 

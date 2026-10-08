@@ -1,0 +1,303 @@
+---
+title: 'The sync block'
+description: 'Reference for the sync block of a connector definition: field rules, event normalisation, comments, outcomes and reasons'
+icon: 'gears'
+---
+
+The `sync` block turns a [connector definition](/developers/connectors/definition) into a two-way task sync. It says how to identify a tracker item, which operations to call, how each task field maps to a tracker field, and how to read the tracker's webhook. The engine does the rest: it receives signed events, writes tasks, pushes task changes back and records every run.
+
+Connecting a tracker that ships with a sync block takes no flow and no code. See [Connect a tracker](/essentials/account/connections). The platform ships one such definition today, for Shortcut. The examples below use a made-up tracker called Acme Tracker so they apply to any service.
+
+## Reference syntax
+
+Inside the block, these forms are available.
+
+| Form | Meaning |
+|---|---|
+| `$.path` | JSONPath over the tracker item or event being read |
+| `$binding.<param>` | A parameter of the connection's binding, such as which project syncs |
+| `$probe.<key>` | A value the connection's probe operation returned, such as the connection's own member id |
+| `$task.<field>` | A task field. Only in `outbound.create` and `outbound.link_back`. |
+| `{{name}}` | A brace template |
+
+A sync block holds no secret references. The webhook's signing secret is stored by name on the connection's ingress record, not in the definition.
+
+## Top-level keys
+
+| Key | Required | Meaning |
+|---|---|---|
+| `entity` | Yes | How a tracker item is identified and linked to a task |
+| `operations` | Yes | The definition's own operations the engine calls |
+| `scope` | No | Rules an item must satisfy to sync |
+| `echo` | No | Skips events caused by the connection's own writes |
+| `fields` | Yes | One mapping per task field. At least one, and `archived` must be mapped. |
+| `inbound` | Yes | The webhook's signature scheme and how to read its events |
+| `outbound` | Yes | Which task events push, how a new item is created, and the link back |
+| `comments` | No | Comment mirroring. Needs `operations.comments`. |
+| `delete` | Yes | Fixed at `{"inbound": "archive_task", "outbound": "archive_remote"}` |
+
+A deleted item on one side archives its counterpart on the other. Nothing is hard-deleted.
+
+### A minimal block
+
+```json
+{
+  "sync": {
+    "entity": {
+      "label": "Ticket",
+      "id": "$.id",
+      "id_pattern": "^\\d+$",
+      "url": "$.web_url",
+      "external_id_prefix": "acme:"
+    },
+    "operations": { "read": "read_ticket", "create": "create_ticket", "update": "update_ticket" },
+    "scope": [{ "path": "$.project_id", "equals": "$binding.project_id" }],
+    "fields": [
+      { "task": "title", "remote": "title", "rule": "verbatim" },
+      { "task": "archived", "remote": "archived", "rule": "boolean" }
+    ],
+    "inbound": {
+      "signature": { "scheme": "hmac-sha256", "header": "X-Signature", "encoding": "hex" },
+      "events": {
+        "items": "$.changes[*]",
+        "id": "$.ticket_id",
+        "action": "$.type",
+        "kinds": [{ "match": { "object": "ticket" }, "kind": "item" }],
+        "actions": { "ticket.created": "create", "ticket.updated": "update", "ticket.deleted": "delete" }
+      }
+    },
+    "outbound": {},
+    "delete": { "inbound": "archive_task", "outbound": "archive_remote" }
+  }
+}
+```
+
+## `entity`
+
+| Key | Required | Meaning |
+|---|---|---|
+| `label` | No | Display noun such as `Ticket`. Fills `{{entity.label}}`. |
+| `id` | Yes | JSONPath of the item id on the tracker's object |
+| `id_pattern` | Yes | A regular expression every id must match. An id that does not is skipped as `bad_id`. |
+| `url` | No | JSONPath of the item's URL |
+| `external_id_prefix` | Yes | Prefix of the task's `external_id`, such as `acme:`. No spaces. |
+
+The task's `external_id` is the prefix plus the item id. That is how the engine finds the task for an item, and the item for a task. See [External ids](/spaces/task-sync#external-ids-and-the-upsert).
+
+## `operations`
+
+Each value names one of the definition's own operations.
+
+| Key | Required | Params the engine passes |
+|---|---|---|
+| `read` | Yes | `id` |
+| `create` | Yes | `body` |
+| `update` | Yes | `id`, `body` |
+| `search_by_external` | No, but warns | `external_id`. Finds an item an earlier, lost delivery already created, so a redelivery links instead of duplicating. |
+| `delete` | No | `id`. Removes a duplicate made by a push whose link failed. Without it the duplicate is archived. |
+| `labels` | No | None. The catalogue a `known` parameter reads. |
+| `member` | No | `id` |
+| `comments` | With `comments` | `list`, `read`, `create`, `update` and `delete`, all required. Params are `parent_id`, `id` and `body`. |
+
+## `scope` and `echo`
+
+| Key | Fields | Rule |
+|---|---|---|
+| `scope[]` | `path`, `equals`, `when_set` | Every rule's path must equal its value, which may be a `$binding` reference. `when_set: true` makes a rule inert when the value is empty, for an optional filter. Applies to items and comments, both directions. A failure gives reason `out_of_scope`. |
+| `echo` | `remote_actor`, `connection_actor` | An event whose actor is the connection's own member is skipped with reason `echo`. A comment written by that member is skipped with reason `author_is_connection`. |
+
+`remote_actor` is a JSONPath on the event. `connection_actor` is a `$probe.*` or `$binding.*` value, usually the member id the probe returned.
+
+## `fields`
+
+Each entry is `{task, remote, rule, ...parameters}`. `task` is one of the nine synced task fields, each mapped at most once. `remote` is the tracker's field name, with no spaces. A parameter the rule does not list is refused.
+
+| Task field | Typical rule |
+|---|---|
+| `title`, `description` | `verbatim` |
+| `status` | `role_map` |
+| `tags` | `mapped_subset_by_name` |
+| `assignees` | `mapped_subset_by_id` |
+| `priority` | `custom_field_value` |
+| `time_tracking.estimate.time_in_seconds` | `scaled_number` |
+| `due_date` | `date` |
+| `archived` | `boolean` |
+
+Every rule works in both directions and answers "equal" as well: both sides are compared in a canonical form, and a write is sent only for a field that differs. A field already in step writes nothing.
+
+| Rule | Parameters (`*` required) | Tracker to task | Task to tracker |
+|---|---|---|---|
+| `verbatim` | None | Copies the string | Copies the string |
+| `role_map` | `to_role`*, `from_role`*, `remote_type` (`integer` or `string`), `keep_roleless_unless` (`state_changed`) | The tracker's state to a role, then to the Space status that holds that role. An unmapped state writes nothing. With `keep_roleless_unless: state_changed`, a task status that has no role is kept unless this event changed the state. | The task status's role to a tracker state, typed by `remote_type`. No role or no mapping writes nothing. |
+| `mapped_subset_by_name` | `remote_name`*, `remote_write`*, `known`, `case` (`insensitive` or `exact`) | Tracker names matched to Space tags by name. Task tags the tracker has never heard of are kept. | Tag names rendered through the `remote_write` template (`{{name}}`). Tracker entries that are not Space tags are kept. `known` is `{operation, path}` and reads the tracker's own catalogue. |
+| `mapped_subset_by_id` | `map`*, `exclude`, `report`, `single` | Tracker ids through `map`. Unmapped ids are collected under the `report` key, except `exclude`. Unmapped task assignees are kept. | Task ids back through `map`. Tracker ids with no mapping are kept. `single: true` writes one id or null. |
+| `custom_field_value` | `map`*, `field_id`, `item` (`{field, value}`), `clear` (`space_default` or `empty`), `disabled_when_empty` | One value of a tracker custom field through `map`. A cleared value gives the Space's default priority, or empty with `clear: empty`. An unmapped value writes nothing. | The task value back through `map`. Other custom field entries are kept. `disabled_when_empty` names a parameter, such as `field_id`, that turns the rule off when it is empty. |
+| `scaled_number` | `unit_seconds`*, `snap_to`, `compare` (`remote_granularity` or `exact`), `clear_task_with`, `skip_when_scale_empty` | Tracker units times `unit_seconds` (`{multiply, by}`) to seconds. An unset value gives `clear_task_with` if set, else 0. | Seconds to units, rounded half up and snapped to the nearest `snap_to` value (ties go up). 0 and null both mean unset. |
+| `date` | `clear_with` (null) | A UTC date at midnight, `T00:00:00Z`. Compared by date only. | The same. A cleared task date writes `clear_with`. |
+| `boolean` | `truthy` (`non_null`) | Copies a flag. `non_null` reads any value except null as true. | The same |
+
+<Note>
+Parameters that take a map or a list, such as `map`, `exclude` or `snap_to`, accept `$binding.*` and `$probe.*` references. The map for `role_map` usually comes from the status map a person fills in during setup.
+</Note>
+
+The `eval` rule, which runs JavaScript snippets for a field the rules above cannot express, is available only to definitions that ship with the platform. A definition you store yourself that uses it is refused.
+
+### Roles
+
+`role_map` goes through a **role**, not a status name. Each Space status has a role such as `todo`, `working` or `done`. The tracker's states map to roles, and each role maps back to one state, so a Space can rename or add statuses without breaking the sync. A status with no role is never overwritten by an inbound change, unless `keep_roleless_unless` says otherwise.
+
+## `inbound`
+
+| Key | Meaning |
+|---|---|
+| `signature` | How to verify the tracker's webhook. The same fields as the [webhook trigger](/flows/triggers/webhook#verifying-a-signature): `scheme` (`hmac-sha256` or `standard-webhooks`), `header`, `encoding` (`hex` or `base64`), `prefix`, `timestamp_header`, `tolerance_seconds` (0 means 300, the maximum is 3600) and `signed_payload` (a template with `{body}` once, and `{timestamp}` if wanted). |
+| `events` | How to read an event body. Below. |
+
+### Event normalisation
+
+Normalising turns one event body into the items it concerns. It is pure and writes nothing, and the Connector step's [`sync_normalise`](/flows/steps/connector#the-six-operations) runs it for your own flows.
+
+| Key | Required | Meaning |
+|---|---|---|
+| `items` | Yes | JSONPath selecting the list of changes in the event, such as `$.changes[*]` |
+| `id` | Yes | JSONPath of the item id, relative to one change |
+| `action` | Yes | JSONPath of the tracker's action name, relative to one change |
+| `event_id` | No | JSONPath of the event's own id, taken from the whole event. Without it the body's SHA-256 is used, so a replay still dedupes. |
+| `kinds` | Yes | A list of `{match, kind}`. The first entry whose `match` keys all equal the change gives the kind: `item` or `comment`. A match value may be a JSONPath. |
+| `actions` | Yes | The tracker's action name to `create`, `update` or `delete`. Other actions are dropped. |
+| `rank` | No | Strongest first. Defaults to `delete`, `create`, `update`. When one event holds several actions on one item, the strongest wins. |
+| `state_changed` | No | `{any: [{action}, {has: <JSONPath>}]}`. Sets the item's `state_changed`, which `role_map` reads. |
+| `comment_parent` | With comments | Ordered selectors that give the item a comment belongs to. The first non-empty one wins. |
+| `dedupe` | No | `kind:id`: one item per kind and id, keeping the strongest action |
+
+A change is dropped without an error when its id fails `id_pattern`, its action is not in `actions`, its kind is not matched, or it is a comment whose parent is empty or fails the pattern. An event that yields no items is reported as `skipped` with reason `no_items`, and an echo as `skipped` with reason `echo`.
+
+### Comment parents
+
+Some trackers send a comment change with no pointer to the item it belongs to. `comment_parent` is a list of rules; set exactly one selector in each.
+
+| Selector | Reads |
+|---|---|
+| `sibling: {kind, contains: [paths]}` | Another item of that kind in the same event whose listed paths contain this comment's id. Its id is the parent. |
+| `regex: {path, pattern}` | The first capture group of the pattern over the value at `path` |
+| `envelope` | A JSONPath over the whole event |
+| `path` | A JSONPath over the comment change |
+| `unless_equals_item_id` | A modifier: discard a result equal to the comment's own id |
+
+## `outbound`
+
+| Key | Meaning |
+|---|---|
+| `event_kinds` | The task event kinds that push. Empty means `task-created`, `task-updated`, `task-status-changed`, `task-deleted`, `comment-created`, `comment-updated` and `comment-deleted`. You can also allow `task-moved`, `task-action-added`, `task-action-completed` and `task-action-deleted`. |
+| `create.required` | Tracker fields filled on create when no mapped field wrote them. Each is `{role_default: <role>}` (the state mapped to that role, else the first mapped state) or `{const: <value>}`. A constant may use `$binding`, `$probe` and `$task` references. An empty value is left out. |
+| `link_back` | `{field, value, mode}` writes the task's URL to the tracker item. `value` must be a `$task.*` reference, usually `$task.url`. `mode` is `append_unique` (a list) or `set`. Applied on pushed creates and after inbound writes. |
+
+A push is a hint: the engine re-reads the task before writing, so a burst of events does not send stale values. An event caused by the integration's own writes is skipped as `integration_origin`, and an event from another Space as `other_space`. Both stop a loop between the two sides.
+
+## `comments`
+
+Mirrors comments in both directions. Add `operations.comments` as well.
+
+| Key | Meaning |
+|---|---|
+| `inbound.text`, `author`, `url` | JSONPaths on the tracker's comment. Required. |
+| `inbound.deleted` | JSONPath of a deleted flag. True is a delete. |
+| `inbound.author_name` | `{operation, path, fallback}`. Looks up the author's name. If the lookup fails, the `fallback` brace template, such as `{{entity.label}} member`, names them. Truncated to 200 characters. |
+| `inbound.match` | Must be `external_author.url`. The task comment is found by the tracker comment's URL. |
+| `outbound.text_field` | The tracker field that carries the text |
+| `outbound.external_id_field` | The tracker field that holds the task comment's id, so a pushed comment is found again |
+| `outbound.attribution` | A brace template over `{{author_name}}`, `{{platform}}` and `{{body}}`. Required. |
+| `outbound.never` | Only `internal`: internal task comments never leave the platform |
+
+A comment that is only whitespace is skipped as `empty_comment`.
+
+## Outcomes and reasons
+
+Every sync run ends with `{outcome, reason?, task_id?, remote_id?, changed?, unmapped_owners?}`. The set of outcomes is closed.
+
+| Outcome | Meaning | Direction |
+|---|---|---|
+| `applied` | An existing task or comment was written | In |
+| `created` | A task or comment was created | In |
+| `linked` | An item a previous delivery made was found and linked | Out |
+| `pushed` | The tracker item was created or updated, or its comment written | Out |
+| `archived` | The task was archived because the item is gone or archived, or the item was archived because the task was deleted | Both |
+| `in_step` | Both sides already agree, so nothing was written. The reason is `equal`. | Both |
+| `skipped` | Deliberately not synced. `reason` says why. | Both |
+| `conflict` | The task changed under the write and the single retry lost, or a create race found no task | In |
+| `deleted` | The task API refused the write because the task is gone | In |
+| `failed` | A tracker or task call failed. The run keeps the failure kind. | Both |
+
+| Reason | Direction | Meaning |
+|---|---|---|
+| `equal` | Both | Nothing differs |
+| `echo` | In | The event was the connection's own write |
+| `no_items` | In | The event produced no items |
+| `out_of_scope` | Both | `scope` did not match |
+| `unknown_kind` | In | The item kind is not `item` or `comment`, or comments are not configured |
+| `bad_id` | Both | An id failed `id_pattern` or is unsafe in a path |
+| `unlinked` | Both | There is no task for the item, or no tracker item for the task |
+| `internal_comment` | Out | Internal comments never leave |
+| `other_space` | Out | The task belongs to another Space |
+| `foreign_external_id` | Out | The task's `external_id` has a different prefix |
+| `integration_origin` | Out | The event came from this integration |
+| `unreadable_task` | Out | The integration may not read the task |
+| `task_not_found` | Out | The task does not exist |
+| `comment_not_found` | Both | The comment, or its counterpart, does not exist |
+| `unknown_event_kind` | Out | The event kind is not in `outbound.event_kinds` |
+| `author_is_connection` | In | The comment was written by the connection's own member |
+| `remote_not_found` | Out | The linked tracker item no longer exists |
+| `empty_comment` | Both | The comment text is blank |
+
+`no_parent` and `scale_empty` are reserved and not currently reported.
+
+### How a run behaves
+
+Applying an item creates the task when none is linked and the item exists, archives the task when the item is gone, and updates it otherwise. A create that loses an `external_id` race waits briefly, re-reads and applies once. An update that meets a version conflict re-applies once on the version it was given.
+
+Pushing creates the tracker item at most once. It searches by external id first, so a redelivery links instead of duplicating, and if linking back fails after a create, the duplicate is removed with `operations.delete`, or archived if there is none.
+
+Deliveries are idempotent: a redelivered event lands on the same run and does nothing. A run that failed with a retryable error is run again on redelivery. Items that touch one tracker object run one at a time, and a comment waits for its parent item.
+
+## The webhook address
+
+Each connection has two signed addresses on your gateway. Both take `POST /connector/sync/<ingress id>`, where the id is `in` followed by 24 hex characters, and the account is read from the address, never from the request.
+
+| Address | Caller | Signature checked with |
+|---|---|---|
+| Tracker | The tracker's webhook | `sync.inbound.signature` and the connection's webhook secret |
+| Task | The [task webhook](/spaces/task-webhooks) subscription for the Space | Standard Webhooks and the subscription's secret |
+
+The body is verified as raw bytes before it is read, and is limited to 4 MiB. You never create these addresses yourself. [Connecting a tracker](/essentials/account/connections) registers the tracker's webhook at its address, and creates the task subscription pointing at the other.
+
+| Status | When |
+|---|---|
+| 202 | A tracker delivery was accepted. Each item is queued and applied in the background. |
+| 200 | A task delivery ran, or was already handled. The body carries `outcome`, `reason` and `run_id`. |
+| 503 | A task delivery failed in a way worth retrying. The subscription redelivers. |
+| 401 | The address is unknown, the body is empty, or the signature check failed. Nothing runs. |
+| 400 | The body is not JSON |
+| 413 | The body is over 4 MiB |
+| 422 | The definition's normalisation failed |
+
+Refused calls are counted on the connection card. Runs, one per item or task event, are kept for 30 days and appear in the card's **Run log**.
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Connector definitions" icon="file-code" href="/developers/connectors/definition">
+    The document the sync block belongs to.
+  </Card>
+
+  <Card title="Connector step" icon="plug" href="/flows/steps/connector">
+    Normalise, apply and push from your own flow.
+  </Card>
+
+  <Card title="Task sync" icon="rotate" href="/spaces/task-sync">
+    External ids, versions and the changes feed.
+  </Card>
+
+  <Card title="Connect a tracker" icon="gears" href="/essentials/account/connections">
+    The setup wizard and connection card.
+  </Card>
+</CardGroup>

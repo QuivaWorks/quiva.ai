@@ -1,0 +1,127 @@
+---
+title: 'Connector'
+description: 'Run an operation of a connected tracker or data source, or one step of a task sync, from a flow'
+icon: 'plug'
+---
+
+# Connector Step
+
+A Connector step runs one operation of a connection you have already set up under **Account**, then **Connections**. It can call an operation the connection defines, look up the choices a connection offers, or run one step of a [task sync](/spaces/task-sync#connector-sync-engine): turn a tracker's event into items, compare an item with its task, write an item to a task, or push a task to the tracker.
+
+<Info>
+You do not need this step to keep a tracker and a Space in step. [Connecting a tracker](/essentials/account/connections) sets up the webhook, the mapping and the task subscription for you, and syncing runs with no flow. Use the step only to add your own logic around a sync, such as extra checks, notifications or a log.
+</Info>
+
+The step is also offered as the `connector` group on a **Quiva Endpoint** step. Both run the same six operations.
+
+---
+
+## Adding one
+
+Add a **Connector** step from the **Add Node** panel. On the **Connector** tab, choose an operation, then fill in the fields it asks for. A **JSON Editor** button opens the whole payload as raw JSON.
+
+Changing the operation keeps only the fields the new operation also has, so check the payload after you switch.
+
+<Warning>
+The step runs with the flow run's own identity, not yours. The sync operations are refused unless that identity has the **admin**, **root** or **developer** role.
+</Warning>
+
+---
+
+## The six operations
+
+| Operation | Label in the editor | Does | Writes |
+|---|---|---|---|
+| `run_operation` | Run a connector operation | Runs one operation of a connection and stores its result | Whatever the operation does |
+| `lookup` | Look up connector values | Runs a connection's lookup operation and returns options as `value`, `text` and `note` | No |
+| `sync_normalise` | Sync: items from a tracker event | Turns a tracker event body into the items it concerns | No |
+| `sync_plan` | Sync: compare and map | Reports what a sync would change for one item or task | No |
+| `sync_apply` | Sync: apply a tracker item to a task | Creates or updates the task for one tracker item | Task |
+| `sync_push` | Sync: push a task to the tracker | Creates or updates the tracker item for a task | Tracker |
+
+### Fields
+
+| Field | Used by | Meaning |
+|---|---|---|
+| `connection` | All | The connection to use, such as the tracker's id. Required. |
+| `operation` | `run_operation`, `lookup` | The connection's own operation to run. Required. |
+| `params` | `run_operation`, `lookup` | Inputs the operation takes |
+| `binding_id` | All sync operations; optional on `run_operation` | The link between a tracker and a Space. Required for the sync operations. |
+| `config_id`, `record_id` | `run_operation` | The record the operation reads or writes |
+| `query`, `limit` | `lookup` | Text to narrow the options by, and the most options to return |
+| `event` | `sync_normalise`, `sync_push` | The tracker's event body, or a task event |
+| `item` | `sync_apply`, `sync_plan` | One item from `sync_normalise` |
+| `task_id` | `sync_plan`, `sync_push` | A task id such as `LEADS-7` |
+| `direction` | `sync_plan` | Which way the sync would run |
+
+Give `sync_push` either `task_id` or `event`, not both. Every field accepts a `$.` path from an earlier step, so `event` is usually mapped from the trigger.
+
+List your bindings with `GET /connector/bindings` on your gateway to find a `binding_id`.
+
+### The result of a sync step
+
+`sync_apply` and `sync_push` return the sync's `outcome` and, for a skip, a `reason`. The full list is in [Outcomes and reasons](/developers/connectors/sync#outcomes-and-reasons).
+
+| Outcome | Meaning |
+|---|---|
+| `applied`, `created` | An existing task or comment was written, or one was created |
+| `pushed`, `linked` | The tracker item was written, or found and linked |
+| `archived` | The task or tracker item was archived |
+| `in_step` | Both sides already agreed, so nothing was written |
+| `skipped` | Left alone on purpose; read `reason` |
+| `conflict`, `deleted`, `failed` | A write lost a race, the task is gone, or a call failed |
+
+---
+
+## Pattern: signed webhook, normalise, fan out, apply
+
+A tracker's webhook can carry several changes in one delivery. Split it into items and apply each one in its own run.
+
+| Step | Configure | Notes |
+|---|---|---|
+| 1 | A [Webhook trigger](/flows/triggers/webhook) with a [signature check](/flows/triggers/webhook#verifying-a-signature) | The flow runs only if the tracker's signature verifies |
+| 2 | **Connector**, `sync_normalise`, with `connection`, `binding_id` and `event` set to `$.trigger` | Returns `items`. Writes nothing. |
+| 3 | A [Condition](/flows/steps/condition) on whether `items` is empty | Skips the next step when there is nothing to do |
+| 4 | **Quiva Endpoint** with subject `microstrate.hub.post.workflow-run` and payload `{"subject": "<child flow>", "triggers": "$.NORMALISE.items"}` | Starts one run of the child flow per item |
+| 5 | In the child flow, **Connector**, `sync_apply`, with `item` set to `$.trigger` | Creates or updates the task. Returns the outcome. |
+
+<Warning>
+The child flow must not use **Static** steps. The parallel runs share one static map, and concurrent writes to it can fail the run.
+</Warning>
+
+`sync_apply` is idempotent: it creates the task when none is linked and updates it otherwise, and an item already in step writes nothing. Putting `sync_plan` between steps 3 and 4 lets you gate on what would change.
+
+## Pattern: task trigger, push
+
+Push a task to the tracker whenever it changes in a Space.
+
+| Step | Configure | Notes |
+|---|---|---|
+| 1 | A task trigger for the Space | Starts the flow on task events |
+| 2 | **Connector**, `sync_push`, with `connection`, `binding_id` and `event` set to `$.trigger` | Outcome is `pushed`, `linked`, `archived`, `in_step` or `skipped` |
+
+<Note>
+A flow-driven sync and the installed connection can run for the same binding. They converge, because applying and pushing are idempotent and items already in step write nothing. The tracker's own webhook is registered once, by the connection.
+</Note>
+
+---
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Connect a tracker" icon="plug" href="/essentials/account/connections">
+    The no-code way to set up a sync.
+  </Card>
+
+  <Card title="The sync block" icon="gears" href="/developers/connectors/sync">
+    Field rules, event normalisation, outcomes and reasons.
+  </Card>
+
+  <Card title="Webhook trigger" icon="bolt" href="/flows/triggers/webhook">
+    Receive and verify the tracker's events.
+  </Card>
+
+  <Card title="Steps overview" icon="list-check" href="/flows/steps/overview">
+    How steps read and store data.
+  </Card>
+</CardGroup>

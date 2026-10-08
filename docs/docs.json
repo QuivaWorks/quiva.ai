@@ -36,7 +36,10 @@
               "spaces/file-management",
               "spaces/scheduling",
               "spaces/escalations",
-              "spaces/client-portal"
+              "spaces/client-portal",
+              "spaces/task-sync",
+              "spaces/task-webhooks",
+              "spaces/staging-spaces"
             ]
           },
           {
@@ -137,6 +140,7 @@
                   "flows/steps/functions",
                   "flows/steps/nested-flows",
                   "flows/steps/api-integrations",
+                  "flows/steps/connector",
                   {
                     "group": "Functions",
                     "icon": "book",
@@ -163,6 +167,8 @@
                   "essentials/account/creating-account",
                   "essentials/account/account-settings",
                   "essentials/account/global-admin-branding-settings",
+                  "essentials/account/api-integrations",
+                  "essentials/account/connections",
                   "essentials/account/billing-subscriptions",
                   "essentials/account/closing-account"
                 ]
@@ -228,6 +234,13 @@
                   "developers/mcp/api-keys",
                   "developers/mcp/local-setup",
                   "developers/mcp/tools"
+                ]
+              },
+              {
+                "group": "Connectors",
+                "pages": [
+                  "developers/connectors/definition",
+                  "developers/connectors/sync"
                 ]
               }
             ]
@@ -347,6 +360,19 @@
             "group": "Accounts",
             "openapi": {
               "source": "api-reference/endpoint/accounts/openapi.json"
+            }
+          },
+          {
+            "group": "Task sync",
+            "pages": [
+              "api-reference/task-sync-auth",
+              "api-reference/task-sync-errors"
+            ]
+          },
+          {
+            "group": "Workspaces",
+            "openapi": {
+              "source": "api-reference/endpoint/workspaces/openapi.json"
             }
           },
           {

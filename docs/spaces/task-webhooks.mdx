@@ -1,0 +1,199 @@
+---
+title: "Task webhooks"
+description: "Receive signed task events at your endpoint, with retries, auto-pause, replay and a delivery log"
+icon: "webhook"
+---
+
+A webhook subscription pushes task events from your Spaces to an HTTPS endpoint you control. Each delivery is signed, so your endpoint can prove the request came from QuivaWorks. If your endpoint is down, deliveries are retried for about a day.
+
+Subscriptions belong to an [API integration](/essentials/account/api-integrations), so they can only cover Spaces where that integration holds `tasks:read`. The events are the same ones the [changes feed](/spaces/task-sync#read-the-changes-feed) returns.
+
+<Note>
+A subscription's endpoint does not have to be yours. When you [connect a tracker](/essentials/account/connections), the connection creates a subscription whose URL is its own signed sync address on your gateway, and the sync engine receives each event, verifies it and pushes the change to the tracker. Those subscriptions appear under the connection's integration and in its **Delivery log**. Leave them as they are.
+</Note>
+
+## Create a subscription
+
+<Steps>
+  <Step title="Open the integration">
+    Go to **Account**, then **Connections**, then **API integrations**, and open the integration.
+  </Step>
+
+  <Step title="Add a subscription">
+    In **Subscriptions**, click **Add**. Enter the **Endpoint URL**, tick the **Spaces** to cover, and tick the **Events** you want. Leave every event unticked to receive all of them.
+  </Step>
+
+  <Step title="Copy the signing secret">
+    A dialog shows the signing secret once. Store it where your endpoint can read it.
+  </Step>
+</Steps>
+
+You can also create one with the API. Admin routes need a root or admin session.
+
+```bash
+curl -X POST https://api.quiva.ai/accounts/integrations/I1a2b3c4d5e6f/subscriptions \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://hooks.example.com/quiva",
+    "spaces": ["OPS"],
+    "event_kinds": ["task-updated", "task-status-changed"]
+  }'
+```
+
+```json
+{ "data": { "subscription": { "id": "W0b9178e19518", "paused": false }, "secret": "whsec_..." } }
+```
+
+| Field | Rule |
+|---|---|
+| `url` | `https` only, up to 2048 characters, no credentials in the URL. Loopback, private, link-local and other internal addresses are refused with `400 bad_url`. Redirects are never followed. |
+| `spaces` | Required. The integration needs `tasks:read` on each, or the call returns `400 space_not_in_scope`. |
+| `event_kinds` | Optional. A subset of the [event types](/spaces/task-sync#event-types). Empty means all. |
+
+An integration can have up to 25 subscriptions.
+
+## What a delivery looks like
+
+Quiva sends a `POST` with a 10-second timeout. The body is the event JSON, the same shape the feed returns, with `Content-Type: application/json`.
+
+| Header | Value |
+|---|---|
+| `webhook-id` | The event id. It stays the same across retries. Use it to remove duplicates. |
+| `webhook-timestamp` | Unix seconds. It is new on each attempt. |
+| `webhook-signature` | `v1,<base64 HMAC-SHA256>`. During a secret rotation it carries two entries separated by a space. |
+| `x-quiva-event` | The event type. |
+| `x-quiva-subscription` | The subscription id. |
+
+## Verify the signature
+
+Signatures follow the [Standard Webhooks](https://www.standardwebhooks.com) scheme. Always verify before you trust a request, and verify the **raw bytes** of the body before you parse JSON.
+
+1. Build the signed content: `<webhook-id>.<webhook-timestamp>.<raw body>`.
+2. Take the signing secret, remove the `whsec_` prefix and base64-decode the rest. That is the key.
+3. Compute an HMAC-SHA256 of the signed content and base64-encode it.
+4. Compare it in constant time against every `v1,` entry in `webhook-signature`. Accept the request if any entry matches.
+5. Reject a timestamp more than 5 minutes away from your clock.
+
+<CodeGroup>
+
+```js Node
+import crypto from "node:crypto";
+
+export function verify(secret, headers, rawBody) {
+  const id = headers["webhook-id"];
+  const ts = headers["webhook-timestamp"];
+  const sig = headers["webhook-signature"] ?? "";
+  if (Math.abs(Date.now() / 1000 - Number(ts)) > 300) return false;
+
+  const key = Buffer.from(secret.replace(/^whsec_/, ""), "base64");
+  const mac = crypto
+    .createHmac("sha256", key)
+    .update(`${id}.${ts}.`)
+    .update(rawBody)
+    .digest("base64");
+
+  return sig.split(" ").some((entry) => {
+    if (!entry.startsWith("v1,")) return false;
+    const got = Buffer.from(entry.slice(3));
+    const want = Buffer.from(mac);
+    return got.length === want.length && crypto.timingSafeEqual(got, want);
+  });
+}
+```
+
+```python Python
+import base64, hashlib, hmac, time
+
+def verify(secret: str, headers: dict, raw_body: bytes) -> bool:
+    msg_id = headers["webhook-id"]
+    ts = headers["webhook-timestamp"]
+    if abs(time.time() - int(ts)) > 300:
+        return False
+    key = base64.b64decode(secret.removeprefix("whsec_"))
+    signed = f"{msg_id}.{ts}.".encode() + raw_body
+    mac = base64.b64encode(hmac.new(key, signed, hashlib.sha256).digest()).decode()
+    for entry in headers.get("webhook-signature", "").split(" "):
+        if entry.startswith("v1,") and hmac.compare_digest(entry[3:], mac):
+            return True
+    return False
+```
+
+</CodeGroup>
+
+## Delivery guarantees
+
+- **At least once, and not ordered.** A retry can arrive after a later event. Each delivery carries the whole task, so apply a task event only if `task.version` is higher than the version you already hold for that task, and discard the rest.
+- **Remove duplicates by `webhook-id`.** This matters most for comment and action events, which have no version to compare.
+- **No echo.** An event whose `origin` is the subscription's own integration is not sent to it.
+- If `sync_key` appears in `changed_fields`, the task joined or left a connected account. Reset your "newer than" check for that task.
+
+### How your response is treated
+
+| Your response | Outcome |
+|---|---|
+| Any `2xx` | Delivered. |
+| `410` | Delivered, and the subscription pauses with the reason `endpoint_gone`. Use it to say "stop sending". |
+| `408`, `425`, `429`, any `5xx`, a timeout or a network error | Retried. |
+| Any other `4xx`, a redirect, or an address that fails the safety check | Failed for good for that event. It is not retried. |
+
+### Retries
+
+A failed delivery is retried after 30 seconds, 1 minute, 5 minutes, 15 minutes, 1 hour, 2 hours, 4 hours, 8 hours and 8 hours: ten attempts in about 24 hours. An event that uses them all is dropped from the queue and recorded in the log. A failing subscription does not cause other subscriptions to receive the event twice.
+
+## Auto-pause
+
+A subscription pauses itself after 50 failures in a row, or when its first failure is more than 24 hours old. Account admins get one email when that happens, and the subscription shows **Paused** with the reason.
+
+| Reason | Cause |
+|---|---|
+| `endpoint_gone` | Your endpoint answered `410`. |
+| `consecutive_failures` | 50 failures in a row. |
+| `failing_for_24h` | Failing for more than 24 hours. |
+| `integration_disabled` | The integration was disabled or deleted. |
+| `scope_removed` | A scope change removed every Space the subscription covered. |
+
+To resume, open the subscription's menu and choose **Resume**. That clears the failure counts. Resuming is refused while the integration is disabled, and enabling the integration does not resume its subscriptions, so do both.
+
+Delivery also re-checks, within about 30 seconds, that the integration is still enabled and still holds `tasks:read` on the event's Space. Removing `tasks:read` on a Space takes it out of the integration's subscriptions.
+
+## Rotate the signing secret
+
+Choose **Rotate signing secret** in the subscription's menu, or send `PATCH` with `{"rotate_secret": true}`. The new secret is shown once. For the next 24 hours each delivery carries **two** signatures, one per secret, so you can deploy the new secret without dropping events. Your verifier already handles this, because it accepts any matching entry.
+
+## Test, replay and the delivery log
+
+In the subscription's menu, **Send test event** sends a signed event with the type `test`. It reaches paused subscriptions and does not change failure counts.
+
+**Deliveries and replay** opens the delivery log, newest first. Each row shows the event, its status (`sending`, `delivered`, `retrying` or `failed`), the attempt count, the last response code, the latency and a short excerpt of your response. Rows are kept for 30 days.
+
+To resend history, enter a **From cursor** and an optional **To cursor** and click **Replay**. Cursors are the values shown in the log or returned by the [changes feed](/spaces/task-sync#read-the-changes-feed).
+
+| Replay rule | Detail |
+|---|---|
+| Range | Events after `from_cursor` up to and including `to_cursor`. Leave `to_cursor` out to replay to the end. It must be greater than `from_cursor`. |
+| Filters | The event-type filter, echo suppression and the scope check still apply. |
+| Size | Up to 10,000 events per request. It stops after 10 failures in a row. |
+| Paused | A paused subscription refuses replay with `409 subscription_paused`. Resume it first. |
+
+Replay and test events run in the background. Read the outcome in the delivery log.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Task sync" icon="rotate" href="/spaces/task-sync">
+    External ids, versions and the changes feed.
+  </Card>
+
+  <Card title="API integrations" icon="plug" href="/essentials/account/api-integrations">
+    Create the integration a subscription belongs to.
+  </Card>
+
+  <Card title="Webhook trigger" icon="bolt" href="/flows/triggers/webhook">
+    Receive and verify these events inside a flow.
+  </Card>
+
+  <Card title="Errors and limits" icon="triangle-exclamation" href="/api-reference/task-sync-errors">
+    Codes returned by the subscription routes.
+  </Card>
+</CardGroup>

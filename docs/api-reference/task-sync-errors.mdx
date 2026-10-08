@@ -1,0 +1,85 @@
+---
+title: "Task sync errors and limits"
+description: "Every error code the task sync routes return, and the limits that apply"
+icon: "triangle-exclamation"
+---
+
+Every error from the task sync routes has the shape below. Branch on `code`, not on the text in `error`, which can change.
+
+```json
+{ "error": "task was deleted", "code": "task_deleted" }
+```
+
+A few older routes return `error` without a `code`.
+
+## Error codes
+
+| Code | Status | Where |
+|---|---|---|
+| `version_conflict` | 409 | `If-Match` did not match on `PATCH`, `DELETE` or the upsert. The body includes the current `task`. Also returned after repeated lost races without `If-Match`. |
+| `bad_if_match` | 400 | `If-Match` is not an integer. |
+| `external_id_pending` | 409 | Upsert: another request is creating the task. Retry. |
+| `task_deleted` | 410 | Upsert of an id whose task was deleted. |
+| `external_id_immutable` | 409 | A `PATCH` changed or cleared the external id of a mapped task. |
+| `cursor_expired` | 410 | A changes-feed cursor is older than the 30-day retention. The body includes `next_cursor` and `retention_days`. |
+| `invalid_cursor` | 400 | A feed, replay or delivery cursor is not a sequence number, or `to_cursor` is not after `from_cursor`. |
+| `invalid_request` | 400 | A malformed body, field, name or event type, a bad `external_id`, or a bad feed `limit`, `since` or `space_id`. |
+| `unknown_status`, `unknown_priority`, `unknown_tag` | 400 | An integration sent an id the Space does not define. |
+| `scope_denied` | 403 | The integration lacks the scope on that Space, the route is not open to integrations, or a `space:configure` call named a field outside its list. |
+| `integration_not_allowed` | 403 | An integration token was used on something other than a task route. |
+| `token_revoked` | 401 | The token's integration was edited, disabled or deleted, or the token is malformed. An expired token, a revoked secret or a deleted integration can instead answer a `401` with no body, because the gateway has already dropped the session. Mint a new one either way. |
+| `invalid_client` | 401 | A token mint was refused. |
+| `two_secrets_live` | 409 | You rotated while two secrets were live and neither was retiring. |
+| `bad_url` | 400 | A subscription URL is not allowed. |
+| `space_not_in_scope` | 400 | A subscription names a Space the integration cannot read. |
+| `subscription_limit` | 409 | The integration already has 25 subscriptions. |
+| `subscription_paused` | 409 | A replay was requested on a paused subscription. |
+| `integration_disabled` | 409 | A subscription was created or resumed while the integration is disabled. |
+| `space_not_staging` | 409 | Reset was called on a Space without the staging flag. |
+| `space_bound` | 409 | Reset was called on a Space connected to another account. |
+| `space_not_found` | 404 | The source of a copy or the target of a reset does not exist. |
+| `not_found` | 404 | An integration, secret or subscription id does not exist. |
+| `storage_unavailable` | 503 | A backing store could not be reached. The call fails closed. Retry. |
+| `temporarily_unavailable` | 503 | Token mint only. Retry shortly. |
+| `internal_error` | 500 | An integration update failed. |
+
+## Which errors to retry
+
+| Retry with backoff | Do not retry |
+|---|---|
+| `external_id_pending`, `storage_unavailable`, `temporarily_unavailable`, and a `version_conflict` after you re-read and merge | `task_deleted`, `external_id_immutable`, `scope_denied`, `invalid_client`, and any `400` |
+
+For `token_revoked`, mint one new token and retry once. For `cursor_expired`, list the Space and resume from the `next_cursor` in the response.
+
+## Limits
+
+| Limit | Value |
+|---|---|
+| Token lifetime | 1 hour, no refresh token |
+| Live secrets per integration | 2 |
+| Secret rotation grace | 0 to 30 days, default 7 |
+| Spaces an integration can be scoped to | 500 |
+| Subscriptions per integration | 25 |
+| `external_id` | 256 bytes of UTF-8, no `/` |
+| Subscription URL | `https`, up to 2048 characters |
+| Webhook timeout | 10 seconds per attempt |
+| Webhook retries | 10 attempts over about 24 hours |
+| Auto-pause | 50 failures in a row, or 24 hours of failing |
+| Replay | 10,000 events per request |
+| Changes feed `limit` | 1 to 500, default 100 |
+| Changes feed retention | 30 days |
+| Delivery log | 30 days, `limit` 1 to 200 |
+| Task list `limit` | Default 300. `has_more` says whether another page exists. There is no total. |
+| Staging reset | 2,000 tasks per call |
+| Signed inbound flow body | 4 MiB |
+| Rate limits per integration | None at present |
+
+<CardGroup cols={2}>
+  <Card title="Task sync authentication" icon="key" href="/api-reference/task-sync-auth">
+    Minting and caching tokens.
+  </Card>
+
+  <Card title="Task sync" icon="rotate" href="/spaces/task-sync">
+    Using the routes together.
+  </Card>
+</CardGroup>

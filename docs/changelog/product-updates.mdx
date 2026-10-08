@@ -9,6 +9,86 @@ month rather than by version. Where a change landed gradually over several weeks
 dated to the month it became generally available rather than to a single commit.
 </Note>
 
+{/* DRAFT: October 2026 entry. Do not merge until task sync is deployed to production and every route is probed on api.quiva.ai. STRIP the service desk paragraph from this entry at merge time; it ships later, when the service desk distribution is on production. */}
+
+<Update label="October 2026" description="Task sync: API integrations, versioned writes, a changes feed, signed webhooks, staging Spaces and a service desk" tags={["Spaces", "Developers", "Flows", "Security"]}>
+
+## API integrations
+
+Root and admin users can now create **API integrations** under **Account**, **Connections**. An integration is a named machine identity with its own client credentials. You choose, Space by Space, whether it can read tasks, write tasks, write comments or configure the Space's workflow. It takes no seat, never appears in your members list, and every change it makes is attributed to it by name. Secrets are shown once, rotate with a grace period you set, and can be revoked immediately.
+
+<CardGroup cols={2}>
+  <Card title="API integrations" icon="plug" href="/essentials/account/api-integrations">
+    Create an integration, scope it to Spaces and rotate its secrets.
+  </Card>
+  <Card title="Task sync authentication" icon="key" href="/api-reference/task-sync-auth">
+    Exchange client credentials for a one-hour token.
+  </Card>
+</CardGroup>
+
+## Keep tasks in step with another system
+
+Tasks now carry a **version** that goes up on every write, and `PATCH`, `DELETE` and the new upsert accept an `If-Match` header so a stale write is refused with `409 version_conflict` instead of overwriting. A task can hold your own **external id**, and a single idempotent call creates or updates it. A new **changes feed** returns every task, comment and action write in a Space, deletes included, with a cursor and 30 days of history. Tasks also gain `activity_at`, which moves on comments, time logs and actions, and the task list reports `has_more`.
+
+<Card title="Task sync" icon="rotate" href="/spaces/task-sync">
+  External ids, versions, the changes feed and a minimal sync loop.
+</Card>
+
+## Signed task webhooks
+
+Each integration can subscribe endpoints to task events. Deliveries are signed with the Standard Webhooks scheme, retried over about 24 hours, paused automatically with an email when an endpoint keeps failing, and never echoed back to the integration that caused them. You get a delivery log, replay of a cursor range, test events, and secret rotation with a 24-hour window where both secrets sign.
+
+<Card title="Task webhooks" icon="webhook" href="/spaces/task-webhooks">
+  Verify signatures, handle retries and replay missed events.
+</Card>
+
+## Connect a tracker
+
+Admin and root users can now connect an item tracker under **Account**, **Connections**, **Connectors**. A short wizard asks for the tracker's token, a Space and how statuses, owners and priority map, then sets up the webhook and task subscription for you. Tasks and tracker items stay in step in both directions, with no flow to build. The card shows the last sync in and out, refused calls and a run log, and offers **Repair** and **Disconnect**. Flows gain a **Connector** step, and developers can describe a new tracker with a connector definition and its `sync` block.
+
+<CardGroup cols={2}>
+  <Card title="Connect a tracker" icon="plug" href="/essentials/account/connections">
+    The wizard, the connection card, Repair and Disconnect.
+  </Card>
+  <Card title="Connector step" icon="plug" href="/flows/steps/connector">
+    Normalise, apply and push from a flow.
+  </Card>
+  <Card title="The sync block" icon="gears" href="/developers/connectors/sync">
+    Field rules, outcomes and reasons.
+  </Card>
+</CardGroup>
+
+## Verify signatures on webhook and HTTP Request triggers
+
+A webhook or HTTP Request trigger can now check a signature before the flow starts. It supports HMAC SHA-256, including GitHub-style and Slack-style presets, and Standard Webhooks. A request that fails the check gets a 401 and no run is created. The `eval` step also gains a small `crypto` object for HMAC, SHA-256 and constant-time comparison.
+
+<CardGroup cols={2}>
+  <Card title="Webhook trigger" icon="bolt" href="/flows/triggers/webhook#verifying-a-signature">
+    The signature fields, limits and behaviour.
+  </Card>
+  <Card title="Eval step" icon="code" href="/flows/steps/eval#crypto-helpers">
+    The crypto helpers.
+  </Card>
+</CardGroup>
+
+## Staging Spaces
+
+A Space can be marked **staging**. Copy a live Space's statuses, priorities, tags and folders into one with a single call, point a test integration at it, and reset it between runs. Reset also clears the Space's external ids so a sync can be repeated.
+
+<Card title="Staging Spaces" icon="flask" href="/spaces/staging-spaces">
+  Copy structure, reset and test safely.
+</Card>
+
+## Service desk
+
+Connect client accounts to one central board. Tickets raised in a client's own Space appear on your board, filtered by client, and status changes and comments move both ways. If both sides edit the same ticket at once, nothing is overwritten: the ticket shows a **Sync conflict** with **Keep mine** and **Take theirs**.
+
+## Retries on flow steps
+
+Steps that set `attempts` now retry inside the step with exponential backoff and a cap of five attempts, so the steps after it run once, with the final result. A status listed in `ignore_response_codes` on an HTTP, function or flow step now lets the step finish with a result you can branch on, instead of failing the run. Review any flow that relied on such a status still failing.
+
+</Update>
+
 <Update label="September 2026" description="Abbie's mode picker, footnoted citations, the account switcher, Entities & Contacts, and a hosted MCP server" tags={["Abbie", "Accounts", "Spaces", "Security", "Developers"]}>
 
 ## Abbie's mode, model and run strip
