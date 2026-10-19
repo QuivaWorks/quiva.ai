@@ -2764,11 +2764,18 @@
     },
     "responses": {
       "success": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Success message"
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Success message"
+                }
+              }
+            }
           }
         }
       },

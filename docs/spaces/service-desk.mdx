@@ -4,17 +4,15 @@ description: "Connect client accounts to one central board, so work items and co
 icon: "headset"
 ---
 
-{/* DRAFT: do not merge until the service desk distribution is deployed to production. Held back from the rest of the task sync pages on purpose. Not registered in docs.json. */}
-
 A **service desk** connects other QuivaWorks accounts to one central board. Each client works in a Space of their own, and tickets they raise appear on your central board, tagged with the client. When your team changes a ticket or replies, the client sees it on their side.
 
-It is built on distribution, the way two accounts are paired. The central account is the **publisher**. Each client account is a **distributor**. Each pair is one grant, and every grant keeps its own history.
+It is built on **linked accounts**, the way two QuivaWorks accounts are paired. Each client you connect is one link, and every link keeps its own history.
 
 ## How it fits together
 
 | Side | Who | What they see |
 |---|---|---|
-| Central desk | You | One board with a ticket from every connected client. A **Client** filter on the toolbar lists each connected account by name. |
+| Central desk | You | One board with a ticket from every connected client. Each synced card carries the client's name, and a **Client** filter on the toolbar lists each connected account. |
 | Client desk | Each client | Their own Space, with only their tickets. They cannot see the central Space or any other client's tickets. |
 
 What stays in sync, in both directions:
@@ -36,12 +34,20 @@ A ticket's **status** crosses by *role*, not by name. Each stage has a role, so 
 ## Connect a client
 
 <Steps>
+  <Step title="Allow linking on your central Space">
+    Open the Space's settings and turn on **Allow linking with other accounts**. The Space then shows a **Linked accounts** tab.
+  </Step>
+
+  <Step title="Create a service desk product">
+    In the **Linked accounts** tab, select **+** on the product rail. Set **Type** to **Service desk** and save. The type cannot be changed later. You only need one product for all your clients.
+  </Step>
+
   <Step title="Send an invitation">
-    In your central Space's **Distribution** tab, create an invitation for the service desk product. Choose the status mapping for this client: where each of their stages lands on your board.
+    In the **Invitations** tab, create an invitation for the service desk product. Choose the status mapping for this client: where each of their stages lands on your board. Send the client the invitation link.
   </Step>
 
   <Step title="The client accepts">
-    The client opens the link, signs in as a root or admin user of their account, and chooses how to connect.
+    The client opens the link, signs in as a root or admin user of their account, and chooses how to connect their own workspace.
   </Step>
 
   <Step title="Tickets start flowing">
@@ -60,7 +66,7 @@ A client account can have only one connection with your account. A client with n
 
 ### Edit the status mapping
 
-On the central side, open the client's row in the **Distribution** tab, then **Distributions**, and choose **Edit status mapping**. The new mapping applies to later moves.
+In your central Space's **Linked accounts** tab, open **Accounts**, then open the menu on the client's row and choose **Edit status mapping**. The new mapping applies to later moves.
 
 <Note>
 You cannot delete a status that a mapping points to, or the only status that carries a required role. Renaming and recolouring columns is always allowed.
@@ -89,7 +95,7 @@ Comments never conflict. Adding a comment on both sides at once keeps both.
 
 ## Find a client's tickets
 
-On the central board, choose a client from the **Client** filter. Each synced ticket's `folder` is the id of that client's grant, so you can do the same through the API.
+On the central board, choose a client from the **Client** filter. A ticket's details show **Linked account** with the client's name. Each synced ticket's `folder` is the id of that client's link, so you can filter the same way through the API.
 
 ```bash
 curl "https://api.quiva.ai/workspaces/space/DESK/tasks?folder=D0F3A91B22C4" \
@@ -100,11 +106,17 @@ Integrations work on a connected Space like any other. A change that arrives fro
 
 ## Pause or end a connection
 
+On the central side, these are on the client's row menu under **Linked accounts** > **Accounts**.
+
 | Action | Effect |
 |---|---|
 | **Suspend** | Changes stop crossing. Edits are retried, and arrive after you **Restore**. |
 | **Restore** | The connection resumes and held changes arrive without duplicates. |
 | **Revoke** | Ends the connection permanently. A revoked connection cannot be restored, and each side keeps its tasks. Changes that can no longer be delivered are recorded as undelivered. |
+
+Changes that could not be delivered are listed under **Failed deliveries**, and **Delivery health** shows whether each link is syncing.
+
+Clients see each connection under **Account settings** > **Connections** > **Linked accounts**, with its status, the shared Space and a health check. You see the clients you invited there too; **Manage** opens the Space's **Linked accounts** tab.
 
 <Warning>
 Deleting a ticket on one side does not delete it on the other. The other side keeps its copy.

@@ -39,7 +39,8 @@
               "spaces/client-portal",
               "spaces/task-sync",
               "spaces/task-webhooks",
-              "spaces/staging-spaces"
+              "spaces/staging-spaces",
+              "spaces/service-desk"
             ]
           },
           {
