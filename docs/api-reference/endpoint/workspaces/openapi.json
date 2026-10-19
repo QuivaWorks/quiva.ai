@@ -3038,17 +3038,13 @@
             "description": "Set only on a move."
           },
           "comment": {
-            "type": [
-              "object",
-              "null"
-            ],
+            "type": "object",
+            "nullable": true,
             "additionalProperties": true
           },
           "action": {
-            "type": [
-              "object",
-              "null"
-            ],
+            "type": "object",
+            "nullable": true,
             "additionalProperties": true
           },
           "old_folder": {
