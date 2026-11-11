@@ -458,6 +458,12 @@
             "openapi": {
               "source": "api-reference/endpoint/distribution/openapi.json"
             }
+          },
+          {
+            "group": "Abbie (beta)",
+            "openapi": {
+              "source": "api-reference/endpoint/abbie/openapi.json"
+            }
           }
         ]
       },

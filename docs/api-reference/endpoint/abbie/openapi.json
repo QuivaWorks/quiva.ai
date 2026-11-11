@@ -1,0 +1,2980 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Abbie API (beta)",
+    "version": "1.0.0",
+    "description": "**Beta.** This API is in beta: operations and fields may change without a deprecation period. Do not depend on undocumented fields. It covers the subset of Abbie's API used by the Quiva coworker MCP server: skills, todos, memory, profile, corrections, environment and models.\n\nHTTP surface of hub-service for Abbie/Coworker configuration, agent rapport & context, chat-session sharing, and MCP registration.\n\n## Transport and response envelope\n\nEvery operation here is a gateway mapping onto a Bellerophon/kraken subject of the form `microstrate.hub.<method>.<endpoint-slug>` (see `hub-service/service/service.go` and `docs/abbie-gateway-mappings.md`). Handlers reply on the mesh with an envelope `{\"status_code\": <int>, \"body\": <object>}`; the gateway unwraps it, so `status_code` becomes the HTTP status and `body` becomes the HTTP response body. **The schemas below describe the unwrapped `body`.**\n\nErrors are always `{\"error\": \"<message>\"}` with the matching HTTP status.\n\n## Parameter conventions\n\nThe gateway forwards URL parameters to the handler as request headers:\n\n- `x-param-query-<name>` — a query-string parameter (`?name=value`)\n- `x-param-<name>` — a path parameter\n\nEvery parameter documented as `in: query` or `in: path` below corresponds to one of those headers, and the header suffix is named in each parameter's description where it is not obvious.\n\n## Authentication\n\nAll operations require the caller's bearer token; the account id, user id and user public key are always taken from the JWT and never from the URL or body. Endpoints that additionally require an account **admin** role are marked in their description — a failed role lookup answers **502**, never 403 and never a pass.\n\n## Two path notes\n\n- `PATCH /hub/agent-session-visibility/{session_id}` — the handler reads the path parameter as `x-param-session_id`, matching its sibling `PATCH /hub/agent-session/{session_id}`.\n- `GET|POST|PUT /hub/agent/user-context/{id}` — the handler requires the **agent id** as `x-param-id`; the frontend calls `/hub/agent/user-context/<agentId>`.\n"
+  },
+  "x-beta": true,
+  "servers": [
+    {
+      "url": "https://api.quiva.ai",
+      "description": "Production API server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Skills"
+    },
+    {
+      "name": "Todos"
+    },
+    {
+      "name": "Memory"
+    },
+    {
+      "name": "Profile and personality"
+    },
+    {
+      "name": "Corrections"
+    },
+    {
+      "name": "Environment"
+    },
+    {
+      "name": "Models"
+    }
+  ],
+  "paths": {
+    "/hub/coworker/skills": {
+      "get": {
+        "tags": [
+          "Skills"
+        ],
+        "summary": "List builtin and user-defined skills",
+        "description": "Returns the builtin skill catalog, the account's disabled-builtin list, and the account's user-defined skills. A fresh account (no aggregate yet) returns empty `disabled_builtins` and `skills` rather than an error. Subject: `microstrate.hub.get.coworker-skills`.",
+        "operationId": "getCoworkerSkills",
+        "responses": {
+          "200": {
+            "description": "The account's skill registry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSkillsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/skill/test": {
+      "post": {
+        "tags": [
+          "Skills"
+        ],
+        "summary": "Dry-run skill activation against a message",
+        "description": "Runs the activation matcher over the account's enabled skills (builtins minus `disabled_builtins`, plus user skills minus disabled ones) and reports which would activate and which are merely discoverable. Subject: `microstrate.hub.post.coworker-skill-test`.",
+        "operationId": "postCoworkerSkillTest",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "The user message to test activation against"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Activation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillTestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/skill-drafts": {
+      "get": {
+        "tags": [
+          "Skills"
+        ],
+        "summary": "List skill drafts awaiting review",
+        "description": "Returns every draft on the account, pending and resolved (resolved drafts are trimmed over time). Subject: `microstrate.hub.get.coworker-skill-drafts`.",
+        "operationId": "getCoworkerSkillDrafts",
+        "responses": {
+          "200": {
+            "description": "Draft list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "drafts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SkillDraft"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/skill-exec": {
+      "get": {
+        "tags": [
+          "Skills"
+        ],
+        "summary": "Read the account's script-execution opt-in",
+        "description": "On unless an admin turned it off: an account with no stored document reports `enabled: true`. Readable by **any member** — knowing whether Abbie may run a skill's code is not privileged. A read failure degrades to `enabled: false` rather than an error: reporting a security switch as open on the strength of a failed read would be the wrong direction.\n\nThis is the middle of three consent layers in front of script execution: the deployment-wide `SKILL_EXEC_ENABLED` flag, this per-account opt-in, and the per-skill `exec_approved` bit on `PUT /hub/coworker/skill`. All three must be open. Subject: `microstrate.hub.get.coworker-skill-exec`.",
+        "operationId": "getCoworkerSkillExec",
+        "responses": {
+          "200": {
+            "description": "Consent state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillExecConsent"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/todos": {
+      "get": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "List the caller's backlog (personal + organisation)",
+        "description": "Returns the account's org backlog first, then the caller's personal backlog, merged into one list and tagged with `scope`. There is no `user_id` parameter — personal scope is always the authenticated caller's own document. Subject: `microstrate.hub.get.coworker-todos`.",
+        "operationId": "getCoworkerTodos",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Single status filter.",
+            "schema": {
+              "$ref": "#/components/schemas/TodoStatus"
+            }
+          },
+          {
+            "name": "session_id",
+            "in": "query",
+            "required": false,
+            "description": "Only items raised from this chat session.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "open_only",
+            "in": "query",
+            "required": false,
+            "description": "`true` restricts to open items.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          },
+          {
+            "name": "scheduled",
+            "in": "query",
+            "required": false,
+            "description": "`true` restricts to items with a schedule armed.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Merged backlog",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TodoItem"
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/todo": {
+      "put": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Update one backlog item",
+        "description": "Sparse patch addressed by `scope` + `id`; a nil field is left alone, and at least one of `status`, `content`, `details`, `follow_up_at` must be present. Cancelling is `status: \"cancelled\"` through this same path.\n\n`scope=user` always resolves to the **caller's own** document — there is no `user_id` field, so a caller can never address a colleague's backlog. `scope=organisation` is writable by any authenticated account member.\n\n`follow_up_at` means \"chase the person this item is stuck on\", not \"start this later\", so it **must** be sent together with `status: \"awaiting_user\"` — otherwise nothing would ever clear it again. Deferring a start is a schedule, which this endpoint deliberately does not expose.\n\nSide effects: closing an item disarms any schedule on it; un-parking one republishes the work event carrying `approved_tool_ids`/`approved_server_ids`/`denied_server_ids` so the resuming run does not hit the same wall; cancelling one also stops the hop already in flight. Subject: `microstrate.hub.put.coworker-todo`.",
+        "operationId": "putCoworkerTodo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutTodoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The item as updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/todo/promote/task": {
+      "post": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Promote a backlog item to a workspace task",
+        "description": "Creates a workspace task from the item, then marks the item **done** with a note pointing at the new task — the workspace tracker becomes the system of record from that point, and leaving the item open would show a stale duplicate forever.\n\nThe destination space resolves `space_id` → the account's task-space setting → `ESCALATE`. An absent or blank `space_id` is *not* an empty space: sending no space at all is the bug that made every promoted task gettable by id and absent from every task list.\n\nIf the task is created but the item cannot be updated, the response is still **200** and carries `task` plus an `error` string, so the caller is not left thinking nothing happened. Subject: `microstrate.hub.post.coworker-todo-promote-task`.",
+        "operationId": "postCoworkerTodoPromoteTask",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromoteTaskRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created task and, when it could be updated, the closed backlog item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromoteTaskResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "502": {
+            "description": "The workspace task could not be created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/org-memories": {
+      "get": {
+        "tags": [
+          "Memory"
+        ],
+        "summary": "List memories",
+        "description": "Lists the caller's memories in the requested scope, tombstones excluded, newest first. `total` is the post-filter count **before** pagination, so the UI can render \"X of Y\". Subject: `microstrate.hub.get.coworker-org-memories`.",
+        "operationId": "getCoworkerOrgMemories",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MemoryScope"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Case-insensitive substring filter on the memory text.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topic",
+            "in": "query",
+            "required": false,
+            "description": "Exact-match topic filter.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Page size. Defaults to 50, clamped to 200; a non-positive or unparseable value falls back to the default.",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Rows to skip. Negative or unparseable values become 0.",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of memories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "memories": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OrgMemory"
+                      }
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "Post-filter count before pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/org-memory": {
+      "post": {
+        "tags": [
+          "Memory"
+        ],
+        "summary": "Create a memory",
+        "description": "Creates a memory in the requested scope. `memory` is required and capped at 2048 characters; at most 10 topics, each at most 64 characters and non-empty.\n\nMemories written here carry no embedding (hub has no embedder) — the post-turn consolidation consumer backfills it. Subject: `microstrate.hub.post.coworker-org-memory`.",
+        "operationId": "postCoworkerOrgMemory",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MemoryScope"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrgMemoryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created memory",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgMemory"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/org-memory/{id}": {
+      "put": {
+        "tags": [
+          "Memory"
+        ],
+        "summary": "Update a memory",
+        "description": "Overwrites `memory` and `topics` and bumps `updated_at`, preserving `id`, `scope` and `created_at`. 404s if the memory does not exist or is already tombstoned for this caller; a *failed read* answers 502 rather than 404, so a broken read never tells the user their memory is gone. Subject: `microstrate.hub.put.coworker-org-memory`.",
+        "operationId": "putCoworkerOrgMemory",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MemoryIdPath"
+          },
+          {
+            "$ref": "#/components/parameters/MemoryScope"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrgMemoryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated memory",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgMemory"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      },
+      "delete": {
+        "tags": [
+          "Memory"
+        ],
+        "summary": "Delete a memory",
+        "description": "A tombstone upsert (`deleted: true`), not a stream delete — the retained text is what stops the consolidation consumer silently re-proposing a fact the user deleted.\n\n`?purge=true` additionally drops the stored text, for memories captured automatically where \"delete\" meaning \"hide, but keep what you said\" is the wrong default. Subject: `microstrate.hub.delete.coworker-org-memory`.",
+        "operationId": "deleteCoworkerOrgMemory",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MemoryIdPath"
+          },
+          {
+            "$ref": "#/components/parameters/MemoryScope"
+          },
+          {
+            "name": "purge",
+            "in": "query",
+            "required": false,
+            "description": "`true` also erases the stored memory text. Forwarded as `x-param-query-purge`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessMessage"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/profile": {
+      "get": {
+        "tags": [
+          "Profile and personality"
+        ],
+        "summary": "Read the account's organisation profile",
+        "description": "Readable by **any member** — same posture as the voice, for the same reason: this text lands in every member's system prompt (and the judge/verify prompts). `is_default` is true only when every field is empty, so the profile block renders nothing at all.\n\nA read failure answers 502 and never degrades to an empty profile. Subject: `microstrate.hub.get.coworker-profile`.",
+        "operationId": "getCoworkerProfile",
+        "responses": {
+          "200": {
+            "description": "The account's organisation profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      },
+      "put": {
+        "tags": [
+          "Profile and personality"
+        ],
+        "summary": "Set the account's organisation profile",
+        "description": "**Account admins only** — this text lands in *every* member's system prompt, plus the judge and verify prompts.\n\nThe body is the profile object itself — fields at the top level, never wrapped in a `profile` key. Sending a body whose fields are all empty drops the layer: the handler then stores an absent `profile` key rather than `{}`, so a fresh account is not permanently blocked from its default seed. Every field is optional; empty list entries are dropped rather than stored. Each field has its own rune cap (see the schema), and the whole document is additionally capped at **8000 characters** summed across every field. Any cap is enforced at the write and refused by name — never silently truncated.\n\nThe write is a read-modify-write over the whole stored document, because agent-service owns the other keys on this subject (`voice`, `expert_count`, `max_retries`, the per-stage model choices). A failed read is therefore a 502, never a write.\n\nA failed role lookup is 502. Subject: `microstrate.hub.put.coworker-profile`.",
+        "operationId": "putCoworkerProfile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoworkerProfile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The organisation profile as stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A field or the whole document over its cap, or the write could not be published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AdminOnly"
+          },
+          "502": {
+            "description": "The stored document could not be read, or the role lookup failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/personal-profile": {
+      "get": {
+        "tags": [
+          "Profile and personality"
+        ],
+        "summary": "Read your own personal profile",
+        "description": "Returns **the caller's own** profile and nothing else. The owner is derived from the bearer token; there is no `user_id` parameter on this endpoint in any position, and no privileged variant that reads another person's — an account admin role grants no access here.\n\n`is_default` is true only when every field is empty, so the prompt block renders nothing. Absent fields come back as `\"\"`, never null.\n\nA read failure answers 502 and never degrades to an empty profile. Subject: `microstrate.hub.get.coworker-personal-profile`.",
+        "operationId": "getCoworkerPersonalProfile",
+        "responses": {
+          "200": {
+            "description": "The caller's personal profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerPersonalProfileResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      },
+      "put": {
+        "tags": [
+          "Profile and personality"
+        ],
+        "summary": "Set your own personal profile",
+        "description": "Writes **the caller's own** profile and nothing else — the storage subject is derived from the bearer token, so no body field can redirect the write at another person. There is no role gate, because this is a person's own data about themselves.\n\nThe body is the profile object itself — fields at the top level, never wrapped in a `personal_profile` key. Every field is optional and is trimmed before storage, so a body whose fields are all empty (or all whitespace) clears the profile: the handler then stores an absent `personal_profile` key rather than `{}`, so a fresh user is not permanently blocked from a default seed. Each field is capped at **1000 characters**, counted in runes, and the whole document at **3000** summed across every field. A cap is refused by name at the write, never silently truncated.\n\nThe write is a read-modify-write over the whole stored document, so keys this endpoint does not model survive. A failed read is therefore a 502, never a write. Subject: `microstrate.hub.put.coworker-personal-profile`.",
+        "operationId": "putCoworkerPersonalProfile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoworkerPersonalProfile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The personal profile as stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerPersonalProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A field or the whole document over its cap, or the write could not be published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/personality": {
+      "get": {
+        "tags": [
+          "Profile and personality"
+        ],
+        "summary": "Read the account's voice layer",
+        "description": "Readable by **any member** — someone who cannot see the voice cannot tell why Abbie sounds the way she does to them. `is_default` is true only when nothing is stored, so the platform default instruction applies alone.\n\nA read failure answers 502 and never degrades to an empty voice: reporting \"no voice set\" on the strength of a broken read invites an admin to retype a layer that is still there. Subject: `microstrate.hub.get.coworker-personality`.",
+        "operationId": "getCoworkerPersonality",
+        "responses": {
+          "200": {
+            "description": "The account's voice layer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerPersonality"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/corrections": {
+      "get": {
+        "tags": [
+          "Corrections"
+        ],
+        "summary": "Read your own corrections",
+        "description": "Returns **the caller's own** corrections and nothing else. The owner is derived from the bearer token; there is no `user_id` parameter on this endpoint in any position, and no privileged variant that reads another person's.\n\nOrder is insertion order and is never re-sorted by clock. `max_entries` reports the cap so a panel can offer removal instead of hard-coding a number. A read failure answers 502 and never degrades to an empty list. Subject: `microstrate.hub.get.coworker-corrections`.",
+        "operationId": "getCoworkerCorrections",
+        "responses": {
+          "200": {
+            "description": "The caller's corrections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerCorrectionsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      },
+      "put": {
+        "tags": [
+          "Corrections"
+        ],
+        "summary": "Replace your own corrections list",
+        "description": "Writes **the caller's own** list and nothing else — the storage subject is derived from the bearer token, so no body field can redirect the write at another person. There is no role gate: these are rules about this person's own work.\n\nThe body carries the whole list as the panel holds it, so this is the edit and remove path. `corrections` is required — an omitted key is a 400, never a silent clear of every rule in force. `id`, `source` and `created_at` are stamped where the caller leaves them blank; `[]` clears the list and removes the key entirely.\n\n`situation` is capped at **150** characters and `instead` at **200**, counted in runes, and at most **6** entries may be in force. A cap is refused by name at the write, never truncated, and a full list is **refused, never evicted** — silently dropping the oldest would leave someone believing a rule is in force that is not.\n\nThe write is a compare-and-swap: the document is also written by the approve endpoint, so a list composed against a version that has since moved answers **409** and the panel reloads. A failed mesh write is 502, never 400. Subject: `microstrate.hub.put.coworker-corrections`.",
+        "operationId": "putCoworkerCorrections",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoworkerCorrectionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The corrections as stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerCorrectionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/RevisionConflict"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/org-corrections": {
+      "get": {
+        "tags": [
+          "Corrections"
+        ],
+        "summary": "Read the organisation's corrections",
+        "description": "Readable by **any member** — this is text every member's prompt already carries. A read failure answers 502, never an empty list. Subject: `microstrate.hub.get.coworker-org-corrections`.",
+        "operationId": "getCoworkerOrgCorrections",
+        "responses": {
+          "200": {
+            "description": "The account's corrections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerCorrectionsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/correction-drafts": {
+      "get": {
+        "tags": [
+          "Corrections"
+        ],
+        "summary": "List proposed corrections awaiting your decision",
+        "description": "**The caller's own** drafts, pending and resolved alike — the dismissed ones are what the analyser dedupes against, so a \"no\" only sticks while they are readable. The caller filters on `status`.\n\nA user nothing has been proposed for returns an empty list, not an error. Subject: `microstrate.hub.get.coworker-correction-drafts`.",
+        "operationId": "getCoworkerCorrectionDrafts",
+        "responses": {
+          "200": {
+            "description": "Draft list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "drafts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CoworkerCorrectionDraft"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/task-space": {
+      "get": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Read the default space for promoted tasks",
+        "description": "Readable by **any member** — where the team's work gets filed is not privileged, and the per-promotion override picker needs it to pre-fill. Never answers an empty space id: an account that has never chosen one gets `ESCALATE`, with `updated` absent to say so. A read failure degrades to the default so the picker always has something to show. Subject: `microstrate.hub.get.coworker-task-space`.",
+        "operationId": "getCoworkerTaskSpace",
+        "responses": {
+          "200": {
+            "description": "The effective default space",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskSpaceSetting"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      },
+      "put": {
+        "tags": [
+          "Todos"
+        ],
+        "summary": "Set the default space for promoted tasks",
+        "description": "**Account admins only** — this moves where *every* member's promotions and every task Abbie creates herself end up.\n\n`space_id` is required (an omitted field is a 400, never a silent reset; send `ESCALATE` explicitly to return to the built-in default), is uppercased, and is **validated against the account's real spaces before it is stored** — an unvalidated id would sit in the aggregate looking fine and fail on every future promotion. `ESCALATE` is accepted without a lookup because workspaces-service hardcodes it rather than storing it.\n\nAn unknown space is 400; a failed space lookup is 502. Subject: `microstrate.hub.put.coworker-task-space`.",
+        "operationId": "putCoworkerTaskSpace",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "space_id"
+                ],
+                "properties": {
+                  "space_id": {
+                    "type": "string",
+                    "example": "ESCALATE"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The setting as stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskSpaceSetting"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing/blank `space_id`, or a space id that names no space on this account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AdminOnly"
+          },
+          "502": {
+            "description": "The account's space list could not be read, or the role lookup failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/env": {
+      "get": {
+        "tags": [
+          "Environment"
+        ],
+        "summary": "List declared environment variables",
+        "description": "Reads are **not** role-gated at either scope: no value returned here is a credential — a literal is config by construction, and a `SECRET::<name>::` reference is an opaque handle that resolves only against the caller's own secrets bucket.\n\nValues are returned **exactly as stored**: never resolved (no endpoint anywhere turns a reference into plaintext for a browser) and never redacted (the UI PUTs the row straight back on an unrelated edit, so a mask would be saved as a literal and destroy the reference).\n\nA failed read answers 502, never an empty list — an empty list is a claim the UI cannot un-show. Subject: `microstrate.hub.get.coworker-env`.",
+        "operationId": "getCoworkerEnv",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EnvScope"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested scope's manifest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerEnvListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`scope=user` with a token that carries no user identity — never widened to the organisation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      },
+      "post": {
+        "tags": [
+          "Environment"
+        ],
+        "summary": "Declare a new environment variable",
+        "description": "**Admin-only at organisation scope** (an org variable binds the whole team and lands in a child process environment); **personal scope is not gated** — it binds only its author.\n\n409 rather than an upsert when the key already exists in this scope — `PUT` is the edit. `secret` is **derived** from whether the value parses as a well-formed `SECRET::<name>::` reference and is never taken from the client. Subject: `microstrate.hub.post.coworker-env`.",
+        "operationId": "postCoworkerEnv",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EnvScope"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoworkerEnvVarRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The stored entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerEnvVar"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed payload, invalid/reserved key, malformed reference, a `$.env.auth_token` passthrough targeting a non-first-party MCP server, or a per-scope key/size budget crossed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AdminOnly"
+          },
+          "409": {
+            "description": "The key is already declared in this scope — use PUT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      },
+      "put": {
+        "tags": [
+          "Environment"
+        ],
+        "summary": "Replace an existing environment variable",
+        "description": "Whole-row replace, including the audit stamp. 404s if the key is not declared in **this** scope — an org variable is not editable through a user-scoped request, and vice versa. Same admin gate and same first-party passthrough check as POST. Subject: `microstrate.hub.put.coworker-env`.",
+        "operationId": "putCoworkerEnv",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EnvScope"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoworkerEnvVarRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The stored entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoworkerEnvVar"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AdminOnly"
+          },
+          "404": {
+            "description": "No such key declared in this scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      },
+      "delete": {
+        "tags": [
+          "Environment"
+        ],
+        "summary": "Remove an environment variable",
+        "description": "The key travels as `?key=KEY`, with a `key` field in the body as a fallback — a request body on DELETE does not survive every gateway intact.\n\nA real removal, no tombstone. 404s when the key is not declared in **this** scope: quietly falling through to the org aggregate would let any member delete a variable the admin gate exists to protect.\n\nDeliberately does **not** run aggregate validation — a delete can only shrink the document, and validating would make an entry that later rules grew to reject impossible to remove. Subject: `microstrate.hub.delete.coworker-env`.",
+        "operationId": "deleteCoworkerEnv",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EnvScope"
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "required": false,
+            "description": "Variable name. Required unless supplied in the body. Forwarded as `x-param-query-key`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deletion confirmation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "scope": {
+                      "type": "string",
+                      "enum": [
+                        "organisation",
+                        "user"
+                      ]
+                    },
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AdminOnly"
+          },
+          "404": {
+            "description": "No such key declared in this scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/model-catalog": {
+      "get": {
+        "tags": [
+          "Models"
+        ],
+        "summary": "Merged model catalogue",
+        "description": "agent-service's static provider/model catalogue plus one entry per custom provider saved on the account.\n\nIf the builtin catalogue cannot be fetched the request still succeeds with `partial: true` and only the custom providers, so the UI stays usable and previously-saved selections keep working. `partial` is also set when the fetch \"succeeded\" with zero providers — a catalogue with no capability data is degraded, not proof that no models exist. Subject: `microstrate.hub.get.coworker-model-catalog`.",
+        "operationId": "getCoworkerModelCatalog",
+        "responses": {
+          "200": {
+            "description": "Merged catalogue",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelCatalogResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/agent/model-pool": {
+      "get": {
+        "tags": [
+          "Models"
+        ],
+        "summary": "Read the account's model pool configuration",
+        "description": "An account with no config yet gets `{}` so the UI renders the default state (all providers enabled, default models). A *failed* read answers 502: the UI draws defaults from an empty body, and the user's next Save would post those defaults over a config that was fine, losing every custom provider and tier pin.\n\nCustom provider credentials come back as `auth_key_ref` (a `SECRET::<name>::` reference) — the raw key is never returned. Subject: `microstrate.hub.get.agent-model-pool`.",
+        "operationId": "getModelPool",
+        "responses": {
+          "200": {
+            "description": "The stored config, redacted; `{}` when none exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelPoolConfig"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamError"
+          }
+        },
+        "x-resource-type": "service",
+        "x-beta": true
+      }
+    },
+    "/hub/coworker/memory-consolidation": {
+      "get": {
+        "summary": "Read the memory-consolidation setting",
+        "description": "Reads the account's memory-consolidation setting.",
+        "operationId": "getCoworkerMemoryConsolidation",
+        "tags": [
+          "Memory"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        },
+        "x-beta": true
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CustomModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "best_for": {
+            "type": "string"
+          },
+          "reasoning_category": {
+            "type": "string"
+          },
+          "supports_tools": {
+            "type": "boolean"
+          },
+          "supports_vision": {
+            "type": "boolean"
+          },
+          "supports_voice": {
+            "type": "boolean"
+          },
+          "supports_video": {
+            "type": "boolean"
+          },
+          "supports_thinking": {
+            "type": "boolean"
+          },
+          "supports_streaming": {
+            "type": "boolean"
+          },
+          "supports_sampling_params": {
+            "type": "boolean"
+          },
+          "routing_tiers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "context_window": {
+            "type": "integer"
+          },
+          "max_output_tokens": {
+            "type": "integer"
+          },
+          "task_strengths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "input_cost_per_1m": {
+            "type": "number"
+          },
+          "output_cost_per_1m": {
+            "type": "number"
+          },
+          "release_date": {
+            "type": "string"
+          }
+        }
+      },
+      "ModelCatalogModelEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "reasoning_category": {
+            "type": "string"
+          },
+          "supports_tools": {
+            "type": "boolean"
+          },
+          "supports_vision": {
+            "type": "boolean"
+          },
+          "supports_voice": {
+            "type": "boolean"
+          },
+          "supports_video": {
+            "type": "boolean"
+          },
+          "supports_thinking": {
+            "type": "boolean"
+          },
+          "supports_streaming": {
+            "type": "boolean"
+          },
+          "supports_sampling_params": {
+            "type": "boolean"
+          },
+          "input_cost_per_1m": {
+            "type": "number"
+          },
+          "output_cost_per_1m": {
+            "type": "number"
+          },
+          "release_date": {
+            "type": "string"
+          },
+          "task_strengths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "best_for": {
+            "type": "string"
+          },
+          "routing_tiers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "context_window": {
+            "type": "integer"
+          },
+          "max_output_tokens": {
+            "type": "integer"
+          },
+          "fast_mode": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "PromoteTaskResponse": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "$ref": "#/components/schemas/WorkspaceTask"
+          },
+          "todo_item": {
+            "$ref": "#/components/schemas/TodoItem"
+          },
+          "error": {
+            "type": "string",
+            "description": "Present instead of `todo_item` when the task was created but the backlog item could not be closed"
+          }
+        }
+      },
+      "SuccessMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "success"
+          }
+        }
+      },
+      "TodoStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "in_progress",
+          "done",
+          "awaiting_user",
+          "cancelled"
+        ]
+      },
+      "CoworkerCorrectionsRequest": {
+        "type": "object",
+        "required": [
+          "corrections"
+        ],
+        "description": "The whole list, as the panel holds it. `corrections` is required: an omitted key is a 400, never a silent clear.",
+        "properties": {
+          "corrections": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "$ref": "#/components/schemas/CoworkerCorrection"
+            }
+          }
+        }
+      },
+      "ModelCatalogProviderEntry": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "custom": {
+            "type": "boolean",
+            "description": "True for entries derived from the account's own custom providers"
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelCatalogModelEntry"
+            }
+          }
+        }
+      },
+      "TaskSpaceSetting": {
+        "type": "object",
+        "properties": {
+          "space_id": {
+            "type": "string",
+            "description": "Always uppercase and never empty; `ESCALATE` when the account has never chosen",
+            "example": "ESCALATE"
+          },
+          "updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Its **absence** means the account has never chosen and is inheriting the built-in default"
+          }
+        }
+      },
+      "SkillConfig": {
+        "type": "object",
+        "description": "One user-defined skill.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{1,62}$",
+            "description": "Lowercase slug, 2–63 characters, must not collide with a builtin id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "description": "Required"
+          },
+          "title": {
+            "type": "string",
+            "description": "Authored display name. Preserved when omitted."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2048,
+            "description": "Under the Agent Skills convention this carries the activation criteria, including negative ones"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "description": "Zero keywords is allowed — a discovery-only skill, surfaced through discovery rather than fast-path activation"
+          },
+          "patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "description": "Each must compile as a Go regexp with a `(?i)` prefix — a bad regex is a 400 at write time, not a silent no-match later"
+          },
+          "negative_patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Same compilation rule as `patterns`"
+          },
+          "instruction": {
+            "type": "string",
+            "description": "SKILL.md-style body, at most 32 KiB"
+          },
+          "tool_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "No empty strings, no whitespace inside an id"
+          },
+          "always_on": {
+            "type": "boolean"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Server-managed — set only by the skill file endpoints; whatever a client sends is ignored",
+            "readOnly": true
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "builtin",
+              "user"
+            ],
+            "description": "Server-managed — always forced to `user` on write",
+            "readOnly": true
+          },
+          "exec_approved": {
+            "type": "boolean",
+            "description": "Per-skill half of the script-execution consent. Cleared when omitted."
+          },
+          "license": {
+            "type": "string",
+            "description": "Frontmatter. Preserved when omitted."
+          },
+          "compatibility": {
+            "type": "string",
+            "description": "Frontmatter. Preserved when omitted."
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Frontmatter. Preserved when omitted."
+          },
+          "allowed_tools": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Frontmatter. Preserved when omitted."
+          },
+          "env": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EnvDeclaration"
+            },
+            "description": "What this skill declares it needs. Preserved when omitted."
+          },
+          "approved_env": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Which declared names a human granted. **Cleared when omitted**, and always narrowed to the intersection with `env` — an approval must never outlive the declaration it was given against."
+          },
+          "catalog_id": {
+            "type": "string",
+            "description": "Catalogue provenance (`owner/repo#skillname`), set once at install. Preserved when omitted."
+          },
+          "source_repo": {
+            "type": "string",
+            "description": "Catalogue provenance. Preserved when omitted."
+          },
+          "enrichment": {
+            "$ref": "#/components/schemas/SkillEnrichment"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "OrgMemory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memory": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "organisation",
+              "user"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deleted": {
+            "type": "boolean",
+            "description": "Tombstone flag — tombstones are filtered out of list reads"
+          }
+        }
+      },
+      "CoworkerPersonalProfile": {
+        "type": "object",
+        "description": "The FROZEN wire shape (docs/abbie-surface-routing-plan.md §1b). Three prose fields, deliberately NOT the eight structured rapport keys — nothing here duplicates `role`, `preferred_formality`, `preferred_length`, `preferred_name`, `preferred_tone`, `expertise_level`, `interests` or `language`. Every field is optional; absent and `\"\"` mean the same and there is no null. Caps are counted in runes and enforced at the write; the whole object is additionally capped at 3000 runes summed across every field.",
+        "properties": {
+          "about_me": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Role, context, what you work on",
+            "example": "I run vendor onboarding for the north-west region."
+          },
+          "how_i_work": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Working style, accessibility needs, how you want answers",
+            "example": "I'm dyslexic — keep paragraphs short and lead with the answer."
+          },
+          "constraints": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Your own always/never rules",
+            "example": "Never draft anything to a client without showing me first."
+          }
+        }
+      },
+      "ModelPoolConfig": {
+        "type": "object",
+        "description": "The account's provider/model routing configuration. A GET on an account with no config returns `{}`.",
+        "properties": {
+          "active_providers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "routing_mode": {
+            "type": "string",
+            "enum": [
+              "",
+              "cost",
+              "balanced",
+              "performance",
+              "accuracy"
+            ],
+            "description": "Sovereignty is not a routing mode — it is orthogonal to this axis and is configured by the `sovereign` block, which composes with any mode here."
+          },
+          "processing_speed": {
+            "type": "string",
+            "enum": [
+              "",
+              "standard",
+              "fast"
+            ],
+            "description": "Omitted on PUT means unchanged; send \"\" to reset the account to standard speed."
+          },
+          "expert_strategy": {
+            "type": "string"
+          },
+          "judge_quorum": {
+            "type": "integer"
+          },
+          "coworker_run_timeout_minutes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60,
+            "description": "Minutes, 5–60. 0 means the 30-minute default. Deliberately an int, never a duration string."
+          },
+          "model_routing": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "stage_models": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "custom_providers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomProvider"
+            }
+          },
+          "sovereign": {
+            "$ref": "#/components/schemas/SovereignConfig"
+          },
+          "provider_keys": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Builtin provider key (`anthropic`/`openai`/`gemini`, later `scx`) to a `SECRET::<name>::` reference for that provider's own key. Unlike `CustomProvider.auth_key`, a value must already be a well-formed reference — there is no raw-key reconciliation path for this field."
+          }
+        }
+      },
+      "CoworkerPersonality": {
+        "type": "object",
+        "properties": {
+          "voice": {
+            "type": "string",
+            "maxLength": 4000,
+            "description": "The stored voice layer; empty when the account has never set one",
+            "example": "Warm, brief, British. No bullet lists unless asked."
+          },
+          "is_default": {
+            "type": "boolean",
+            "description": "True when no voice is stored, so the platform default instruction applies alone"
+          }
+        }
+      },
+      "CoworkerProfileGlossaryEntry": {
+        "type": "object",
+        "properties": {
+          "term": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "MSA"
+          },
+          "meaning": {
+            "type": "string",
+            "maxLength": 300,
+            "example": "Master services agreement — the umbrella terms a vendor signs before any work order"
+          }
+        }
+      },
+      "WorkspaceTask": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "Derived from the item's content, truncated at 120 characters"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "TodoItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "description": "The one-line item"
+          },
+          "details": {
+            "type": "string",
+            "description": "Long-form context behind `content`"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TodoStatus"
+          },
+          "owner_user_id": {
+            "type": "string",
+            "description": "Mesh identity of the item's owner"
+          },
+          "session_id": {
+            "type": "string"
+          },
+          "blocked_on": {
+            "type": "string"
+          },
+          "follow_up_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "\"Chase the person this item is parked on\" — only meaningful on an `awaiting_user` item"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "scheduled_for": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cron": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "organisation",
+              "user"
+            ],
+            "description": "Added by the read/write handlers; not part of the stored document"
+          }
+        }
+      },
+      "CoworkerProfileSystemOfRecord": {
+        "type": "object",
+        "properties": {
+          "system": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "NetSuite"
+          },
+          "authoritative_for": {
+            "type": "string",
+            "maxLength": 300,
+            "example": "Supplier and contract data"
+          }
+        }
+      },
+      "CoworkerEnvVar": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[A-Z_][A-Z0-9_]*$",
+            "maxLength": 64
+          },
+          "value": {
+            "type": "string",
+            "description": "Either a literal or a `SECRET::<name>::` reference. Returned verbatim — never resolved, never redacted."
+          },
+          "secret": {
+            "type": "boolean",
+            "description": "**Derived on write** from whether `value` parses as a well-formed reference. Never taken from the client.",
+            "readOnly": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Model-visible for every entry, secret or not"
+          },
+          "server": {
+            "type": "string",
+            "description": "Catalog server id this variable belongs to, verbatim. Optional — plenty of config belongs to no server."
+          },
+          "consumers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "mcp",
+                "skill"
+              ]
+            },
+            "description": "Narrows which surfaces receive this variable. Empty means all."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_by": {
+            "type": "string",
+            "description": "Accounts user id",
+            "readOnly": true
+          }
+        }
+      },
+      "SkillTestResponse": {
+        "type": "object",
+        "properties": {
+          "activated": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkillActivation"
+            },
+            "description": "Skills the message matched"
+          },
+          "discoverable": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkillActivation"
+            },
+            "description": "Enabled skills that did not activate but would surface through discovery"
+          }
+        }
+      },
+      "CoworkerProfileResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CoworkerProfile"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "is_default": {
+                "type": "boolean",
+                "description": "True when every field is empty, so the profile block renders nothing at all"
+              }
+            }
+          }
+        ]
+      },
+      "GetSkillsResponse": {
+        "type": "object",
+        "properties": {
+          "builtins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuiltinSkill"
+            }
+          },
+          "disabled_builtins": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkillConfig"
+            }
+          }
+        }
+      },
+      "CoworkerProfile": {
+        "type": "object",
+        "description": "The FROZEN wire shape (docs/abbie-org-profile-and-env-request-plan.md §B-1a). Every field is optional; absent, `\"\"` and `[]` all mean nothing to render — there is no null. Caps are counted in runes and enforced at the write; the whole object is additionally capped at 8000 runes summed across every field.",
+        "properties": {
+          "legal_name": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "trading_names": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "maxItems": 10
+          },
+          "what_we_do": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "industry": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "regulator": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Regulator and/or licence reference"
+          },
+          "size": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "locations": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "financial_year_end": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "systems_of_record": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoworkerProfileSystemOfRecord"
+            },
+            "maxItems": 20
+          },
+          "glossary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoworkerProfileGlossaryEntry"
+            },
+            "maxItems": 40
+          },
+          "working_hours": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "timezone": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "house_style": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "always": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 300
+            },
+            "maxItems": 20
+          },
+          "never": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 300
+            },
+            "maxItems": 20
+          },
+          "data_handling": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      },
+      "SovereignScenario": {
+        "type": "object",
+        "description": "One circumstance in which sovereign routing binds. Stored only — nothing evaluates these yet.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Required when the scenario is present."
+          },
+          "condition": {
+            "type": "string",
+            "description": "Natural-language condition evaluated by the classifier."
+          }
+        }
+      },
+      "SkillDraft": {
+        "type": "object",
+        "description": "A proposed skill awaiting human approval.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Draft id — not the skill id. Empty mints a new draft."
+          },
+          "skill_id": {
+            "type": "string",
+            "description": "Set means this draft is an edit of an existing skill"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "expired"
+            ],
+            "description": "Server-owned — always forced to `pending` on write. `expired` = aged out unanswered; a late approve or reject still lands, and a PUT re-opens it with a fresh review window.",
+            "readOnly": true
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "explicit",
+              "proactive",
+              "refinement"
+            ],
+            "description": "Defaults to `explicit`"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tool_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "env": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EnvDeclaration"
+            },
+            "description": "A declaration only — approving the draft never creates an `approved_env` grant"
+          },
+          "session_id": {
+            "type": "string",
+            "description": "Provenance"
+          },
+          "created_by": {
+            "type": "string",
+            "description": "Stamped server-side where possible; immutable once set. Absent for unattended proactive proposals."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Immutable while pending; re-stamped when a PUT re-opens a resolved draft (it is the expiry clock)"
+          },
+          "pii_redactions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Redaction categories that fired while generating this draft. The only route by which the approving human learns the text was rewritten."
+          }
+        }
+      },
+      "OrgMemoryRequest": {
+        "type": "object",
+        "required": [
+          "memory"
+        ],
+        "properties": {
+          "memory": {
+            "type": "string",
+            "maxLength": 2048,
+            "description": "Required and non-blank"
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "maxItems": 10,
+            "description": "No empty strings"
+          }
+        }
+      },
+      "EnvDeclaration": {
+        "type": "object",
+        "description": "One environment variable a skill or MCP server declares it needs. A declaration, never a grant — the approval is a separate human act recorded in `approved_env`.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "`^[A-Z_][A-Z0-9_]*$`, not platform-reserved"
+          },
+          "description": {
+            "type": "string"
+          },
+          "is_required": {
+            "type": "boolean"
+          },
+          "is_secret": {
+            "type": "boolean",
+            "description": "When true, any `default` is dropped on write so a plaintext credential cannot ride in"
+          },
+          "format": {
+            "type": "string"
+          },
+          "default": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "SkillActivation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "builtin",
+              "user"
+            ]
+          },
+          "always_on": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CoworkerPersonalProfileResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CoworkerPersonalProfile"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "is_default": {
+                "type": "boolean",
+                "description": "True when every field is empty, so the profile block renders nothing at all"
+              }
+            }
+          }
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "description": "The unwrapped error body. The HTTP status carries the code.",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "PutTodoRequest": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "organisation",
+              "user"
+            ],
+            "description": "`user` always means the caller's own document"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TodoStatus"
+          },
+          "content": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string",
+            "description": "An explicit empty string clears it; a blank `content` is refused"
+          },
+          "follow_up_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Must be sent together with `status: awaiting_user`"
+          },
+          "approved_tool_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Answer to the consent card that parked this item. **Not stored** — forwarded on the work event so the resuming run carries the consent. Ignored unless the patch un-parks the item."
+          },
+          "approved_server_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "\"Just this once\" server approvals. Forwarded, never stored — an approval that settled on the item would become the standing grant the Authorise button exists to make deliberate."
+          },
+          "denied_server_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Forwarded, never stored"
+          }
+        }
+      },
+      "CoworkerCorrectionsResponse": {
+        "type": "object",
+        "properties": {
+          "corrections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoworkerCorrection"
+            },
+            "description": "Empty list, never null"
+          },
+          "max_entries": {
+            "type": "integer",
+            "example": 6,
+            "description": "The entry cap. A full list is refused, never evicted — the panel offers removal."
+          }
+        }
+      },
+      "ModelCatalogResponse": {
+        "type": "object",
+        "properties": {
+          "providers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelCatalogProviderEntry"
+            }
+          },
+          "partial": {
+            "type": "boolean",
+            "description": "The builtin catalogue could not be fetched, or came back with zero providers — only custom providers are present"
+          }
+        }
+      },
+      "CoworkerCorrectionDraft": {
+        "type": "object",
+        "description": "A proposed correction awaiting the person's decision. FROZEN cross-module record (docs/abbie-corrections-surface-plan.md §3) — mirrored by hand in bellerophon-workforce, which writes this same per-user document directly and cannot import hub. FIELD COUNT: 9. Nothing in this aggregate reaches any prompt until it is approved.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Draft id, stamped by the filer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "dismissed",
+              "expired"
+            ],
+            "description": "Server-owned. Approved and dismissed drafts are immutable; a dismissal is permanent. Expired means it aged out unanswered and still accepts a late approve or dismiss.",
+            "readOnly": true
+          },
+          "situation": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "instead": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "confidence": {
+            "type": "number",
+            "format": "double",
+            "description": "The analyser's confidence. Corrections never auto-apply at any confidence."
+          },
+          "evidence": {
+            "type": "string",
+            "description": "A verbatim quote from the user's own turn"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "analyser",
+              "vote"
+            ],
+            "description": "Which feed filed it. Anything unrecognised is recorded as `analyser` on approval — never as `manual`, which would claim a person typed it."
+          },
+          "session_id": {
+            "type": "string",
+            "description": "Provenance"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BuiltinSkill": {
+        "type": "object",
+        "description": "One platform-provided skill.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "negative_patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tool_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "always_on": {
+            "type": "boolean"
+          },
+          "locked": {
+            "type": "boolean",
+            "description": "A locked builtin can never be disabled"
+          }
+        }
+      },
+      "CustomProvider": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "endpoint": {
+            "type": "string",
+            "format": "uri",
+            "description": "OpenAI-compatible base URL"
+          },
+          "auth_type": {
+            "type": "string",
+            "enum": [
+              "api_key",
+              "bearer"
+            ]
+          },
+          "auth_key": {
+            "type": "string",
+            "description": "Write-only. A raw key is moved into the account's secrets bucket on save and replaced by `auth_key_ref`; a `SECRET::<name>::` reference is stored verbatim. Never returned."
+          },
+          "auth_key_ref": {
+            "type": "string",
+            "description": "The stored `SECRET::<name>::` reference. What GET returns in place of `auth_key`.",
+            "readOnly": true
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomModel"
+            },
+            "description": "The legacy shape (`[\"model-a\", \"model-b\"]` with provider-level capability flags) is still accepted on write and still parses out of previously stored aggregates; writes always store the object shape."
+          },
+          "supports_tools": {
+            "type": "boolean",
+            "description": "Legacy provider-level flag"
+          },
+          "supports_vision": {
+            "type": "boolean",
+            "description": "Legacy provider-level flag"
+          }
+        }
+      },
+      "PromoteTaskRequest": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "organisation",
+              "user"
+            ]
+          },
+          "space_id": {
+            "type": "string",
+            "description": "Overrides the account's default space for this one promotion. Absent or blank falls back to the account setting, then `ESCALATE` — it is never an empty space."
+          }
+        }
+      },
+      "SovereignConfig": {
+        "type": "object",
+        "description": "The account's sovereign-routing boundary. Omitted on PUT means unchanged — the stored boundary is preserved; send an explicit empty object to clear it. `providers` is intersected with `active_providers` to form the boundary every routing decision filters on; leaving it empty falls back to `active_providers` alone.",
+        "properties": {
+          "providers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Entries must be non-empty. The boundary the router enforces is `active_providers` intersected with this list — see `enforcement`."
+          },
+          "enforcement": {
+            "type": "string",
+            "enum": [
+              "",
+              "preferred",
+              "strict"
+            ],
+            "description": "Empty means \"preferred\" — a crossing is allowed, not blocked. \"strict\" is live in the router: it makes the boundary absolute, so a request that cannot be served from inside it fails instead of reaching outside it. The boundary is `active_providers` intersected with `providers`; a provider must be in both. A strict boundary that is empty, or whose two lists share nothing, is rejected on save. Scenario matching is not built, so a strict boundary binds every request rather than only a matched scenario."
+          },
+          "scenarios": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SovereignScenario"
+            },
+            "description": "Stored only — scenario matching is not built."
+          },
+          "regions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "ISO-3166 alpha-2 country codes, UPPERCASE (e.g. `[\"AU\"]`). Entries must be exactly two uppercase letters — not silently upper-cased. Empty/absent means no residency constraint. Composes with `providers` and `enforcement`; does not replace them."
+          }
+        }
+      },
+      "CoworkerEnvListResponse": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "type": "string",
+            "enum": [
+              "organisation",
+              "user"
+            ]
+          },
+          "vars": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CoworkerEnvVar"
+            },
+            "description": "Always an array, never null"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CoworkerCorrection": {
+        "type": "object",
+        "description": "One correction — a situation and a different behaviour for it. FROZEN wire shape (docs/abbie-corrections-surface-plan.md §3), spelled by hand in bellerophon-workforce and the frontend, which cannot import hub. FIELD COUNT: 5. `source` and `created_at` are stored but never rendered into a prompt.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stamped server-side as `c_<uuid>` when blank",
+            "example": "c_2f5a1e14-9a2b-4f0e-8f3a-1d2c3b4a5e6f"
+          },
+          "situation": {
+            "type": "string",
+            "maxLength": 150,
+            "description": "When the rule applies. Required.",
+            "example": "when I ask for a quote"
+          },
+          "instead": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "What to do instead. Required — a situation with no instead is a complaint, not a correction.",
+            "example": "check the schedule before pricing"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "analyser",
+              "vote",
+              "manual"
+            ],
+            "description": "Provenance. Defaults to `manual` when blank; an unknown value is refused."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Stamped server-side when blank. Never used to sort — order is insertion order."
+          }
+        }
+      },
+      "CoworkerEnvVarRequest": {
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[A-Z_][A-Z0-9_]*$",
+            "maxLength": 64
+          },
+          "value": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "server": {
+            "type": "string"
+          },
+          "consumers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "mcp",
+                "skill"
+              ]
+            }
+          }
+        },
+        "description": "Note what is absent: `secret`, `updated_at` and `updated_by`. All three are server-derived; the fields are omitted from the request type rather than accepted-and-ignored so the omission is visible at the boundary."
+      },
+      "SkillEnrichment": {
+        "type": "object",
+        "description": "Server-managed provenance for generated keywords/patterns. Ignored on input and rebuilt from what is stored.",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "description": "Generator version"
+          },
+          "model": {
+            "type": "string"
+          },
+          "enriched_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source_hash": {
+            "type": "string",
+            "description": "Fingerprint of the generator's input fields"
+          },
+          "keywords_source": {
+            "type": "string",
+            "enum": [
+              "generated",
+              "manual"
+            ]
+          },
+          "patterns_source": {
+            "type": "string",
+            "enum": [
+              "generated",
+              "manual"
+            ]
+          },
+          "generated_keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "generated_patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "probe_queries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Natural-language messages that should activate this skill"
+          }
+        }
+      },
+      "SkillExecConsent": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "enabled_by": {
+            "type": "string",
+            "description": "Accounts user id — the audit trail"
+          },
+          "enabled_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "EnvScope": {
+        "name": "scope",
+        "in": "query",
+        "required": false,
+        "description": "`user` addresses the caller's personal manifest; anything else — including an unrecognised value — resolves to organisation. A `user` request from a token that carries no user identity is a **400**, never widened to the organisation. Forwarded as `x-param-query-scope`.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "organisation",
+            "user"
+          ],
+          "default": "organisation"
+        }
+      },
+      "MemoryIdPath": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Memory id. Forwarded as `x-param-id`.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "MemoryScope": {
+        "name": "scope",
+        "in": "query",
+        "required": false,
+        "description": "`user` addresses the caller's personal memories; anything else resolves to organisation, so callers written before personal memories existed keep working unchanged. Forwarded as `x-param-query-scope`.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "organisation",
+            "user"
+          ],
+          "default": "organisation"
+        }
+      }
+    },
+    "responses": {
+      "SuccessMessage": {
+        "description": "Success",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SuccessMessage"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "No account (or user) identity in the auth context",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Malformed payload or a failed validation rule",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "The addressed resource does not exist for this caller",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "AdminOnly": {
+        "description": "An account admin role is required",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "UpstreamError": {
+        "description": "A backend read or write failed — deliberately not degraded to an empty or default answer",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "RevisionConflict": {
+        "description": "The document moved between the caller's read and its write — the request was well formed, so reload and re-offer rather than retrying blindly",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
