@@ -37,7 +37,7 @@ An origin to prefix `url` with. Useful when several steps share a host.
 </ParamField>
 
 <ParamField path="data" type="object">
-**The request body.** JSON-encoded, and `Content-Type: application/json` is set automatically when it is present. The field is `data`, not `body`.
+**The request body.** An object or array is JSON-encoded and sent with `Content-Type: application/json`. A string is sent as it is: it is labelled `application/json` when it parses as JSON and `application/x-www-form-urlencoded` otherwise, so form-encoded token requests work without extra setup. An empty string sends no body. A `Content-Type` header you set yourself always wins. The field is `data`, not `body`.
 </ParamField>
 
 <ParamField path="query" type="object">
@@ -150,17 +150,12 @@ A **constant** wait before each retry. There is no exponential backoff and no mu
 </ParamField>
 
 <ParamField path="options.ignore_response_codes" type="integer[]">
-Status codes that must not trigger a **retry**. The name is misleading: a code listed here is still an error.
+Status codes the step should treat as an expected outcome. A listed code is not retried and does not end the run: the step returns a result carrying `status_code` and `error`, alongside the response's own `status`, `statusText`, `headers` and `data`, so a Condition step can branch on `$.STEP.status_code`.
 </ParamField>
 
-<Warning>
-`ignore_response_codes` does not let the run continue. It is read only when deciding whether to
-retry — a listed code skips the retry loop, and the step then fails exactly as it would have
-anyway, ending the run. There is no setting that tolerates a 4xx or 5xx from this step.
-
-To handle an expected 404, put the call in a nested flow whose own error path returns a value the
-parent can read, or use an Eval step to make the request yourself.
-</Warning>
+<Note>
+Only a code that arrives as an HTTP status can be listed. A request that never gets a response, such as a timeout or a connection failure, has no status and still fails the step. A code that is not listed fails the step as before.
+</Note>
 
 <ParamField path="options.flat_map" type="boolean">
 Flattens the response into dotted keys before storing it, turning `$.STEP.data.id` into the key `data.id`.

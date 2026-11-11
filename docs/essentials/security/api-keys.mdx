@@ -79,7 +79,7 @@ The prefix uses a hyphen, not an underscore.
 
 ## Expiry
 
-Keys expire after **90 days** by default. When a key is created through the API the lifetime is configurable, and a negative value produces a key that never expires.
+A key created in Settings expires after **90 days**; the dialog has no expiry option. When a key is created through the API the lifetime is configurable, and a negative value produces a key that never expires.
 
 You get two emails around expiry:
 
@@ -94,7 +94,7 @@ A key that never expires never gets rotated by the platform on your behalf. If y
 
 ### Viewing your keys
 
-The **API keys** tab lists your keys with these columns:
+The **API keys** tab lists your personal keys for the account you are signed in to. Keys you hold in another account appear when you switch to that account. It shows these columns:
 
 | Column | Shows |
 |---|---|
@@ -263,7 +263,7 @@ curl -H "Authorization: Bearer $QUIVA_API_KEY" \
 ```
 
 <Info>
-HTTP paths are defined per account by your own gateway mappings, so there is no single shared base URL to publish here. Use the endpoint your account exposes.
+Requests go to `https://api.quiva.ai`. The API reference tab lists the available endpoints.
 </Info>
 
 <Tabs>

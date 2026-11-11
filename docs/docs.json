@@ -377,6 +377,18 @@
             }
           },
           {
+            "group": "Records",
+            "openapi": {
+              "source": "api-reference/endpoint/records/openapi.json"
+            }
+          },
+          {
+            "group": "Documents",
+            "openapi": {
+              "source": "api-reference/endpoint/documents/openapi.json"
+            }
+          },
+          {
             "group": "Secrets Manager",
             "openapi": {
               "source": "api-reference/endpoint/secrets-manager/openapi.json"
@@ -416,6 +428,12 @@
             "group": "Monitoring",
             "openapi": {
               "source": "api-reference/endpoint/monitoring/openapi.json"
+            }
+          },
+          {
+            "group": "Microsoft 365",
+            "openapi": {
+              "source": "api-reference/endpoint/m365/openapi.json"
             }
           }
         ]

@@ -6,7 +6,7 @@ icon: 'user-check'
 
 # Checkpoint Step
 
-A Checkpoint step stops the run and hands it to a person. It creates a task, notifies the people you named, and parks the run until somebody continues it from the Monitoring page. Whatever that person sends back becomes the step's result.
+A Checkpoint step stops the run and hands it to a person. It creates a task, notifies the people you named, and parks the run until somebody continues it — by answering a form on the task, or from the Monitoring page. Whatever that person sends back becomes the step's result.
 
 The step is called **Checkpoint** when you add it to a flow; its node type is `human-in-the-loop`.
 
@@ -14,7 +14,7 @@ The step is called **Checkpoint** when you add it to a flow; its node type is `h
 
 ## Configuration
 
-The editor has a **General** tab (name, ID and description) and a **Notifications** tab holding the whole payload — five fields, and no others.
+The editor has a **General** tab (name, ID and description), a **Notifications** tab with five fields, and a **Form** tab for answering on the task.
 
 <ParamField path="title" type="string">
 The title of the task created for the assignees.
@@ -48,6 +48,22 @@ Like every step payload, these are JSONPath-resolved before the step runs, so a 
 }
 ```
 
+### Form tab
+
+Add form fields to let the assignee answer on the task itself instead of from Monitoring.
+
+<ParamField path="fields" type="object">
+**Form fields** — the questions, built with the schema builder. Leave it empty for the Continue-only behaviour described below.
+</ParamField>
+
+<ParamField path="task_id" type="string">
+**Use an existing task** — a task ID, or a path to one such as `$.CREATE_TASK.id`. Leave it empty to create a new task.
+</ParamField>
+
+<ParamField path="keep_status" type="boolean">
+**Don't change the task status** — answering the form leaves the task in its current status.
+</ParamField>
+
 ---
 
 ## What happens when the run reaches it
@@ -63,7 +79,7 @@ Like every step payload, these are JSONPath-resolved before the step runs, so a 
     The run's status becomes **paused**, and its remaining graph and collected data are stored so it can be picked up later. Nothing downstream runs. There is no expiry: a paused run waits indefinitely.
   </Step>
   <Step title="Somebody continues it">
-    On the Monitoring page, a paused run shows a green **Continue** button. It opens a dialog with one field — a message to pass as the output of the paused step — and resuming restarts the run from that step.
+    If the step has form fields, the task carries an action that opens the form. Submitting it resumes the run with the answers, and a comment on the task names who answered. Otherwise, or in addition, a paused run shows a green **Continue** button on the Monitoring page. It opens a dialog with one field — a message to pass as the output of the paused step — and resuming restarts the run from that step.
   </Step>
 </Steps>
 
@@ -71,11 +87,15 @@ Like every step payload, these are JSONPath-resolved before the step runs, so a 
 
 ## What the step returns
 
-**Exactly what the person typed into the Continue dialog.** The step imposes no shape on it: there is no `approved` flag, no `reviewer`, no `comments` and no timestamp. If a later step needs to branch on a decision, the resumer has to supply it and you have to read it back yourself.
+**The values from the task form, or exactly what the person typed into the Continue dialog.** With form fields, the result is the object the form produces. Through Continue, the step imposes no shape on it: there is no `approved` flag, no `reviewer`, no `comments` and no timestamp. If a later step needs to branch on a decision, the resumer has to supply it and you have to read it back yourself.
 
 <Warning>
-The Continue dialog's message field is parsed as **JSON**. Type `{"approved": true, "note": "fine"}` and the step's result is that object; type bare prose and it fails to parse, in which case the step's result is an empty object. Agree a small JSON shape with whoever is going to action these, and say so in the escalation message.
+The Continue dialog's message field must be **JSON**. Type `{"approved": true, "note": "fine"}` and the step's result is that object; type bare prose and Continue refuses it. Agree a small JSON shape with whoever is going to action these, say so in the escalation message, or give the step form fields so the shape is fixed for you.
 </Warning>
+
+<Note>
+Resuming a run that is not paused, for example one already answered, is refused with a `409`. A second submit of the same form is refused too.
+</Note>
 
 ```json
 { "approved": true, "note": "Refund authorised, under the £200 threshold" }
@@ -108,7 +128,7 @@ A Condition step after the Checkpoint can then route on it:
 <Warning>
 - **No quorum.** Any single Continue resumes the run, however many people were assigned. There is no "2 of 3" or "all approvers".
 - **No timeout.** A paused run has no expiry and no automatic approve, reject or escalate. It waits until a person acts or somebody cancels it.
-- **No approval buttons.** There is no set of named options to choose from — approval is whatever JSON the resumer sends, interpreted by your own Condition step.
+- **No approval buttons.** There is no set of named options to choose from — approval is whatever the form or JSON contains, interpreted by your own Condition step. A dropdown field in the form is the closest thing.
 - **No structured display.** The person sees the task's title, description and priority. There is no separate data panel showing values from the run; put anything they need to see into the description.
 </Warning>
 

@@ -39,7 +39,7 @@ A ticket's **status** crosses by *role*, not by name. Each stage has a role, so 
   </Step>
 
   <Step title="Create a service desk product">
-    In the **Linked accounts** tab, select **+** on the product rail. Set **Type** to **Service desk** and save. The type cannot be changed later. You only need one product for all your clients.
+    In the **Linked accounts** tab, select **+** on the product rail. Set **Type** to **Service desk**. The form then shows a **Stages** section listing the Space's statuses, which you can add, rename and reorder, with a picker for each stage (Intake, Acknowledged, In progress and Done), pre-filled from the roles the Space already has. Each stage needs its own status, and the Done status is marked complete. Save. The type cannot be changed later. You only need one product for all your clients.
   </Step>
 
   <Step title="Send an invitation">
@@ -67,6 +67,10 @@ A client account can have only one connection with your account. A client with n
 ### Edit the status mapping
 
 In your central Space's **Linked accounts** tab, open **Accounts**, then open the menu on the client's row and choose **Edit status mapping**. The new mapping applies to later moves.
+
+<Note>
+An invitation can't be sent until the Space has a status for every stage. If you see `roles_unmapped`, open the product and map the stages. The To do, In progress and Done task-action pickers in Space settings no longer offer a status that holds a service desk stage.
+</Note>
 
 <Note>
 You cannot delete a status that a mapping points to, or the only status that carries a required role. Renaming and recolouring columns is always allowed.

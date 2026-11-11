@@ -9,6 +9,91 @@ month rather than by version. Where a change landed gradually over several weeks
 dated to the month it became generally available rather than to a single commit.
 </Note>
 
+<Update label="November 2026" description="An email platform, Microsoft 365 mail and files, sign-in without an account name, and local AI agents" tags={["Email", "Microsoft 365", "Security", "Flows", "Spaces", "Abbie", "Developers"]}>
+
+## Email platform
+
+**Account**, **Email sending** now has three cards. **Email templates** lets Abbie write a template from a prompt or a reference image, or lets you create and edit one yourself, with a draft and published preview and Publish and Discard. **Email delivery** lists every email with its status and history, with toggles to raise a task when an email fails and to track opens and clicks. The **Suppression list** shows bounces, spam reports and opt-outs, and lets you look up, add and lift addresses. In flows, the Email node can send a published template, and a new **Email delivery** trigger starts a flow when an email bounces or can't be delivered.
+
+<CardGroup cols={2}>
+  <Card title="Email sending" icon="envelope" href="/essentials/account/email-sending">
+    Templates, delivery, suppression and tracking.
+  </Card>
+  <Card title="Email delivery trigger" icon="bolt" href="/flows/triggers/email-delivery">
+    Start a flow when an email fails to arrive.
+  </Card>
+</CardGroup>
+
+## Microsoft 365 and Automations
+
+Connect Microsoft 365 files and mail to Abbie. File mail from chosen senders, domains or subjects into a Space folder with **space mail filters**, and run email **automations** from the new **More**, **Automations** page. A new **Mail** trigger starts a flow from an automation. Files sources have sync rules for storage mode, file types, size and interval. Citations to verified emails and synced files link to Outlook or SharePoint, and a new **Integration problems** notification tells you when a connection needs attention.
+
+<CardGroup cols={2}>
+  <Card title="Microsoft 365" icon="microsoft" href="/abbie/connecting/microsoft-365">
+    Files and mail sources.
+  </Card>
+  <Card title="Automations" icon="gears" href="/flows/automations">
+    Email automations and the Mail trigger.
+  </Card>
+</CardGroup>
+
+## Signing in
+
+Sign-in no longer asks for an account name. Enter your email and password; if your email belongs to more than one account, a **Choose an account** screen follows. After two-factor, tick **Remember this device for 30 days** to skip it on that device. Root users can also set a **sign-in address** for the account, such as `https://acme.<domain>`, from the Account page. Client sign-in links use it, and emailed links prefill the account.
+
+<Card title="Sign-in address" icon="link" href="/essentials/account/account-settings#sign-in-address">
+  Set, change and publish your account's sign-in address.
+</Card>
+
+## Flows and tasks
+
+A **Checkpoint** step can now carry a form. The assignee answers on the task, and the run resumes with their answers. Resuming a run that isn't paused returns `409`. The canvas gains a **Change layout** menu and **Search nodes**. A failed assistant step now carries a status code, so **Ignore response codes** applies to it, and the HTTP Request step can send a non-JSON body.
+
+Tasks gain a fifth action kind, **Records**, plus **Related tickets**, search by task ID, **Saved views**, and a **Tasks**, **Automations** tab that archives tasks after they sit in chosen statuses for a number of days. Collaborators can archive tasks.
+
+<CardGroup cols={2}>
+  <Card title="Checkpoint" icon="user-check" href="/flows/steps/human-in-the-loop">
+    Pause a run and answer from the task.
+  </Card>
+  <Card title="Task actions" icon="circle-check" href="/spaces/task-actions">
+    The five kinds, and the resource each needs.
+  </Card>
+</CardGroup>
+
+## Spaces, records and forms
+
+Organise your Spaces into **groups**, rename a folder from its menu, and preview HTML files as interactive pages. The form builder gains a **Versions** panel with **Publish version** and compare, and record sets have a **View records** page across all Spaces. Flows can create a record once with `record-once`. Service desk products map their stages in the product form.
+
+## E-signature
+
+Document approvals now hold up as evidence. The request has a **Jurisdiction** (AU, NZ, UK or US), the document can't change between request and decision, and the audit trail is a separate approval certificate PDF. External approval links expire after 30 days.
+
+## Abbie
+
+The Model pool lists each provider's models, and **opt-in** models are ticked one by one. Gemini 4 Argon joins the routing pool. Abbie can forget a memory on request and keeps working notes in web chat and direct messages. Branding gains dark theme colours, **Text on primary** and a dark mode favicon.
+
+## MCP and local AI agents
+
+The hosted MCP server at `https://api.quiva.ai/mcp` is live, and the servers can be run locally with a profile (`QUIVA_PROFILE`), so one API key works across Claude Code, Codex and the Quiva skills.
+
+<Card title="Local AI agents" icon="terminal" href="/developers/agents/overview">
+  Set up a key, a profile and your agent.
+</Card>
+
+## Breaking or behaviour changes
+
+<Warning>
+Check these before you upgrade integrations or tell your team.
+
+- **Task actions need a resource.** Creating a task action through the API without a resource, with an unknown type, an empty todo list or a record set not attached to the Space now returns `400`. See [Task actions](/spaces/task-actions).
+- **Old approval links stopped working.** External approval links sent before this release no longer work, and new ones expire after 30 days. Request those approvals again.
+- **Opt-in models need ticking.** Accounts that ticked SCX stop routing to its opt-in models until each one is ticked in the Model pool.
+- **"Everyone" chat sharing is team-only.** A chat shared with everyone is no longer visible to client and guest logins. Share with them by name.
+- **Re-verify your sender domain** to get open and click tracking events. Tracking is now off by default and is an opt-in on **Email delivery**.
+</Warning>
+
+</Update>
+
 <Update label="October 2026" description="Task sync: API integrations, versioned writes, a changes feed, signed webhooks, staging Spaces and a service desk" tags={["Spaces", "Developers", "Flows", "Security"]}>
 
 ## API integrations

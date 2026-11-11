@@ -41,7 +41,7 @@ Click **Save** to store changes to the contact fields.
 Only the root user can rename an account. Editing **Account Name** enables a **Rename Account** button, which opens a confirmation modal.
 
 <Warning>
-Renaming signs out you and every member of the account. Everyone must use the new account name to sign in again, and an email notification about the change is sent to everyone affected.
+Renaming signs out you and every member of the account. Everyone signs in again with their email and password, and an email notification about the change is sent to everyone affected. The new name is what appears in the account picker.
 </Warning>
 
 To confirm, click **Send code**, enter the code emailed to you, then click **Apply Change**. If the code does not arrive, you can request another once the countdown on the button finishes.
@@ -49,6 +49,26 @@ To confirm, click **Send code**, enter the code emailed to you, then click **App
 <Note>
 Account names are matched case-insensitively — they are lowercased and trimmed when stored, so `AcmeOps` and `acmeops` are the same name.
 </Note>
+
+## Sign-in address
+
+Your account can have its own sign-in address, such as `https://acme.<domain>`. It is optional, off until you set it, and only the root user can set or change it.
+
+The **Sign-in address** row on the Account page shows the current address with a copy button.
+
+<Steps>
+  <Step title="Set the address">
+    Click **Set address** (or **Change**), enter 3 to 63 lowercase letters, numbers or hyphens, and confirm.
+  </Step>
+  <Step title="Confirm with a code">
+    Click **Send code**, enter the code emailed to you, then confirm. If the address is saved but not yet live, the button reads **Publish**.
+  </Step>
+  <Step title="Wait for it to go live">
+    A new address is live within about 5 minutes.
+  </Step>
+</Steps>
+
+On the address, the sign-in card reads "Signing in to" your brand, with **Not you? Use another account** underneath. Client sign-in links use the address, and emailed links prefill the account. After a change, your previous address keeps working, and up to 3 previous addresses are kept.
 
 ## Branding
 

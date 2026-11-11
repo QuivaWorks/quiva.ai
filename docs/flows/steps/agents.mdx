@@ -105,6 +105,21 @@ In both cases the step stores no result and nothing downstream runs. The run is 
 
 ---
 
+## When the assistant fails
+
+A failed assistant step carries a status code, so **Ignore response codes** in the step's options applies to it as it does for HTTP, flow and function steps:
+
+| Failure | Status |
+|---|---|
+| The assistant timed out | `504` |
+| Any other transport or decoding error | `502` |
+| A service error | `500` |
+| The assistant replied with an error | The assistant's own status |
+
+List the codes you expect, and the step returns `{ "error": "...", "status_code": 504 }` and the run carries on, so a Condition step can record the failure instead of the run ending. A step that lists no codes behaves as before.
+
+---
+
 ## What an assistant step cannot do
 
 <Warning>
