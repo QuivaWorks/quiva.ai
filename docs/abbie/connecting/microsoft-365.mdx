@@ -1,0 +1,61 @@
+---
+title: "Microsoft 365 files and mail"
+description: "Sync SharePoint folders into a space, connect your Outlook mailbox, and file mail into spaces"
+icon: "microsoft"
+---
+
+Besides [Teams](/abbie/connecting/teams), QuivaWorks connects to two other parts of Microsoft 365. Both are managed from the **Integrations** page, and both keep Abbie's answers pointing back at the original.
+
+| | Files | Mail |
+|---|---|---|
+| What it brings in | A SharePoint library or folder, synced into a space | Your own Outlook mailbox, and mail filed into spaces |
+| Who connects it | An account admin, who signs in as a Microsoft 365 administrator | Each person, for their own mailbox |
+| Who can search it | Members who can see the space | Only you, until mail is filed into a space |
+
+## Files
+
+<Steps>
+  <Step title="Connect Microsoft 365">
+    On the **Microsoft 365 files** card, choose **Connect Microsoft 365**. Microsoft sign-in opens in a new window.
+  </Step>
+  <Step title="Add a folder">
+    Choose **Add folder**, pick the site and library, then the folder, and the space it syncs into.
+  </Step>
+  <Step title="Set the sync rules">
+    Choose how files are stored: **Keep a copy in the space** (recommended: files open instantly and stay readable if SharePoint is unavailable) or **Reference only** (nothing is stored; Abbie fetches the file from SharePoint each time, which is slower). Then set the file types to sync, a maximum file size, how often to check (every 15 minutes, hourly or daily) and whether to skip files with a sensitivity label.
+  </Step>
+</Steps>
+
+Each source shows its state (**Synced**, **Paused**, **Needs attention**), when it last synced, the next sync, file counts and recent runs. If access lapses, **Re-grant access** appears on the source. Changing the storage mode later is a full re-sync: old copies are removed first and everything is read again from SharePoint. A synced folder cannot be renamed in the space.
+
+## Mail
+
+<Steps>
+  <Step title="Connect your Outlook">
+    On the **Your Outlook mail** card, choose **Connect your Outlook**. If your organisation has not approved QuivaWorks Mail yet, an admin approves it first and you sign in afterwards.
+  </Step>
+  <Step title="Choose folders">
+    Pick the mail folders to index and how often to check for new mail. Choose **Start indexing**. The first sync usually takes a few minutes.
+  </Step>
+</Steps>
+
+Your indexed mail is searchable by you alone. **Manage folders** changes what is indexed. **Disconnect and delete my indexed mail** removes it, and warns first if you have automations that depend on the connection.
+
+### Filing mail into a space
+
+A **mail filter** saves matching mail from your Outlook into a folder of a space, so the team can find it and Abbie can cite it.
+
+1. In a space, open the folder's menu and choose **File mail here** (or open the space's **Mail filters** and choose **New filter**).
+2. Under **Match mail**, add senders (an address, or a domain such as `@brokerco.example`) and, optionally, words the subject must contain. Fill in one or both; when both are filled, mail must match both.
+3. Choose the folder to **Save into**. Matching mail from the last few days is imported too.
+4. Optionally save attachments as separate files so each can be previewed and searched on its own.
+
+Each space shows a **Mail filing** strip with an **Auto-file** switch, and filters that need attention. A filter keeps working only while the owner's mailbox stays connected; **Reconnect Outlook** fixes it. To do more than file the mail, add an [email automation](/flows/automations).
+
+## Notifications
+
+When a synced folder or a mailbox stops and needs fixing, admins (or, for a mailbox, its owner) get an in-app notice of the type **Integration problems**. Turn it on or off under **Settings → Notifications → Integrations**. You are told once per change of problem, not on every retry.
+
+## Links back to Microsoft
+
+When Abbie cites a synced file or a filed email, the citation ends with **Open in SharePoint** or **Open in Outlook**, so you can open the original.

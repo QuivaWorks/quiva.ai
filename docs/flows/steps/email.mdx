@@ -1,0 +1,49 @@
+---
+title: "Send Email"
+description: "Send an email from a flow, from a published template or with your own subject and body"
+icon: "envelope"
+---
+
+The Send email step sends one email. Prefer a [published template](/essentials/account/email-sending#email-templates): the template owns the design and wording, and the step only supplies the data.
+
+<Info>
+The step reports that the email was **accepted for sending**, not that it was delivered. A suppressed address, missing consent or an unverified sending domain can still refuse it after the step completes. Watch the outcome in [Email delivery](/essentials/account/email-sending#email-delivery), or react to it with the [Email delivery trigger](/flows/triggers/email-delivery).
+</Info>
+
+## Fields
+
+<ParamField path="template_key" type="string">
+A published template, chosen from a dropdown. Choosing one hides the subject and body fields. If none are listed, create and publish one under **Account → Email sending → Email templates**, then reopen the step.
+</ParamField>
+
+<ParamField path="data" type="object">
+Answers the template's tags, as an object or a path into the run's data. A tag the data does not answer refuses the send.
+</ParamField>
+
+<ParamField path="subject" type="string">
+Only needed when you send without a template. Not required when `template_key` is set.
+</ParamField>
+
+<ParamField path="class" type="commercial | transactional">
+**commercial** mail honours unsubscribes and the suppression list. **transactional** is for messages the person needs, such as a receipt or a notice.
+</ParamField>
+
+<ParamField path="cc / bcc" type="addresses">
+Transactional mail only.
+</ParamField>
+
+<ParamField path="attachments" type="files">
+Attach a file stored in a space with the file picker, or name one by bucket, key and optional file name. Map **Attachments**, or any one value, from an earlier step. Up to 6 MB in total. Files are read with the sender's own access, so a send attaches only what its sender could open, and a missing file refuses the send and names it. The step cannot upload files.
+</ParamField>
+
+<ParamField path="idempotency_key" type="string">
+A key you choose. A retry with the same key does not send the email twice.
+</ParamField>
+
+<ParamField path="ref" type="object">
+Your own reference, such as an order id. It comes back on the delivery log row and on every [delivery event](/flows/triggers/email-delivery), so you can tie an outcome to the run that sent it.
+</ParamField>
+
+<Tip>
+Email sent by a run that an Email delivery trigger started starts no further flow and raises no task, so a failure handler cannot loop.
+</Tip>

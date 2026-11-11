@@ -1,0 +1,49 @@
+---
+title: "OpenAPI specs"
+description: "Download the machine-readable spec for each API area and hand it to an agent"
+icon: "file-code"
+---
+
+Each area of the QuivaWorks API has an OpenAPI spec. An agent that calls the API directly, or writes code against it, can read the spec instead of guessing at request shapes.
+
+## Where to get them
+
+```
+https://docs.quiva.ai/api-reference/endpoint/<area>/openapi.json
+```
+
+| Area | Spec |
+|---|---|
+| Accounts | `accounts/openapi.json` |
+| Assistants | `assistants/openapi.json` |
+| Documents | `documents/openapi.json` |
+| Gateway | `gateway/openapi.json` |
+| Flows (hub) | `hub-flows/openapi.json` |
+| Microsoft 365 | `m365/openapi.json` |
+| Monitoring | `monitoring/openapi.json` |
+| Records | `records/openapi.json` |
+| Secrets manager | `secrets-manager/openapi.json` |
+| Storage | `storage/openapi.json` |
+| Triggers | `trigger/openapi.json` |
+| Workspaces | `workspaces/openapi.json` |
+
+## Calling the API
+
+- **Base URL**: `https://api.quiva.ai`
+- **Authentication**: send your [API key](/developers/agents/overview) in an `x-api-key` header.
+
+```sh
+curl https://api.quiva.ai/<path from the spec> -H "x-api-key: $QUIVA_API_KEY"
+```
+
+## Handing a spec to an agent
+
+Download only the areas the task needs. Specs can be large, and a smaller set keeps the agent focused.
+
+```sh
+mkdir -p specs && curl -s https://docs.quiva.ai/api-reference/endpoint/records/openapi.json -o specs/records.json
+```
+
+Then tell the agent: "Use `specs/records.json` as the reference for the Records API. Call it at `https://api.quiva.ai` with the `x-api-key` header, reading the key from `QUIVA_API_KEY`. Never print the key."
+
+The same pages are also browsable in the **API Reference** tab of these docs.

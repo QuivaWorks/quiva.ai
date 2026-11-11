@@ -1,0 +1,46 @@
+---
+title: "Skills"
+description: "The quiva-config skill: pull, diff, push and copy account configuration from a local agent"
+icon: "wand-magic-sparkles"
+---
+
+The `quiva-config` skill teaches a local agent to read and change your QuivaWorks configuration safely. It wraps a small Node script (Node 18 or later, no dependencies) so the agent works through reviewable files and dry runs instead of raw requests.
+
+## What it does
+
+| Action | What happens |
+|---|---|
+| **Pull** | Writes a flow, record set, space or task template to a local JSON file, plus a base copy. |
+| **Diff and push** | `push` is a **dry run** by default: it shows the account, the diff against what is live and the requests it would make. Nothing is written until you approve and it runs again with `--yes`. |
+| **Conflicts** | A push is refused if the live object changed since you pulled. Pull again and re-apply the edit. |
+| **Backups** | Each write first saves the live object under `.quiva/<profile>/backups/`. |
+| **Copy** | Copies an object between accounts, with the same dry-run rule. It warns about anything still pointing at the source account, such as missing secrets. |
+| **Publish** | Publishes a flow only when every secret it references exists. |
+| **Secrets** | Lists names, checks what a flow needs, and sets a value through a hidden prompt. Values never enter the chat or the output. |
+
+It works on record sets, records, spaces, task templates and flows, in any account you have a [profile](/developers/agents/overview#store-the-key) for.
+
+## Install it
+
+<Tabs>
+  <Tab title="Claude Code">
+    Install the QuivaWorks plugin, which includes the skill and the MCP connection. See [Claude Code](/developers/agents/claude-code#install-the-plugin).
+  </Tab>
+  <Tab title="Codex and others">
+    Copy the `skills/quiva-config` folder from the [QuivaWorks/mcp](https://github.com/QuivaWorks/mcp) repository to somewhere your agent can read, and point your `AGENTS.md` at it. See [Codex](/developers/agents/codex).
+  </Tab>
+</Tabs>
+
+
+The script runs against production. Pulled files go to `./.quiva` in the directory you run it from. Then add a [profile](/developers/agents/overview#store-the-key) in your own terminal, and check it with `profile list` and `check <name>`.
+
+## Example prompts
+
+- "Pull the flow `onboarding.welcome` from my production profile and show me what it sends."
+- "Change the subject of the welcome email in that flow, then show me the dry run before applying it."
+- "Copy the `Intake` record set from `production` to `sandbox` and tell me what is still pointing at the source."
+- "Which secrets does the `renewals` flow need that `sandbox` is missing? Give me the command to set them."
+
+## Safety
+
+Writes are dry runs until you say yes, secrets never pass through the conversation, and the agent is told to ask you to run `profile add` yourself if a profile is missing. Writing shared secrets needs an admin's key.

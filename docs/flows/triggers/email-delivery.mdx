@@ -1,0 +1,31 @@
+---
+title: "Email Delivery Trigger"
+description: "Start a flow when an email your account sent is delivered, bounces or is otherwise not sent"
+icon: "envelope-circle-check"
+---
+
+An Email delivery trigger starts a flow when something happens to an email your account sent. Use it to retry, notify someone, or open a task when mail fails.
+
+This is different from the [Email trigger](/flows/triggers/email), which starts a flow when mail arrives at an issued address.
+
+## Setting it up
+
+Add an **Email delivery** trigger from **Add Node**, then set:
+
+- **Start this flow when an email is**: one or more of **Bounced**, **Blocked**, **Dropped**, **Not sent**, **Delayed**, **Marked as spam**, **Unsubscribed**, **Delivered**, **Opened** and **Clicked**.
+- **Email type**: **Commercial**, **Transactional** or **Any**.
+- **Template**: a published template, or **Any**.
+
+A flow takes one Email delivery trigger. Changes take effect once the flow is saved and published.
+
+<Note>
+**Opened** and **Clicked** events only arrive when [Track opens and clicks](/essentials/account/email-sending#email-delivery) is on and your sending domain is verified.
+</Note>
+
+## What the flow receives
+
+`$.trigger` holds `msg_id`, `to`, `event`, `reason`, `template_key` and `ref` (the object you set on the [Send email step](/flows/steps/email)), plus `subject` on a failure.
+
+Email sent by a run this trigger started starts no flow and raises no task, whatever becomes of it.
+
+If you only want a task per failed recipient, you do not need a flow: turn on **Raise a task when an email fails** under [Email sending](/essentials/account/email-sending#email-delivery).

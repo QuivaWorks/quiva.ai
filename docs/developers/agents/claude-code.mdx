@@ -1,0 +1,66 @@
+---
+title: "Claude Code"
+description: "Connect Claude Code to your QuivaWorks account with the plugin, the remote server or local servers"
+icon: "terminal"
+---
+
+Before you start, create a key and store it as described in [Local AI agents](/developers/agents/overview#store-the-key). The examples assume `QUIVA_API_KEY` is set in your shell.
+
+## Install the plugin
+
+The QuivaWorks plugin bundles the remote MCP connection and the [`quiva-config` skill](/developers/agents/skills) in one install. In Claude Code:
+
+```text
+/plugin marketplace add QuivaWorks/mcp
+/plugin install quiva@quivaworks
+```
+
+
+The first command registers the repository as a marketplace. The second installs a plugin as `<plugin>@<marketplace>`. From a shell the same steps are `claude plugin marketplace add QuivaWorks/mcp` and `claude plugin install quiva@quivaworks`. After it is active, type `/` and look for the plugin's skills under the `quiva` name.
+
+## Or add the remote server yourself
+
+```sh
+claude mcp add --transport http quiva https://api.quiva.ai/mcp \
+  --header "Authorization: Bearer $QUIVA_API_KEY"
+```
+
+The shell expands `$QUIVA_API_KEY` when you run the command, so the key is stored in your Claude Code configuration. Add `--scope user` to use it in every project. The default, `local`, is only you in the current project, and `project` writes a shared `.mcp.json`.
+
+Run `/mcp` in Claude Code to confirm `quiva` is **Connected**.
+
+### Share it in a project
+
+To share the setup with your team without sharing a key, commit a `.mcp.json` that reads the key from each person's environment:
+
+```json
+{
+  "mcpServers": {
+    "quiva": {
+      "type": "http",
+      "url": "https://api.quiva.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer ${QUIVA_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+Claude Code replaces `${QUIVA_API_KEY}` from your environment when it loads the file.
+
+## Local stdio servers
+
+To run the [local servers](/developers/mcp/local-setup) with a profile instead of one `.env` file per server, pass the profile name:
+
+```sh
+claude mcp add --env QUIVA_PROFILE=<name> --transport stdio quiva-flows \
+  -- sh /path/to/mcp/quiva-flows-mcp/bin/run.sh
+```
+
+Repeat for each server you want. `--env` takes `KEY=value` pairs and needs another option, such as `--transport stdio`, between it and the server name. The server finds its key as described in [Local AI agents](/developers/agents/overview#store-the-key).
+
+
+## First prompts
+
+Start with something that changes nothing: "List my spaces", "Which flows are published?" Anything that writes or deletes is refused once and needs `confirm: true` before it runs.
