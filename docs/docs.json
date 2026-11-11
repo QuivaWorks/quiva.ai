@@ -452,6 +452,12 @@
             "openapi": {
               "source": "api-reference/endpoint/m365/openapi.json"
             }
+          },
+          {
+            "group": "Distribution",
+            "openapi": {
+              "source": "api-reference/endpoint/distribution/openapi.json"
+            }
           }
         ]
       },

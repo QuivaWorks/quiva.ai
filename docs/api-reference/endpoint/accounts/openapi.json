@@ -2518,6 +2518,38 @@
     {
       "name": "Branding",
       "description": "Sign-in branding and account images"
+    },
+    {
+      "name": "Client Access",
+      "description": "Passwordless sign-in and invitations for client users"
+    },
+    {
+      "name": "Sync Packages",
+      "description": "Install, upgrade and remove sync packages for an account"
+    },
+    {
+      "name": "Terms",
+      "description": "Terms documents, provider terms and the acceptance log"
+    },
+    {
+      "name": "Email Sending",
+      "description": "Sending identity and outbound email"
+    },
+    {
+      "name": "Usage and Billing",
+      "description": "Cost events, billing events, credit budget and spend guard"
+    },
+    {
+      "name": "Notifications",
+      "description": "In-app notifications for the signed-in user"
+    },
+    {
+      "name": "Resource Access",
+      "description": "Per-user grants on resources such as spaces"
+    },
+    {
+      "name": "Document Branding",
+      "description": "Account theme and logo used on generated documents"
     }
   ],
   "paths": {
@@ -8782,7 +8814,6 @@
         "tags": [
           "Email Templates"
         ],
-        "x-staging-only": true,
         "parameters": [
           {
             "name": "status",
@@ -8843,7 +8874,6 @@
         "tags": [
           "Email Templates"
         ],
-        "x-staging-only": true,
         "parameters": [
           {
             "name": "key",
@@ -8904,7 +8934,6 @@
         "tags": [
           "Email Templates"
         ],
-        "x-staging-only": true,
         "requestBody": {
           "required": true,
           "content": {
@@ -8973,7 +9002,6 @@
         "tags": [
           "Email Templates"
         ],
-        "x-staging-only": true,
         "parameters": [
           {
             "name": "key",
@@ -9051,7 +9079,6 @@
         "tags": [
           "Email Templates"
         ],
-        "x-staging-only": true,
         "requestBody": {
           "required": true,
           "content": {
@@ -9133,7 +9160,6 @@
         "tags": [
           "Email Templates"
         ],
-        "x-staging-only": true,
         "requestBody": {
           "required": true,
           "content": {
@@ -9215,7 +9241,6 @@
         "tags": [
           "Email Templates"
         ],
-        "x-staging-only": true,
         "requestBody": {
           "required": true,
           "content": {
@@ -9297,7 +9322,6 @@
         "tags": [
           "Email Templates"
         ],
-        "x-staging-only": true,
         "requestBody": {
           "required": true,
           "content": {
@@ -9379,7 +9403,6 @@
         "tags": [
           "Email Templates"
         ],
-        "x-staging-only": true,
         "requestBody": {
           "required": true,
           "content": {
@@ -9441,6 +9464,3956 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/request-client-magic-link": {
+      "post": {
+        "summary": "Request a client sign-in link",
+        "description": "Regenerates a client's magic link and 6-digit code and re-sends the invitation email. Public. Always answers success so that account names and emails cannot be enumerated.",
+        "operationId": "requestClientMagicLink",
+        "tags": [
+          "Client Access"
+        ],
+        "x-resource-type": "service",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "Email address of the client user"
+                  },
+                  "account": {
+                    "type": "string",
+                    "description": "Account name the client belongs to"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Always a success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/auth-with-magic-link": {
+      "post": {
+        "summary": "Sign in with a magic link or code",
+        "description": "Signs a client in with a single-use magic-link `token`, or with the 6-digit `code` together with `email` and `account`. Repeated wrong codes lock the sign-in until an admin clears it (see **/accounts/clear-client-signin-lock**).",
+        "operationId": "authWithMagicLink",
+        "tags": [
+          "Client Access"
+        ],
+        "x-resource-type": "service",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "Single-use token from the link"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "6-digit code from the invitation email"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Email address of the client user"
+                  },
+                  "account": {
+                    "type": "string",
+                    "description": "Account name; required with `code`"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sign-in code locked after too many attempts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/send-client-invite": {
+      "post": {
+        "summary": "Send a client invitation email",
+        "description": "Sends a client user's invitation email with a fresh sign-in link. Admin or root only. The user must hold the client role in the caller's account.",
+        "operationId": "sendClientInvite",
+        "tags": [
+          "Client Access"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "Email address of the client user"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/clear-client-signin-lock": {
+      "post": {
+        "summary": "Clear a client sign-in lock",
+        "description": "Clears the failed sign-in code attempts for a client once the lock has tripped. Admin or root only.",
+        "operationId": "clearClientSigninLock",
+        "tags": [
+          "Client Access"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "Email address of the client user"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/vertical-updates": {
+      "get": {
+        "summary": "List vertical template updates",
+        "description": "For each stamped template of the account's verticals, reports whether the copy is current, can take the update safely, or has been edited. Read only. Admin or root. Apply updates with `reapply_verticals` on **PATCH /accounts**.",
+        "operationId": "getVerticalUpdates",
+        "tags": [
+          "Account Management"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "updates": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/export-activation": {
+      "post": {
+        "summary": "Mint an export activation token",
+        "description": "Mints the activation token that lets one named account import a token-required export of the caller's account. Admin or root only. The response carries the fields the importing side must echo back on its import.",
+        "operationId": "mintExportActivation",
+        "tags": [
+          "Account Management"
+        ],
+        "x-resource-type": "service",
+        "x-path-derived": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "account_id": {
+                    "type": "string",
+                    "description": "Account that will import the export"
+                  },
+                  "export_name": {
+                    "type": "string",
+                    "description": "Name of a token-required export"
+                  },
+                  "expires_in_seconds": {
+                    "type": "integer",
+                    "description": "Optional token lifetime"
+                  }
+                },
+                "required": [
+                  "account_id",
+                  "export_name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "description": "Activation token"
+                        },
+                        "export_name": {
+                          "type": "string",
+                          "description": "Export name"
+                        },
+                        "subject": {
+                          "type": "string",
+                          "description": "Subject to echo on import"
+                        },
+                        "import_type": {
+                          "type": "string",
+                          "description": "Import type to echo on import"
+                        },
+                        "account": {
+                          "type": "string",
+                          "description": "Issuing account"
+                        },
+                        "target_account": {
+                          "type": "string",
+                          "description": "Importing account"
+                        },
+                        "expires_at": {
+                          "type": "integer",
+                          "description": "Unix expiry"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fontawesome/token": {
+      "post": {
+        "summary": "Get an icon font access token",
+        "description": "Returns a short-lived access token for the icon font service, used by the app to load icons. Any signed-in user.",
+        "operationId": "getFontawesomeToken",
+        "tags": [
+          "Branding"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string",
+                          "description": "Access token"
+                        },
+                        "expires_in": {
+                          "type": "integer",
+                          "description": "Seconds until expiry"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/document-theme": {
+      "get": {
+        "summary": "Get the document theme",
+        "description": "Returns the resolved document theme for the caller's own account, including the logo as a data URI when one is set. The account comes from the session; it cannot be asked for.",
+        "operationId": "getDocumentTheme",
+        "tags": [
+          "Document Branding"
+        ],
+        "x-resource-type": "service",
+        "x-path-derived": true,
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "logo_data_uri": {
+                          "type": "string",
+                          "description": "Logo as a data URI, empty when no logo is set"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/document-logo": {
+      "post": {
+        "summary": "Set the document logo",
+        "description": "Files the account's document logo. Upload the image to the account's profile-images storage first, then name its key here. Admin or root only.",
+        "operationId": "uploadDocumentLogo",
+        "tags": [
+          "Document Branding"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImageKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ImageKeyResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove the document logo",
+        "description": "Clears the document logo and removes the stored object. Admin or root only.",
+        "operationId": "deleteDocumentLogo",
+        "tags": [
+          "Document Branding"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/assign-resources": {
+      "post": {
+        "summary": "Assign resources to a user",
+        "description": "Grants a member of the caller's account access to resources such as spaces, with optional read, write, execute and delete permissions. Admin or root only.",
+        "operationId": "assignUserResources",
+        "tags": [
+          "Resource Access"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "description": "Member to grant"
+                  },
+                  "resources": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Resource type, for example `space`"
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "Resource id"
+                        },
+                        "read": {
+                          "type": "boolean"
+                        },
+                        "write": {
+                          "type": "boolean"
+                        },
+                        "execute": {
+                          "type": "boolean"
+                        },
+                        "delete": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "id"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "user_id",
+                  "resources"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/unassign-resources": {
+      "post": {
+        "summary": "Remove resource assignments from a user",
+        "description": "Removes a member's grants on the named resources. Admin or root only.",
+        "operationId": "unassignUserResources",
+        "tags": [
+          "Resource Access"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "description": "Member to change"
+                  },
+                  "resources": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Resource type"
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "Resource id"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "id"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "user_id",
+                  "resources"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/assigned-resources": {
+      "get": {
+        "summary": "List resources assigned to a user",
+        "description": "Lists the resources assigned to a user. Members can read their own; an admin can name any member of the account.",
+        "operationId": "listAssignedResources",
+        "tags": [
+          "Resource Access"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "description": "User to list; defaults to the caller",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "Only this resource type",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "description": "Resource type, for example `space`"
+                          },
+                          "id": {
+                            "type": "string",
+                            "description": "Resource id"
+                          },
+                          "read": {
+                            "type": "boolean"
+                          },
+                          "write": {
+                            "type": "boolean"
+                          },
+                          "execute": {
+                            "type": "boolean"
+                          },
+                          "delete": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "id"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/sync-packages": {
+      "get": {
+        "summary": "List sync packages",
+        "description": "Lists the sync packages available to the account and the account's installs.",
+        "operationId": "listSyncPackages",
+        "tags": [
+          "Sync Packages"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "packages": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "installs": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/sync-packages/installs": {
+      "get": {
+        "summary": "List sync package installs",
+        "description": "Lists the account's sync package installs.",
+        "operationId": "listSyncPackageInstalls",
+        "tags": [
+          "Sync Packages"
+        ],
+        "x-resource-type": "service",
+        "x-path-derived": true,
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "installs": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/sync-packages/install": {
+      "post": {
+        "summary": "Install a sync package",
+        "description": "Installs a package into a space. Sending only `install_id` repairs an existing install with its stored values.",
+        "operationId": "installSyncPackage",
+        "tags": [
+          "Sync Packages"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "package": {
+                    "type": "string",
+                    "description": "Package key"
+                  },
+                  "instance": {
+                    "type": "string",
+                    "description": "Instance name"
+                  },
+                  "space_id": {
+                    "type": "string",
+                    "description": "Target space"
+                  },
+                  "params": {
+                    "type": "object",
+                    "description": "Package parameters"
+                  },
+                  "install_id": {
+                    "type": "string",
+                    "description": "Existing install to repair"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "install": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/sync-packages/upgrade": {
+      "post": {
+        "summary": "Upgrade a sync package install",
+        "description": "Upgrades an install to the current package version.",
+        "operationId": "upgradeSyncPackage",
+        "tags": [
+          "Sync Packages"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "install_id": {
+                    "type": "string",
+                    "description": "Install to upgrade"
+                  },
+                  "params": {
+                    "type": "object",
+                    "description": "Package parameters"
+                  }
+                },
+                "required": [
+                  "install_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "install": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/sync-packages/uninstall": {
+      "post": {
+        "summary": "Uninstall a sync package",
+        "description": "Removes an install, and with `remove_connection` its connection.",
+        "operationId": "uninstallSyncPackage",
+        "tags": [
+          "Sync Packages"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "install_id": {
+                    "type": "string",
+                    "description": "Install to remove"
+                  },
+                  "remove_connection": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "install_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "install": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/documents": {
+      "get": {
+        "summary": "List terms documents",
+        "description": "Returns the platform, provider and account layers of terms documents and the provider bindings. Admin or root.",
+        "operationId": "listTermsDocuments",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/document": {
+      "post": {
+        "summary": "Create a terms document draft",
+        "description": "Starts a draft. Nothing is shown to anyone until it is published. Admin or root.",
+        "operationId": "createTermsDocument",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Document id"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "description": "Document kind"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Title"
+                  },
+                  "body": {
+                    "type": "string",
+                    "description": "Document text"
+                  },
+                  "show": {
+                    "type": "object",
+                    "description": "Rules for when the document is shown"
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a terms document draft",
+        "description": "Edits a draft. `revision` must match the revision read with the document; a mismatch answers 409 instead of merging. Admin or root.",
+        "operationId": "updateTermsDocument",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Document id"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "description": "Document kind"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Title"
+                  },
+                  "body": {
+                    "type": "string",
+                    "description": "Document text"
+                  },
+                  "show": {
+                    "type": "object"
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "description": "Revision the edit is based on"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Revision mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Archive a terms document",
+        "description": "Soft archive: prompting stops, versions stay readable and the acceptance log is untouched. Admin or root.",
+        "operationId": "archiveTermsDocument",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "query",
+            "required": true,
+            "description": "Document to archive",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/document/publish": {
+      "post": {
+        "summary": "Publish a terms document",
+        "description": "Publishes the draft as the next version. Admin or root.",
+        "operationId": "publishTermsDocument",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "document_id": {
+                    "type": "string",
+                    "description": "Document id"
+                  },
+                  "change_note": {
+                    "type": "string",
+                    "description": "What changed"
+                  }
+                },
+                "required": [
+                  "document_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "document": {
+                          "type": "object"
+                        },
+                        "version": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/document/versions": {
+      "get": {
+        "summary": "List terms document versions",
+        "description": "Lists the published versions of one document. Admin or root.",
+        "operationId": "listTermsDocumentVersions",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "query",
+            "required": true,
+            "description": "Document id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "versions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/version": {
+      "get": {
+        "summary": "Get a terms version",
+        "description": "Returns one version of a document; the latest when `version` is omitted.",
+        "operationId": "getTermsVersion",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "layer",
+            "in": "query",
+            "required": true,
+            "description": "Layer: platform, provider or account",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "document_id",
+            "in": "query",
+            "required": true,
+            "description": "Document id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "Version number",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/provider": {
+      "put": {
+        "summary": "Enable or disable a provider",
+        "description": "Enables or disables a provider and records the organisation's acceptance. Enabling requires `accepted_version` to equal the current version. Admin or root.",
+        "operationId": "setTermsProvider",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "provider_id": {
+                    "type": "string",
+                    "description": "Provider id"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "record_config_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "accepted_version": {
+                    "type": "integer",
+                    "description": "Provider terms version accepted"
+                  }
+                },
+                "required": [
+                  "provider_id",
+                  "enabled"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/provider-status": {
+      "get": {
+        "summary": "Get provider terms status",
+        "description": "Whether a provider is enabled for the account and which version was accepted.",
+        "operationId": "getTermsProviderStatus",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "query",
+            "required": true,
+            "description": "Provider id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/pending": {
+      "get": {
+        "summary": "List terms the caller must accept",
+        "description": "Returns what the caller must accept now. With `context=record_config:<id>` it answers the assessment question instead of the sign-in one. Self only, unless an admin names a member of their own account.",
+        "operationId": "getTermsPending",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "required": false,
+            "description": "Optional `record_config:<id>`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "description": "Member to check; admin only",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/accept": {
+      "post": {
+        "summary": "Accept terms",
+        "description": "Records an acceptance. A stale reference answers 409 with the current pending list, so consent is never logged against a document nobody saw.",
+        "operationId": "acceptTerms",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "acceptances": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "context": {
+                    "type": "string",
+                    "description": "Acceptance context"
+                  }
+                },
+                "required": [
+                  "acceptances"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "accepted": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "pending": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A referenced document is no longer current",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/pending-for-signin": {
+      "post": {
+        "summary": "Preview terms for a sign-in link",
+        "description": "Shows what a sign-in link's holder will be asked to accept, without spending the link. Public, and reveals nothing the holder does not already have. A wrong code counts as an attempt.",
+        "operationId": "getTermsPendingForSignin",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "Magic-link token"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "6-digit code"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Email address of the client user"
+                  },
+                  "account": {
+                    "type": "string",
+                    "description": "Account name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/terms/acceptances": {
+      "get": {
+        "summary": "Export the acceptance log",
+        "description": "An admin or root can ask for any member of their account; anyone else gets their own rows only. `format=csv` returns a ready-to-send file.",
+        "operationId": "listTermsAcceptances",
+        "tags": [
+          "Terms"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "description": "Member to export",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Output format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "csv"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "acceptances": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "count": {
+                          "type": "integer"
+                        },
+                        "truncated": {
+                          "type": "boolean"
+                        },
+                        "csv": {
+                          "type": "string",
+                          "description": "CSV text when format=csv"
+                        },
+                        "filename": {
+                          "type": "string",
+                          "description": "Suggested file name"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/sender-identity": {
+      "get": {
+        "summary": "Get the sending identity",
+        "description": "The account's email sending identity. Any member can read it.",
+        "operationId": "getSenderIdentity",
+        "tags": [
+          "Email Sending"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Sending identity: domain, from_address, display_name, reply_to, DNS records and verification state",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Set the sending identity",
+        "description": "Sets the sending domain and from address, then provisions the sending side. Admin only, because the sending domain is the account's outbound reputation.",
+        "operationId": "setSenderIdentity",
+        "tags": [
+          "Email Sending"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "domain": {
+                    "type": "string",
+                    "description": "Sending domain"
+                  },
+                  "from_address": {
+                    "type": "string",
+                    "description": "From address"
+                  },
+                  "display_name": {
+                    "type": "string",
+                    "description": "Display name"
+                  },
+                  "reply_to": {
+                    "type": "string",
+                    "description": "Reply-to address"
+                  },
+                  "failure_task_space_id": {
+                    "type": "string",
+                    "description": "Space where a failed email raises a task"
+                  },
+                  "track_engagement": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Sending identity: domain, from_address, display_name, reply_to, DNS records and verification state",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/sender-identity-verify": {
+      "post": {
+        "summary": "Verify the sending identity",
+        "description": "Runs the DNS check and returns the same object as **GET /accounts/sender-identity**. Records not yet published are a resting state: the call succeeds with per-record reasons.",
+        "operationId": "verifySenderIdentity",
+        "tags": [
+          "Email Sending"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Sending identity: domain, from_address, display_name, reply_to, DNS records and verification state",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/send-commercial-email": {
+      "post": {
+        "summary": "Send an email from the account",
+        "description": "The sanctioned send for account email. Stamps scope and class so suppression and consent apply. `queued` means accepted by the outbox, not delivered. Give either `template_key` with `data`, or `subject` with `html`/`text`, never both.",
+        "operationId": "sendCommercialEmail",
+        "tags": [
+          "Email Sending"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "to": {
+                    "type": "string",
+                    "description": "Recipient"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "description": "Subject"
+                  },
+                  "html": {
+                    "type": "string",
+                    "description": "HTML body"
+                  },
+                  "text": {
+                    "type": "string",
+                    "description": "Text body"
+                  },
+                  "from_address": {
+                    "type": "string",
+                    "description": "From address"
+                  },
+                  "reply_to": {
+                    "type": "string",
+                    "description": "Reply-to"
+                  },
+                  "template_key": {
+                    "type": "string",
+                    "description": "Published email template to render"
+                  },
+                  "data": {
+                    "type": "object",
+                    "description": "Template tag values"
+                  },
+                  "contact_folder": {
+                    "type": "string",
+                    "description": "Contact folder the mail belongs to"
+                  },
+                  "task_id": {
+                    "type": "string",
+                    "description": "Task the mail belongs to"
+                  },
+                  "class": {
+                    "type": "string",
+                    "description": "commercial (default) or transactional"
+                  },
+                  "cc": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "bcc": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "idempotency_key": {
+                    "type": "string",
+                    "description": "Collapses repeats inside the outbox duplicate window"
+                  },
+                  "ref": {
+                    "type": "object",
+                    "description": "Sender keys echoed on the activity row and delivery events"
+                  },
+                  "attachments": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "attachment_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "required": [
+                  "to"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "queued": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/cost-events": {
+      "get": {
+        "summary": "List cost events",
+        "description": "Spend events for the account. Account-wide roles see every user's spend; other roles see their own.",
+        "operationId": "listCostEvents",
+        "tags": [
+          "Usage and Billing"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "Window start (with end_date)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "Window end",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "session_id",
+            "in": "query",
+            "required": false,
+            "description": "Only this session",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "correlation_id",
+            "in": "query",
+            "required": false,
+            "description": "Only this request",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Rows per page",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/billing-events": {
+      "get": {
+        "summary": "List billing events",
+        "description": "Subscription and credit events recorded against the account.",
+        "operationId": "listBillingEvents",
+        "tags": [
+          "Usage and Billing"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/admin/export-cost-events": {
+      "post": {
+        "summary": "Email a cost events export",
+        "description": "Exports the account's cost events and emails the file. Admin or root only.",
+        "operationId": "exportCostEvents",
+        "tags": [
+          "Usage and Billing"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "start_date": {
+                    "type": "string",
+                    "description": "Window start"
+                  },
+                  "end_date": {
+                    "type": "string",
+                    "description": "Window end"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Where to send the export"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an admin or root",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/ai-budget-limits": {
+      "get": {
+        "summary": "Get budget limits and spend guard",
+        "description": "The account's spend guard state and budget limits.",
+        "operationId": "getBudgetLimits",
+        "tags": [
+          "Usage and Billing"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Set the spend guard",
+        "description": "Sets `guard_percent` (5 to 100; 100 leaves the credit balance as the only gate). Admin, root or billing role on a subscribed account. Returns the fresh budget state.",
+        "operationId": "setBudgetLimits",
+        "tags": [
+          "Usage and Billing"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "guard_percent": {
+                    "type": "integer",
+                    "description": "Percent of budget at which spend is stopped",
+                    "minimum": 5,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "guard_percent"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/ai-budget-limits/override": {
+      "post": {
+        "summary": "Override the spend guard",
+        "description": "Arms a temporary override of the spend guard, or with `clear: true` removes an active one. Admin, root or billing role on a subscribed account.",
+        "operationId": "setSpendGuardOverride",
+        "tags": [
+          "Usage and Billing"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clear": {
+                    "type": "boolean",
+                    "description": "Remove an active override"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/ai-budget": {
+      "get": {
+        "summary": "Get the credit balance",
+        "description": "The account's credit balance and budget state.",
+        "operationId": "getCredits",
+        "tags": [
+          "Usage and Billing"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/usage-summary": {
+      "get": {
+        "summary": "Get a usage summary",
+        "description": "Usage totals for the account. Defaults to the last twelve months; send `start_date` and `end_date` to choose the window.",
+        "operationId": "getUsageSummary",
+        "tags": [
+          "Usage and Billing"
+        ],
+        "x-resource-type": "service",
+        "x-path-derived": true,
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "Window start (with end_date)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "Window end",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/auto-topup": {
+      "patch": {
+        "summary": "Set auto top-up",
+        "description": "Sets the credit level that triggers an automatic top-up and the pack to buy. A zero `threshold` turns it off. Admin, root or billing role.",
+        "operationId": "setAutoTopup",
+        "tags": [
+          "Usage and Billing"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "threshold": {
+                    "type": "number",
+                    "description": "Credit level that triggers a top-up; 0 disables"
+                  },
+                  "pack": {
+                    "type": "string",
+                    "description": "Credit pack key; required when threshold is above 0"
+                  }
+                },
+                "required": [
+                  "threshold"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/credit-warning": {
+      "patch": {
+        "summary": "Set the credit warning level",
+        "description": "Sets the remaining-credit level at which the account is warned. Zero restores the platform default; values between 0 and 1 are refused. Admin, root or billing role.",
+        "operationId": "setCreditWarning",
+        "tags": [
+          "Usage and Billing"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "threshold": {
+                    "type": "number",
+                    "description": "Whole number of credits, or 0 for the default"
+                  }
+                },
+                "required": [
+                  "threshold"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/payment/credit-packs": {
+      "get": {
+        "summary": "List credit packs",
+        "description": "Credit packs the account's plan can buy, priced in the customer's currency.",
+        "operationId": "listCreditPacks",
+        "tags": [
+          "Payment"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/payment/payment-methods": {
+      "get": {
+        "summary": "List payment methods",
+        "description": "The payment methods on file for the account.",
+        "operationId": "listPaymentMethods",
+        "tags": [
+          "Payment"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/payment/ai-budget": {
+      "post": {
+        "summary": "Buy a credit pack",
+        "description": "Creates a checkout for a credit pack. Admin, root or billing role on a subscribed paid plan. `return_path` is an app-relative path to return to.",
+        "operationId": "buyCreditPack",
+        "tags": [
+          "Payment"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pack": {
+                    "type": "string",
+                    "description": "Credit pack key"
+                  },
+                  "return_path": {
+                    "type": "string",
+                    "description": "App-relative return path"
+                  }
+                },
+                "required": [
+                  "pack"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/payment/subscription-schedule": {
+      "delete": {
+        "summary": "Cancel a scheduled downgrade",
+        "description": "Releases the subscription schedule so a pending downgrade no longer takes effect.",
+        "operationId": "cancelSubscriptionSchedule",
+        "tags": [
+          "Payment"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/users/notifications": {
+      "get": {
+        "summary": "List notifications",
+        "description": "The signed-in user's in-app notifications, newest first.",
+        "operationId": "listUserNotifications",
+        "tags": [
+          "Notifications"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "viewed",
+            "in": "query",
+            "required": false,
+            "description": "Filter by viewed state",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "subject": {
+                            "type": "string",
+                            "description": "Notification subject"
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Title"
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "Description"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "viewed": {
+                            "type": "boolean"
+                          },
+                          "refs": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/users/notifications/viewed": {
+      "patch": {
+        "summary": "Mark a notification viewed",
+        "description": "Marks one notification viewed.",
+        "operationId": "markNotificationViewed",
+        "tags": [
+          "Notifications"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subject": {
+                    "type": "string",
+                    "description": "Notification subject"
+                  }
+                },
+                "required": [
+                  "subject"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/users/notifications/viewed-all": {
+      "patch": {
+        "summary": "Mark notifications viewed",
+        "description": "Marks a batch of the caller's own notifications viewed. Subjects outside the caller's own tree are reported as failed.",
+        "operationId": "markNotificationsViewed",
+        "tags": [
+          "Notifications"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subjects": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "subjects"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {

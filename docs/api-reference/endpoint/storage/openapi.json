@@ -1648,6 +1648,96 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
+      },
+      "put": {
+        "summary": "Create or update several KV entries",
+        "description": "Writes several entries in one call.",
+        "operationId": "putKVEntries",
+        "tags": [
+          "KV Entries"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        },
+        "x-path-derived": true
+      },
+      "delete": {
+        "summary": "Delete several KV entries",
+        "description": "Deletes the entries named by repeated key query parameters.",
+        "operationId": "deleteKVEntries",
+        "tags": [
+          "KV Entries"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
       }
     },
     "/storage/kv/{bucket}/entries/{key}": {
@@ -2346,6 +2436,49 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
+      },
+      "delete": {
+        "summary": "Delete several object store entries",
+        "description": "Deletes the entries named by repeated key query parameters.",
+        "operationId": "deleteObjectStoreEntries",
+        "tags": [
+          "Object Store"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
       }
     },
     "/storage/obj/{bucket}/entries/{key}": {
@@ -2382,6 +2515,50 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
+      },
+      "get": {
+        "summary": "Get an object store entry",
+        "description": "Returns one object's content as base64, so binary files survive the JSON reply. Refused when the encoded object would exceed the reply limit.",
+        "operationId": "getObjectStoreEntry",
+        "tags": [
+          "Object Store"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        },
+        "x-path-derived": true
       }
     },
     "/storage/streams": {
@@ -3172,6 +3349,454 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/files": {
+      "get": {
+        "summary": "List an assistant session's files",
+        "description": "Lists the files kept for a chat session: work, outputs, uploads and scratch. Session access rules apply.",
+        "operationId": "listAgentSessionFiles",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a file to an assistant session",
+        "description": "Stores a file under the session.",
+        "operationId": "createAgentSessionFile",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/files/{key}": {
+      "get": {
+        "summary": "Read a session file",
+        "description": "Returns the live object, base64 encoded in body.data, with its content type. The reply carries the object's current digest in a header.",
+        "operationId": "getAgentSessionFile",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      },
+      "put": {
+        "summary": "Overwrite a session file",
+        "description": "Overwrites a work or outputs file. Other kinds are refused.",
+        "operationId": "putAgentSessionFile",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/files/{key}/versions": {
+      "get": {
+        "summary": "List a session file's versions",
+        "description": "Lists the live object first, then archived copies. Each entry's key is what the read endpoints take.",
+        "operationId": "listAgentSessionFileVersions",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/files/{key}/versions/{content_key}": {
+      "get": {
+        "summary": "Read an archived session file version",
+        "description": "Returns one archived copy, base64 encoded. Only the content key is used server side.",
+        "operationId": "getAgentSessionFileVersion",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/tool-responses": {
+      "get": {
+        "summary": "List a session's stored tool responses",
+        "description": "Lists tool responses kept for the session.",
+        "operationId": "listAgentToolResponses",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/tool-responses/{key}": {
+      "get": {
+        "summary": "Read a stored tool response",
+        "description": "Returns one tool response, base64 encoded in body.data.",
+        "operationId": "getAgentToolResponse",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/obj/sync": {
+      "put": {
+        "summary": "Sync an object store entry",
+        "description": "Synchronises one object store entry through the data point service.",
+        "operationId": "syncObjectEntry",
+        "tags": [
+          "Object Store"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/index/{name}/query": {
+      "post": {
+        "summary": "Query a search index",
+        "description": "Runs a query against the named index.",
+        "operationId": "queryIndex",
+        "tags": [
+          "Index"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
           }
         }
       }

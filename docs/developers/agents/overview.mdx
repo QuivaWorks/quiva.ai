@@ -26,7 +26,7 @@ Everything here authenticates with a **user API key**. Create one in **Settings 
 
 A profile is tied to one account. You do not need to look the id up: `profile add` asks the API which account the key belongs to (`GET /accounts/info`, which returns the account's id, name and display name) and saves it. `--account <account id>` is optional.
 
-{/* ACCOUNT-ID: update if the UI or CLI exposes it */}
+You can also copy it from the app: open **Account**, and the **Account ID** row (under **Sign-in address**) has a copy button.
 
 If you use an environment variable and want to see the account a key belongs to:
 
@@ -35,7 +35,7 @@ curl -H "x-api-key: $QUIVA_API_KEY" https://api.quiva.ai/accounts/info
 ```
 
 <Note>
-The account id is not shown in the web app, and the `/u/<code>/` segment in a QuivaWorks address is a session code, not the id.
+The `/u/<code>/` segment in a QuivaWorks address is a session code, not the account id.
 </Note>
 
 ## Store the key

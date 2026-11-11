@@ -60,19 +60,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SecretListItem"
-                  }
-                },
-                "example": [
-                  {
-                    "key": "api-key"
-                  },
-                  {
-                    "key": "database-password"
-                  }
-                ]
+                  "$ref": "#/components/schemas/SecretList"
+                }
               }
             }
           },
@@ -168,6 +157,18 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "description": "Use `user` for a personal secret; omit for an account secret",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "user"
+              ]
+            }
           }
         ],
         "responses": {
@@ -230,6 +231,18 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "description": "Use `user` for a personal secret; omit for an account secret",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "user"
+              ]
+            }
           }
         ],
         "responses": {
@@ -280,6 +293,70 @@
           }
         },
         "x-resource-type": "service"
+      }
+    },
+    "/secrets/user": {
+      "get": {
+        "summary": "List personal secrets",
+        "description": "Lists the signed-in user's personal secrets. These are scoped to the caller and never appear in **GET /secrets**. By default only key names are returned; pass `reveal=true` for values.",
+        "operationId": "listUserSecrets",
+        "tags": [
+          "Secrets"
+        ],
+        "x-resource-type": "service",
+        "x-path-derived": true,
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of secrets to return (default: 500)",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "reveal",
+            "in": "query",
+            "required": false,
+            "description": "Include secret values",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -350,6 +427,14 @@
           "value": {
             "type": "string",
             "description": "The secret value to store"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "user",
+              "account"
+            ],
+            "description": "Where to store the secret; `account` is the default"
           }
         },
         "required": [
@@ -368,6 +453,28 @@
         "required": [
           "error"
         ]
+      },
+      "SecretList": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SecretListItem"
+            }
+          },
+          "results_total": {
+            "type": "integer"
+          },
+          "truncated": {
+            "type": "boolean",
+            "description": "More results exist than the limit returned"
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Cursor for the next page"
+          }
+        }
       }
     }
   },

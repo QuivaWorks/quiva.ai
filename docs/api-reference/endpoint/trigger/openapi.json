@@ -270,6 +270,115 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
+      },
+      "patch": {
+        "summary": "Update a trigger",
+        "description": "Updates the fields given; the rest are kept. The trigger can also be named by `subject` in the body.",
+        "operationId": "patchTrigger",
+        "tags": [
+          "Triggers"
+        ],
+        "x-resource-type": "service",
+        "x-path-derived": true,
+        "parameters": [
+          {
+            "name": "trigger_type",
+            "in": "path",
+            "required": true,
+            "description": "Trigger type: gateway, stream, subject, obj or email",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topic",
+            "in": "path",
+            "required": true,
+            "description": "Topic of the trigger, without the prefix",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Trigger name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "description": "Trigger subject"
+                  },
+                  "trigger_type": {
+                    "type": "string",
+                    "description": "Trigger type"
+                  },
+                  "gateway_mapping": {
+                    "$ref": "#/components/schemas/GatewayMapping"
+                  },
+                  "source": {
+                    "$ref": "#/components/schemas/TriggerSource"
+                  },
+                  "target": {
+                    "$ref": "#/components/schemas/TriggerTarget"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriggerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Trigger not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/trigger/gateway": {
@@ -502,6 +611,310 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/trigger/emails/search": {
+      "post": {
+        "summary": "Search received emails",
+        "description": "Queries the account's email trigger index. Conditions are combined by `operator`, with paging and sorting set by `limit` and `sort_by`.",
+        "operationId": "searchEmails",
+        "tags": [
+          "Email triggers"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "sort_by": {
+                    "type": "string",
+                    "description": "Field to sort by"
+                  },
+                  "operator": {
+                    "type": "string",
+                    "description": "How conditions combine"
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "results": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trigger/emails/{uid}": {
+      "get": {
+        "summary": "Get a received email",
+        "description": "Returns the full email by uid, including body, headers and attachments.",
+        "operationId": "getEmail",
+        "tags": [
+          "Email triggers"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "description": "Email uid",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "description": "A received email with its headers, body and attachments"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a received email",
+        "description": "Removes the email and its attachments from storage.",
+        "operationId": "deleteEmail",
+        "tags": [
+          "Email triggers"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "description": "Email uid",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trigger/emails/{uid}/trigger": {
+      "post": {
+        "summary": "Re-run the flow for an email",
+        "description": "Runs the flow the email originally triggered again, passing its attachments.",
+        "operationId": "retriggerEmail",
+        "tags": [
+          "Email triggers"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "description": "Email uid",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -1216,6 +1629,16 @@
     },
     {
       "apiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Triggers",
+      "description": "Gateway, stream and object store triggers"
+    },
+    {
+      "name": "Email triggers",
+      "description": "Emails received by email triggers"
     }
   ]
 }

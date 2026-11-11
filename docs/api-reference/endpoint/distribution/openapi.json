@@ -1,0 +1,4010 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "quiva.ai Distribution API",
+    "description": "API for distributing products from a publisher account to distributor accounts: invitations, the distribution register, product definitions, messages between the two sides and config id reservations.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "quiva.ai Support",
+      "url": "https://app.quiva.ai"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.quiva.ai",
+      "description": "Production API server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "description": "API integration client credentials. Tokens only work on the task-sync routes in workspaces.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.quiva.ai/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "DistributionRefusalResponse": {
+        "type": "object",
+        "description": "A refusal by the distribution register. `refusal_code` names the reason so a caller can branch on it.",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "Always `refused`"
+              },
+              "refusal_code": {
+                "type": "string"
+              },
+              "detail": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ProvisioningStep": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "done": {
+            "type": "boolean"
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "done"
+        ]
+      },
+      "InviteProduct": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string",
+            "description": "Empty tracks the latest version"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "commission_cap": {
+            "type": "number",
+            "description": "Per-product cap, a percentage"
+          },
+          "clear_commission_cap": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "product_id"
+        ]
+      },
+      "CreateDistributionInviteRequest": {
+        "type": "object",
+        "properties": {
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InviteProduct"
+            }
+          },
+          "distribution_id": {
+            "type": "string",
+            "description": "Generated when absent"
+          },
+          "scope": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expiry_days": {
+            "type": "integer",
+            "description": "Default 14, maximum 90"
+          },
+          "space_id": {
+            "type": "string",
+            "description": "Space where the distributor firm and its distributions are filed"
+          },
+          "brokerage_name": {
+            "type": "string",
+            "description": "Name of the distributor firm"
+          },
+          "abn": {
+            "type": "string"
+          },
+          "afsl_number": {
+            "type": "string"
+          },
+          "primary_contact_name": {
+            "type": "string"
+          },
+          "primary_contact_email": {
+            "type": "string",
+            "format": "email"
+          },
+          "primary_contact_phone": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "distribution_agreement_ref": {
+            "type": "string"
+          },
+          "activity_signal_enabled": {
+            "type": "boolean"
+          },
+          "status_map": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "publisher_gateway_id": {
+            "type": "string"
+          },
+          "ingress_path_format": {
+            "type": "string"
+          },
+          "bind_path_format": {
+            "type": "string"
+          },
+          "request_path_format": {
+            "type": "string"
+          },
+          "return_path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "products",
+          "brokerage_name",
+          "space_id"
+        ]
+      },
+      "CreateDistributionInviteResponse": {
+        "type": "object",
+        "properties": {
+          "invite_id": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string",
+            "description": "Bearer credential, shown once"
+          },
+          "invite_url": {
+            "type": "string",
+            "description": "Public landing page"
+          },
+          "expires_at": {
+            "type": "integer",
+            "description": "Unix seconds"
+          },
+          "distribution_id": {
+            "type": "string"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InviteProduct"
+            }
+          },
+          "brokerage_name": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProvisioningStep"
+            }
+          },
+          "outstanding": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DistributionInviteListItem": {
+        "type": "object",
+        "properties": {
+          "invite_id": {
+            "type": "string"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InviteProduct"
+            }
+          },
+          "distribution_id": {
+            "type": "string"
+          },
+          "brokerage_name": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "integer"
+          },
+          "granted_by": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "outstanding",
+              "redeemed",
+              "withdrawn",
+              "expired"
+            ]
+          }
+        }
+      },
+      "DistributionInviteInboxItem": {
+        "type": "object",
+        "properties": {
+          "invite_id": {
+            "type": "string"
+          },
+          "publisher_name": {
+            "type": "string"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InviteProduct"
+            }
+          },
+          "brokerage_name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "integer"
+          }
+        }
+      },
+      "DistributionInviteLink": {
+        "type": "object",
+        "properties": {
+          "invite_id": {
+            "type": "string"
+          },
+          "invite_url": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "integer"
+          },
+          "contact_ref": {
+            "type": "string"
+          }
+        }
+      },
+      "DistributionInviteSendResult": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Delivery outcome of the invitation email, with `removed_distribution_id` when a resend reopened a redeemed invitation."
+      },
+      "DistributionInviteView": {
+        "type": "object",
+        "properties": {
+          "invite_id": {
+            "type": "string"
+          },
+          "publisher_name": {
+            "type": "string"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InviteProduct"
+            }
+          },
+          "scope": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expires_at": {
+            "type": "integer"
+          },
+          "redeemable": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the token is not redeemable"
+          },
+          "brokerage_name": {
+            "type": "string"
+          },
+          "branding": {
+            "type": "object",
+            "properties": {
+              "display_name": {
+                "type": "string"
+              },
+              "logo_data_uri": {
+                "type": "string"
+              },
+              "accent_color": {
+                "type": "string"
+              },
+              "muted_color": {
+                "type": "string"
+              }
+            }
+          },
+          "product_type": {
+            "type": "string"
+          },
+          "required_roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "redeemable"
+        ]
+      },
+      "RedeemDistributionInviteRequest": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Invitation token"
+          },
+          "return_flow_subject": {
+            "type": "string"
+          },
+          "space": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "provision",
+                  "link"
+                ]
+              },
+              "space_id": {
+                "type": "string"
+              },
+              "status_map": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "RedeemDistributionInviteResponse": {
+        "type": "object",
+        "properties": {
+          "distribution": {
+            "$ref": "#/components/schemas/Distribution"
+          },
+          "ingress_url": {
+            "type": "string"
+          },
+          "distributor_space_id": {
+            "type": "string"
+          },
+          "binding": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProvisioningStep"
+            }
+          },
+          "outstanding": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "distributor_setup": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProvisioningStep"
+            }
+          }
+        }
+      },
+      "PendingDistributionInvite": {
+        "type": "object",
+        "properties": {
+          "pending": {
+            "type": "boolean"
+          },
+          "invite_id": {
+            "type": "string"
+          },
+          "publisher_name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string",
+            "description": "App-relative invitation page with a freshly signed token"
+          },
+          "cleared": {
+            "type": "string",
+            "description": "Why the marker was removed on this read"
+          }
+        },
+        "required": [
+          "pending"
+        ]
+      },
+      "Distribution": {
+        "type": "object",
+        "description": "One register entry: a grant from a publisher to a distributor.",
+        "properties": {
+          "publisher_account_id": {
+            "type": "string"
+          },
+          "distributor_account_id": {
+            "type": "string"
+          },
+          "distributor_name": {
+            "type": "string"
+          },
+          "publisher_name": {
+            "type": "string"
+          },
+          "distribution_id": {
+            "type": "string"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "active",
+              "suspended",
+              "revoked"
+            ],
+            "description": "Lifecycle state of the grant"
+          },
+          "status_reason": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "provisioning_state": {
+            "type": "string"
+          },
+          "space_id": {
+            "type": "string"
+          },
+          "publisher_space_id": {
+            "type": "string"
+          },
+          "distributor_space_id": {
+            "type": "string"
+          },
+          "record_config_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "invite_id": {
+            "type": "string"
+          },
+          "granted_by": {
+            "type": "string"
+          },
+          "requested_by": {
+            "type": "string"
+          },
+          "effective_from": {
+            "type": "string"
+          },
+          "effective_to": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      },
+      "AmendDistributionRequest": {
+        "type": "object",
+        "properties": {
+          "distributor_account_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended",
+              "revoked"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "grant_products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InviteProduct"
+            }
+          },
+          "withdraw_products": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "distributor_account_id"
+        ]
+      },
+      "DistributionStatus": {
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string"
+          },
+          "export_name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "complete": {
+            "type": "boolean"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "passed": {
+                  "type": "boolean"
+                },
+                "detail": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "missing": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "account_plane_only": {
+            "type": "boolean"
+          },
+          "unverified": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DistributionLink": {
+        "type": "object",
+        "properties": {
+          "publisher_account_id": {
+            "type": "string"
+          },
+          "distributor_account_id": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string"
+          },
+          "refusal_code": {
+            "type": "string"
+          },
+          "counterparty_users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "DistributionBrokerage": {
+        "type": "object",
+        "properties": {
+          "distribution_id": {
+            "type": "string"
+          },
+          "brokerage_id": {
+            "type": "string",
+            "description": "The distributor account id"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "type": "string"
+              },
+              "suburb": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              }
+            }
+          },
+          "commission_caps": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Product id to cap, a percentage"
+          },
+          "brokers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "first_name": {
+                  "type": "string"
+                },
+                "last_name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "DistributorFeatures": {
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "type": "string"
+          },
+          "vertical": {
+            "type": "string"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "catalog": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "defaults": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "overrides": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "effective": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "ProductDefinition": {
+        "type": "object",
+        "description": "A product: its record sets and the actions around them.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "record_configs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "actions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          },
+          "sla_business_days": {
+            "type": "integer"
+          },
+          "entity_config": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "filing": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "change_request": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "distributor_front_page_layouts": {},
+          "version": {
+            "type": "integer"
+          },
+          "publisher_account_id": {
+            "type": "string"
+          },
+          "published_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "record_configs",
+          "actions"
+        ]
+      },
+      "ProductVersionResult": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductDefinition"
+          }
+        }
+      },
+      "DistributionMessageRequest": {
+        "type": "object",
+        "properties": {
+          "distribution_id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "description": "Message kind. Which side may send which kind is enforced server-side."
+          },
+          "thread_id": {
+            "type": "string",
+            "description": "The conversation key the answer comes back on. `quote_id` is accepted as an alias."
+          },
+          "quote_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "request_id": {
+            "type": "string",
+            "description": "Idempotency key"
+          },
+          "product_id": {
+            "type": "string",
+            "description": "Required on distributor-side kinds"
+          },
+          "config_id": {
+            "type": "string",
+            "description": "Where a record message lands. Only a config the grant installed there is accepted."
+          },
+          "target_record_id": {
+            "type": "string"
+          },
+          "saved_at": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "distribution_id",
+          "kind",
+          "request_id"
+        ]
+      },
+      "SpaceDistributionBinding": {
+        "type": "object",
+        "properties": {
+          "distribution_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "publisher",
+              "distributor"
+            ]
+          },
+          "counterparty_account_id": {
+            "type": "string"
+          },
+          "counterparty_name": {
+            "type": "string"
+          },
+          "folder": {
+            "type": "string",
+            "description": "Publisher side only"
+          },
+          "required_roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status_map": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Incoming status role to this space's status id"
+          },
+          "bound_at": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Distribution Invitations",
+      "description": "Mint, deliver, preview and redeem invitations that connect a distributor to a publisher"
+    },
+    {
+      "name": "Distribution Register",
+      "description": "The register of distributions between a publisher and its distributors"
+    },
+    {
+      "name": "Distributor Setup",
+      "description": "Distributor features, space template and space bindings"
+    },
+    {
+      "name": "Distribution Products",
+      "description": "Product definitions and the products a distributor may work under"
+    },
+    {
+      "name": "Distribution Messages",
+      "description": "Messages sent between the two sides of a distribution"
+    },
+    {
+      "name": "Config Reservations",
+      "description": "Reservations of record config ids"
+    }
+  ],
+  "paths": {
+    "/accounts/distribution-invite": {
+      "post": {
+        "summary": "Create a distribution invitation",
+        "description": "Mints an invitation from the calling publisher account to a distributor firm. The response carries the one-time token and the public landing link. Root and admin roles only. Refused when the firm already holds an outstanding invitation or a distribution from this publisher.",
+        "operationId": "createDistributionInvite",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDistributionInviteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invitation created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CreateDistributionInviteResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Withdraw a distribution invitation",
+        "description": "Withdraws an unspent invitation minted by the calling publisher. An already withdrawn invitation answers success; a redeemed one is refused. Root and admin roles only.",
+        "operationId": "revokeDistributionInvite",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Invitation id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invitation withdrawn",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-invites": {
+      "get": {
+        "summary": "List outstanding invitations",
+        "description": "Lists the calling publisher's own invitations, newest first. Root and admin roles only.",
+        "operationId": "listDistributionInvites",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Filter by state: `outstanding`, `redeemed`, `withdrawn` or `expired`.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "results": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/DistributionInviteListItem"
+                          }
+                        },
+                        "results_total": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/send-distribution-invite": {
+      "post": {
+        "summary": "Email an invitation",
+        "description": "Emails an outstanding invitation to the contact address stored on the invitation itself. The address is never taken from the request. Root and admin roles only.",
+        "operationId": "sendDistributionInvite",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invite_id": {
+                    "type": "string",
+                    "description": "Invitation id"
+                  }
+                },
+                "required": [
+                  "invite_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invitation sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DistributionInviteSendResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invitation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/resend-distribution-invite": {
+      "post": {
+        "summary": "Resend or reopen an invitation",
+        "description": "Emails an invitation again. An expired invitation is renewed and a redeemed one is reopened, both with a new token; an outstanding one keeps its link. Supply `invite_id` or `distribution_id`. Root and admin roles only.",
+        "operationId": "resendDistributionInvite",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invite_id": {
+                    "type": "string",
+                    "description": "Invitation id"
+                  },
+                  "distribution_id": {
+                    "type": "string",
+                    "description": "Distribution id, used to find the newest invitation that was not withdrawn"
+                  },
+                  "expiry_days": {
+                    "type": "integer",
+                    "description": "New lifetime in days. Defaults to 14, maximum 90."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invitation sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DistributionInviteSendResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-invite-link": {
+      "post": {
+        "summary": "Re-fetch an invitation link",
+        "description": "Returns the redeemable link of an outstanding invitation minted by the calling publisher. Nothing is written and the invitation is not marked as sent. Root and admin roles only.",
+        "operationId": "getDistributionInviteLink",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invite_id": {
+                    "type": "string",
+                    "description": "Invitation id"
+                  }
+                },
+                "required": [
+                  "invite_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DistributionInviteLink"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/preview-distribution-invite": {
+      "post": {
+        "summary": "Preview an invitation",
+        "description": "Public. Answers who invited the holder of a token and to what, before the recipient has an account. Writes nothing and withholds contact details. An invalid or expired token answers 200 with `redeemable: false` and a `reason`. The token may also be sent as a `token` query parameter.",
+        "operationId": "previewDistributionInvite",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "description": "Invitation token, when not sent in the body",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "Invitation token"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DistributionInviteView"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/redeem-distribution-invite": {
+      "post": {
+        "summary": "Redeem an invitation",
+        "description": "Accepts an invitation as the distributor account of the signed-in session and provisions the distribution. The invitation is spent before anything is provisioned, so a failure part way leaves it used and the publisher reopens it with resend. An account cannot redeem its own invitation. Root and admin roles only.",
+        "operationId": "redeemDistributionInvite",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedeemDistributionInviteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invitation redeemed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RedeemDistributionInviteResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/pending-distribution-invite": {
+      "get": {
+        "summary": "Get the invitation an account signed up from",
+        "description": "Returns the invitation the calling account was signed up from and has not accepted yet, with a freshly signed app path. An invitation that can no longer be redeemed clears the marker and the response says why. Any signed-in member.",
+        "operationId": "getPendingDistributionInvite",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PendingDistributionInvite"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-invite-inbox": {
+      "get": {
+        "summary": "List invitations addressed to me",
+        "description": "Lists pending invitations addressed to the signed-in user's own confirmed email, so a firm that lost the mail can find it. The address comes from the session. `complete` is false when only the first part of the ledger was checked. Root and admin roles only.",
+        "operationId": "listDistributionInviteInbox",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "results": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/DistributionInviteInboxItem"
+                          }
+                        },
+                        "results_total": {
+                          "type": "integer"
+                        },
+                        "complete": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-invite-inbox-link": {
+      "post": {
+        "summary": "Get the link for an invitation addressed to me",
+        "description": "Returns the redeemable link for one invitation addressed to the signed-in user's confirmed email. Any other invitation is refused with the same answer. Root and admin roles only.",
+        "operationId": "getDistributionInviteInboxLink",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Invitations"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invite_id": {
+                    "type": "string",
+                    "description": "Invitation id"
+                  }
+                },
+                "required": [
+                  "invite_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DistributionInviteLink"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-status": {
+      "get": {
+        "summary": "Check a distribution is provisioned",
+        "description": "Runs named account-plane checks for one publisher and distributor pair and reports which passed, which failed and which could not be seen. Side defaults to publisher; `account_id` is the counterparty. `path` and `export_name` can be sent in the body and `path` defaults to `gateway`. Root, admin and developer roles.",
+        "operationId": "getDistributionStatus",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Register"
+        ],
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "query",
+            "description": "The counterparty account id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "side",
+            "in": "query",
+            "description": "The caller's own side: `publisher` (default) or `distributor`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "description": "Narrow the checks to one product",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DistributionStatus"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution": {
+      "get": {
+        "summary": "Get one distribution",
+        "description": "Reads one register entry the calling account is party to. Supply exactly one of `publisher_account_id` or `distributor_account_id`; the other comes from the session. Root, admin, developer, monitoring and billing roles.",
+        "operationId": "getDistribution",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Register"
+        ],
+        "parameters": [
+          {
+            "name": "publisher_account_id",
+            "in": "query",
+            "description": "The publisher, when the caller is the distributor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "distributor_account_id",
+            "in": "query",
+            "description": "The distributor, when the caller is the publisher",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "description": "Also return the refusal code for this product",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "distribution": {
+                          "$ref": "#/components/schemas/Distribution"
+                        },
+                        "refusal_code": {
+                          "type": "string",
+                          "description": "Empty when the grant is live"
+                        },
+                        "active_products": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "product_refusal_code": {
+                          "type": "string",
+                          "description": "Present when `product_id` was sent"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No distribution between the two accounts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Amend a distribution",
+        "description": "Publisher side only. Suspends, restores or revokes a distribution and grants or withdraws products. Revoked is terminal. Supply at least one of `status`, `grant_products` or `withdraw_products`. Root and admin roles only.",
+        "operationId": "amendDistribution",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Register"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AmendDistributionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Distribution updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "distribution": {
+                          "$ref": "#/components/schemas/Distribution"
+                        },
+                        "previous_status": {
+                          "type": "string"
+                        },
+                        "previous_products": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "active_products": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ProvisioningStep"
+                          }
+                        },
+                        "note": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No distribution with that distributor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A work-item product cannot be granted to a distribution with no service desk.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionRefusalResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distributions": {
+      "get": {
+        "summary": "List distributions",
+        "description": "Lists the calling account's register entries, as publisher by default or as distributor with `side=distributor`. Root, admin, developer, monitoring and billing roles.",
+        "operationId": "listDistributions",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Register"
+        ],
+        "parameters": [
+          {
+            "name": "side",
+            "in": "query",
+            "description": "`publisher` (default) or `distributor`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "results": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Distribution"
+                          }
+                        },
+                        "results_total": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-link": {
+      "get": {
+        "summary": "Get the link to a counterparty",
+        "description": "Describes how the calling account relates to a counterparty over a grant, with the counterparty's staff users unless the grant is revoked. Staff roles only: client and collaborator sessions are refused. Answers 404 when no grant exists.",
+        "operationId": "getDistributionLink",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Register"
+        ],
+        "parameters": [
+          {
+            "name": "counterparty_account_id",
+            "in": "query",
+            "description": "The other account",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DistributionLink"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No distribution with that account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-reprovision": {
+      "post": {
+        "summary": "Reprovision a distribution",
+        "description": "Re-runs provisioning for one distribution from the calling account's side and records the resulting state. A revoked distribution is refused. `account_id` is the counterparty. Root and admin roles only.",
+        "operationId": "reprovisionDistribution",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Register"
+        ],
+        "x-path-derived": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "account_id": {
+                    "type": "string",
+                    "description": "The counterparty account id"
+                  },
+                  "side": {
+                    "type": "string",
+                    "description": "The caller's own side: `publisher` (default) or `distributor`"
+                  },
+                  "replace_custom_decision_flow": {
+                    "type": "boolean"
+                  },
+                  "copy_quote_config": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "account_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Distribution reprovisioned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "distribution": {
+                          "$ref": "#/components/schemas/Distribution"
+                        },
+                        "provisioning_state": {
+                          "type": "string"
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ProvisioningStep"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No distribution with that account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-brokerage": {
+      "get": {
+        "summary": "Get the distributor firm behind a grant",
+        "description": "Returns the distributor firm of one distribution: name, address, per-product caps and active people. Either party to the grant may read it. Root, admin, developer and collaborator roles.",
+        "operationId": "getDistributionBrokerage",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Register"
+        ],
+        "parameters": [
+          {
+            "name": "distribution_id",
+            "in": "query",
+            "description": "Distribution id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DistributionBrokerage"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden, or the grant refuses the call (`refusal_code` says why).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionRefusalResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-connected-accounts": {
+      "get": {
+        "summary": "List distributors a product can be sent to",
+        "description": "Lists the distributors the calling publisher can send a record to under one product: live grants carrying it actively, with a landing space. Root and admin roles only.",
+        "operationId": "listDistributionConnectedAccounts",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Register"
+        ],
+        "x-path-derived": true,
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "description": "Product id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "product_id": {
+                          "type": "string"
+                        },
+                        "results": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                          }
+                        },
+                        "results_total": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distributor-features": {
+      "get": {
+        "summary": "Get a distributor's features",
+        "description": "Reads the features of one distributor layer by layer: defaults, overrides and effective values. Only an admin of the publisher that holds a live distribution with that account may call it, and the account must have been set up through a distributor vertical. Root and admin roles only.",
+        "operationId": "getDistributorFeatures",
+        "x-resource-type": "service",
+        "tags": [
+          "Distributor Setup"
+        ],
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "query",
+            "description": "The distributor account id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DistributorFeatures"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace a distributor's feature overrides",
+        "description": "Replaces the distributor's overrides whole; an empty map resets every feature to its default. Same gate as the read. Root and admin roles only.",
+        "operationId": "putDistributorFeatures",
+        "x-resource-type": "service",
+        "tags": [
+          "Distributor Setup"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "account_id": {
+                    "type": "string",
+                    "description": "The distributor account id"
+                  },
+                  "overrides": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                },
+                "required": [
+                  "account_id",
+                  "overrides"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DistributorFeatures"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distributor-space-template": {
+      "post": {
+        "summary": "Set the distributor space template",
+        "description": "Chooses one of the calling publisher's spaces as the template new distributors start from, and publishes its logo. Idempotent: call it again after the logo changes. Root and admin roles only.",
+        "operationId": "setDistributorSpaceTemplate",
+        "x-resource-type": "service",
+        "tags": [
+          "Distributor Setup"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "space_id": {
+                    "type": "string",
+                    "description": "Space id"
+                  }
+                },
+                "required": [
+                  "space_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Template set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "distributor_space_template_id": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Clear the distributor space template",
+        "description": "Returns new distributors to the built-in space. The published logo stays, so existing distributor spaces keep showing it. Root and admin roles only.",
+        "operationId": "deleteDistributorSpaceTemplate",
+        "x-resource-type": "service",
+        "tags": [
+          "Distributor Setup"
+        ],
+        "responses": {
+          "200": {
+            "description": "Template cleared",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/product-definition": {
+      "post": {
+        "summary": "Publish a record set definition",
+        "description": "Snapshots one of the calling publisher's own record configs into the catalogue as its next version. Every distributor tracking latest resolves it. Reserves the config id for the publisher; a config id reserved by another account is refused with 409. Root and admin roles only.",
+        "operationId": "publishProductDefinition",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Products"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "config_id": {
+                    "type": "string",
+                    "description": "The publisher's own record config. Defaults to `quote_config`."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Definition published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "type": "integer"
+                        },
+                        "index_fields_changed": {
+                          "type": "boolean"
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ProvisioningStep"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The config id is reserved by another account (`refusal_code: config_id_reserved`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionRefusalResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/product-definitions": {
+      "get": {
+        "summary": "List definition versions",
+        "description": "Lists the versions the calling publisher has published for one record config. Root, admin, developer, monitoring and billing roles.",
+        "operationId": "listProductDefinitions",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Products"
+        ],
+        "parameters": [
+          {
+            "name": "config_id",
+            "in": "query",
+            "description": "Record config id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "config_id": {
+                          "type": "string"
+                        },
+                        "versions": {
+                          "type": "array",
+                          "items": {}
+                        },
+                        "latest": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-product": {
+      "post": {
+        "summary": "Publish a product",
+        "description": "Publishes version 1 of a product: its record sets and its actions. Refused with 409 when the code is already published. Root and admin roles only.",
+        "operationId": "createDistributionProduct",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Products"
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "The whole product definition. A version is the definition as it stood; nothing is merged.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDefinition"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductVersionResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The product code is already published, or its entity config conflicts with a grant that carries it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionRefusalResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Publish the next product version",
+        "description": "Publishes the next version of an existing product as a whole-document write. A work-item product cannot become another type. Root and admin roles only.",
+        "operationId": "updateDistributionProduct",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Products"
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "The whole product definition. A version is the definition as it stood; nothing is merged.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDefinition"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProductVersionResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nothing is published under that code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The product's entity config conflicts with a grant that carries it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionRefusalResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a product",
+        "description": "Reads one of the calling publisher's products at a version, or the latest. Root, admin, developer, monitoring and billing roles.",
+        "operationId": "getDistributionProduct",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Products"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "description": "Product code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "Version number. Defaults to the latest.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "product": {
+                          "$ref": "#/components/schemas/ProductDefinition"
+                        },
+                        "versions": {
+                          "type": "array",
+                          "items": {
+                            "type": "integer"
+                          }
+                        },
+                        "sla_business_days": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nothing is published under that code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-products": {
+      "get": {
+        "summary": "List my products",
+        "description": "Lists the calling publisher's own products, latest version of each. Another account's products are never listed here. Root, admin, developer, monitoring and billing roles.",
+        "operationId": "listDistributionProducts",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Products"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "integer"
+                        },
+                        "products": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ProductDefinition"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-granted-products": {
+      "get": {
+        "summary": "List products granted by a publisher",
+        "description": "Distributor side. Returns what the calling account may work under one publisher, scoped by the grant. A revoked or suspended grant, a missing grant, or a withdrawn product answers 403 with a `refusal_code`. Root, admin, developer and collaborator roles.",
+        "operationId": "listDistributionGrantedProducts",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Products"
+        ],
+        "parameters": [
+          {
+            "name": "publisher_account_id",
+            "in": "query",
+            "description": "The publisher account id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "publisher_account_id": {
+                          "type": "string"
+                        },
+                        "publisher_name": {
+                          "type": "string"
+                        },
+                        "distribution_id": {
+                          "type": "string"
+                        },
+                        "space_id": {
+                          "type": "string"
+                        },
+                        "products": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ProductDefinition"
+                          }
+                        },
+                        "notices": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden, or the grant refuses the call (`refusal_code` says why).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionRefusalResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-products-sync": {
+      "post": {
+        "summary": "Sync products to distributors",
+        "description": "Re-resolves the calling publisher's products and installs the record sets they name into every live grant. Publishing a definition moves each distributor's schema, but not the shape of the product around it; this does. Root and admin roles only.",
+        "operationId": "syncDistributionProducts",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Products"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "product_id": {
+                    "type": "string",
+                    "description": "Narrow to grants carrying this product"
+                  },
+                  "distributor_account_id": {
+                    "type": "string",
+                    "description": "Narrow to one distributor"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Products synced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "product_id": {
+                          "type": "string"
+                        },
+                        "synced": {
+                          "description": "Distributors synced"
+                        },
+                        "skipped": {
+                          "description": "Distributors skipped"
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ProvisioningStep"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-clear-space-cards": {
+      "post": {
+        "summary": "Clear stored space cards",
+        "description": "One-shot and re-runnable. Removes the frozen card list from every distributor space created before provisioning stopped writing one. Root and admin roles only.",
+        "operationId": "clearDistributionSpaceCards",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Products"
+        ],
+        "x-path-derived": true,
+        "responses": {
+          "200": {
+            "description": "Cards cleared",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "cleared": {
+                          "type": "integer"
+                        },
+                        "already": {
+                          "type": "integer"
+                        },
+                        "failed": {
+                          "type": "integer"
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ProvisioningStep"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/distribution-message": {
+      "post": {
+        "summary": "Send a distribution message",
+        "description": "The one door every distribution message goes through. The sender is the token's account and the register decides whether it may send this kind under this grant. Which side may send which kind is enforced server-side (for example record, status, workitem-upsert, comment-upsert and comment-delete). `request_id` is the idempotency key: a repeat answers 200 with `status: duplicate`. Roles: root, admin and developer, plus collaborator for distributor-side kinds.",
+        "operationId": "createDistributionMessage",
+        "x-resource-type": "service",
+        "tags": [
+          "Distribution Messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DistributionMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message_id": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "`accepted` or `duplicate`"
+                        },
+                        "sequence": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden, or the grant refuses the call (`refusal_code` says why).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionRefusalResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/config-reservation": {
+      "delete": {
+        "summary": "Release a config id",
+        "description": "Frees one reserved config id. Only the owning account may release it, and only while nothing still resolves it (409 `reservation_in_use`). Releasing an id nobody holds answers success with `released: false`. Root and admin roles only.",
+        "operationId": "releaseConfigReservation",
+        "x-resource-type": "service",
+        "tags": [
+          "Config Reservations"
+        ],
+        "x-path-derived": true,
+        "parameters": [
+          {
+            "name": "config_id",
+            "in": "query",
+            "description": "Reserved config id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "config_id": {
+                          "type": "string"
+                        },
+                        "released": {
+                          "type": "boolean"
+                        },
+                        "owner_account_id": {
+                          "type": "string"
+                        },
+                        "detail": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The id is owned by another account (`config_id_reserved`) or is still in use (`reservation_in_use`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistributionRefusalResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/config-reservations": {
+      "get": {
+        "summary": "List my config id reservations",
+        "description": "With `owner=me`, lists the config ids the calling account has reserved. Root, admin, developer, monitoring and billing roles. Without it the call lists every account's reservations and is limited to platform callers.",
+        "operationId": "listConfigReservations",
+        "x-resource-type": "service",
+        "tags": [
+          "Config Reservations"
+        ],
+        "x-path-derived": true,
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "query",
+            "description": "Must be `me`. No other value is available to account sessions.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "owner": {
+                          "type": "string"
+                        },
+                        "count": {
+                          "type": "integer"
+                        },
+                        "reservations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
