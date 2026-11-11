@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "quiva.ai Gateway",
+    "title": "quiva.ai Gateways API",
     "description": "quiva.ai Gateway API for managing gateway infrastructure and routing API requests.",
     "version": "1.0.0",
     "contact": {
@@ -31,10 +31,10 @@
   ],
   "security": [
     {
-      "bearer_auth": []
+      "bearerAuth": []
     },
     {
-      "api_key_auth": []
+      "apiKeyAuth": []
     }
   ],
   "paths": {
@@ -1027,15 +1027,25 @@
   },
   "components": {
     "securitySchemes": {
-      "bearer_auth": {
+      "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       },
-      "api_key_auth": {
+      "apiKeyAuth": {
         "type": "apiKey",
         "in": "header",
-        "name": "X-Api-Key"
+        "name": "x-api-key"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "description": "API integration client credentials. Tokens only work on the task-sync routes in workspaces.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.quiva.ai/oauth/token",
+            "scopes": {}
+          }
+        }
       }
     },
     "parameters": {

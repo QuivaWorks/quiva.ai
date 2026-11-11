@@ -3,7 +3,7 @@
   "info": {
     "title": "Quiva Assistants API",
     "x-gateway-name": "API Gateway",
-    "description": "API for managing Quiva Assistants. Every endpoint requires either a Bearer JWT or an API key \u2014 the gateway resolves an API key into the user/account context these endpoints read. A restricted API key must explicitly allow the /hub/agent* paths it's used against, or requests are rejected before they reach this API.",
+    "description": "API for managing Quiva Assistants. Every endpoint requires either a Bearer JWT or an API key — the gateway resolves an API key into the user/account context these endpoints read. A restricted API key must explicitly allow the /hub/agent* paths it's used against, or requests are rejected before they reach this API.",
     "version": "0.1.1",
     "contact": {
       "name": "quiva.ai Support"
@@ -92,7 +92,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Cancel identifier for this assistant invocation. NOTE: this endpoint does NOT read this query param (nor the request-body cancel_token) \u2014 to cancel a running invocation, call POST /hub/agent/cancel instead. Kept for compatibility.",
+            "description": "Cancel identifier for this assistant invocation. NOTE: this endpoint does NOT read this query param (nor the request-body cancel_token) — to cancel a running invocation, call POST /hub/agent/cancel instead. Kept for compatibility.",
             "example": "cancel-abc123"
           }
         ],
@@ -390,7 +390,7 @@
           "Assistants"
         ],
         "summary": "Delete an assistant",
-        "description": "Deletes an assistant by {id} (or subject in the body). Genuinely removes it \u2014 a second delete returns 404 and it disappears from the list \u2014 but a subsequent GET returns a hollow config rather than 404 (see GetAgentResponse).",
+        "description": "Deletes an assistant by {id} (or subject in the body). Genuinely removes it — a second delete returns 404 and it disappears from the list — but a subsequent GET returns a hollow config rather than 404 (see GetAgentResponse).",
         "operationId": "deleteAgent",
         "x-resource-type": "service",
         "responses": {
@@ -431,7 +431,7 @@
       "get": {
         "operationId": "listMcpRegistryServers",
         "summary": "Browse the MCP registry",
-        "description": "Searches the public Model Context Protocol registry (registry.modelcontextprotocol.io) for remote MCP servers your assistants could connect to. This browses the shared public catalog, not the servers already registered to your account \u2014 see POST /hub/mcp/register for that.",
+        "description": "Searches the public Model Context Protocol registry (registry.modelcontextprotocol.io) for remote MCP servers your assistants could connect to. This browses the shared public catalog, not the servers already registered to your account — see POST /hub/mcp/register for that.",
         "tags": [
           "Assistants"
         ],
@@ -510,7 +510,7 @@
       "post": {
         "operationId": "registerMcpServer",
         "summary": "Register an MCP server to your account",
-        "description": "Connects to a remote MCP server, runs its initialize and tools/list handshake, and adds it to your account's own catalog. Its tools become callable by your assistants immediately. Registering a server you do not control puts its tool descriptions and results directly into assistant context \u2014 review an unfamiliar endpoint the way you would an unreviewed package before registering it.",
+        "description": "Connects to a remote MCP server, runs its initialize and tools/list handshake, and adds it to your account's own catalog. Its tools become callable by your assistants immediately. Registering a server you do not control puts its tool descriptions and results directly into assistant context — review an unfamiliar endpoint the way you would an unreviewed package before registering it.",
         "tags": [
           "Assistants"
         ],
@@ -572,7 +572,7 @@
         "properties": {
           "subject": {
             "type": "string",
-            "description": "Optional \u2014 the full assistant subject. When omitted, the {id} path param identifies the assistant. Update is a PUT that REPLACES the config (only owner/shared are carried over from the prior version), so send a complete config."
+            "description": "Optional — the full assistant subject. When omitted, the {id} path param identifies the assistant. Update is a PUT that REPLACES the config (only owner/shared are carried over from the prior version), so send a complete config."
           },
           "config": {
             "$ref": "#/components/schemas/AgentConfig"
@@ -597,7 +597,7 @@
       },
       "GetAgentResponse": {
         "type": "object",
-        "description": "NOTE: a deleted or never-existed subject does NOT return 404 \u2014 this endpoint returns a hollow config with all-empty fields (name/llm_provider/model/owner = \"\"). Treat an all-empty config as \"not found\"; use GET /hub/agent (list) to confirm existence.",
+        "description": "NOTE: a deleted or never-existed subject does NOT return 404 — this endpoint returns a hollow config with all-empty fields (name/llm_provider/model/owner = \"\"). Treat an all-empty config as \"not found\"; use GET /hub/agent (list) to confirm existence.",
         "properties": {
           "subject": {
             "type": "string",
@@ -692,7 +692,7 @@
       },
       "AgentAgentInvokeRequest": {
         "type": "object",
-        "description": "Provide either `subject` (an existing assistant) OR an inline `agent` definition \u2014 400 if neither. `prompt` (string or object) is expected but not strictly enforced by the engine. The old example field `agent_subject` is NOT read \u2014 use `subject`.",
+        "description": "Provide either `subject` (an existing assistant) OR an inline `agent` definition — 400 if neither. `prompt` (string or object) is expected but not strictly enforced by the engine. The old example field `agent_subject` is NOT read — use `subject`.",
         "properties": {
           "agent": {
             "$ref": "#/components/schemas/AgentConfig",
@@ -885,7 +885,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Optional human-facing label (alphanumeric, dashes, underscores). This is NOT the identifier and is not used for routing \u2014 the real identifier is the server-generated `subject`. The GET/PUT/DELETE path {id} is the uuid suffix of that subject, not this field.",
+            "description": "Optional human-facing label (alphanumeric, dashes, underscores). This is NOT the identifier and is not used for routing — the real identifier is the server-generated `subject`. The GET/PUT/DELETE path {id} is the uuid suffix of that subject, not this field.",
             "example": "EMAIL_DRAFT"
           },
           "name": {
@@ -1642,7 +1642,7 @@
       },
       "McpRegistryResponse": {
         "type": "object",
-        "description": "Verified against a live call 2026-09-27. Page with `next_cursor`, not `cursor` \u2014 despite what an older version of this spec said.",
+        "description": "Verified against a live call 2026-09-27. Page with `next_cursor`, not `cursor` — despite what an older version of this spec said.",
         "properties": {
           "servers": {
             "type": "array",
@@ -1666,7 +1666,7 @@
       },
       "RegisterMcpServerRequest": {
         "type": "object",
-        "description": "Provide `endpoint` (a remote MCP server URL) or `registry_name` (an entry id from GET /hub/mcp/registry) \u2014 one is required.",
+        "description": "Provide `endpoint` (a remote MCP server URL) or `registry_name` (an entry id from GET /hub/mcp/registry) — one is required.",
         "properties": {
           "endpoint": {
             "type": "string",
@@ -1674,7 +1674,7 @@
           },
           "registry_name": {
             "type": "string",
-            "description": "A registry entry id, e.g. \"io.github.owner/repo\" \u2014 selects that entry instead of a URL.",
+            "description": "A registry entry id, e.g. \"io.github.owner/repo\" — selects that entry instead of a URL.",
             "example": "io.github.owner/repo"
           },
           "transport": {
@@ -1705,7 +1705,7 @@
           },
           "auth_token": {
             "type": "string",
-            "description": "Used only for this registration's handshake \u2014 never stored."
+            "description": "Used only for this registration's handshake — never stored."
           },
           "oauth_integration_id": {
             "type": "string",
@@ -1771,14 +1771,22 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "JWT Authorization header using the Bearer scheme."
+        "bearerFormat": "JWT"
       },
       "apiKeyAuth": {
         "type": "apiKey",
         "in": "header",
-        "name": "X-Api-Key",
-        "description": "API key authentication via X-Api-Key header."
+        "name": "x-api-key"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "description": "API integration client credentials. Tokens only work on the task-sync routes in workspaces.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.quiva.ai/oauth/token",
+            "scopes": {}
+          }
+        }
       }
     },
     "parameters": {

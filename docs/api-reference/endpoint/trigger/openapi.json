@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "quiva.ai Gateway",
+    "title": "quiva.ai Triggers API",
     "description": "Manages the triggers that start automation in response to events — create, retrieve and delete gateway triggers (custom API endpoints that kick off a flow) and stream triggers (real-time data flowing from a source into a target).",
     "contact": {
       "name": "quiva.ai Support"
@@ -102,14 +102,16 @@
           {
             "name": "trigger_type",
             "in": "path",
-            "description": "The type of trigger (gateway, stream, subject)",
+            "description": "The type of trigger (gateway, stream, subject, obj, email)",
             "required": true,
             "schema": {
               "type": "string",
               "enum": [
                 "gateway",
                 "stream",
-                "subject"
+                "subject",
+                "obj",
+                "email"
               ]
             },
             "example": "gateway"
@@ -209,14 +211,16 @@
           {
             "name": "trigger_type",
             "in": "path",
-            "description": "The type of trigger (gateway, stream, subject)",
+            "description": "The type of trigger (gateway, stream, subject, obj, email)",
             "required": true,
             "schema": {
               "type": "string",
               "enum": [
                 "gateway",
                 "stream",
-                "subject"
+                "subject",
+                "obj",
+                "email"
               ]
             },
             "example": "gateway"
@@ -417,15 +421,113 @@
           }
         }
       }
+    },
+    "/trigger/obj": {
+      "post": {
+        "summary": "Create an object store trigger",
+        "description": "Creates a trigger that starts a flow when an object store bucket changes.",
+        "operationId": "createObjectStoreTrigger",
+        "x-resource-type": "service",
+        "tags": [
+          "Object Store Triggers"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectStoreTriggerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Trigger created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectStoreTriggerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/trigger/email": {
+      "post": {
+        "summary": "Create an email trigger",
+        "description": "Creates a trigger that starts a flow when a message arrives at the generated address. The response carries the draft and published addresses. Flow trigger nodes of type `email`, `mail` (Microsoft 365 mail automations) and `email-delivery` (delivery events for emails sent from templates) are configured on the flow itself, see the flows API.",
+        "operationId": "createEmailTrigger",
+        "x-resource-type": "service",
+        "tags": [
+          "Email Triggers"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailTriggerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Trigger created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailTriggerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
     }
   },
   "components": {
     "securitySchemes": {
-      "bearer_auth": {
+      "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "JWT token for authentication. Required for all API operations to verify identity and access permissions."
+        "bearerFormat": "JWT"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "description": "API integration client credentials. Tokens only work on the task-sync routes in workspaces.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.quiva.ai/oauth/token",
+            "scopes": {}
+          }
+        }
       }
     },
     "schemas": {
@@ -911,6 +1013,142 @@
             "example": 400
           }
         }
+      },
+      "ObjectStoreTriggerRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique trigger name"
+          },
+          "collection": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "flow_subject": {
+            "type": "string",
+            "description": "Subject of the flow the trigger starts"
+          }
+        }
+      },
+      "EmailTriggerRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique trigger name"
+          },
+          "collection": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "flow_subject": {
+            "type": "string",
+            "description": "Subject of the flow the trigger starts. A draft subject is stored as its published subject."
+          }
+        }
+      },
+      "EmailTriggerResponse": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "collection": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "trigger_type": {
+                    "type": "string",
+                    "enum": [
+                      "email"
+                    ]
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "flow_subject": {
+                    "type": "string"
+                  },
+                  "email_published": {
+                    "type": "string",
+                    "description": "Generated address that starts the published flow"
+                  },
+                  "email_draft": {
+                    "type": "string",
+                    "description": "Generated address that starts the draft flow"
+                  }
+                }
+              }
+            }
+          },
+          "status_code": {
+            "type": "integer"
+          }
+        }
+      },
+      "ObjectStoreTriggerResponse": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "collection": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "trigger_type": {
+                    "type": "string",
+                    "enum": [
+                      "obj"
+                    ]
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "flow_subject": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "status_code": {
+            "type": "integer"
+          }
+        }
       }
     },
     "responses": {
@@ -974,7 +1212,10 @@
   },
   "security": [
     {
-      "bearer_auth": []
+      "bearerAuth": []
+    },
+    {
+      "apiKeyAuth": []
     }
   ]
 }
