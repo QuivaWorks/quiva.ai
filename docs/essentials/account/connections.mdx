@@ -41,6 +41,10 @@ Click **Connect** on the tracker's card. The wizard shows the steps for that tra
     Priority is matched by name, and the tracker's estimate becomes a time estimate using the conversion the step asks for. If the tracker has no priority field to match, priority is not synced.
   </Step>
 
+  <Step title="Provider terms">
+    If the connection's operations need the provider's terms, the dialog ends with an **Enable and accept** step. Nothing is sent to the provider until its terms are accepted. Only an admin can accept them; other users are pointed to the **Terms & privacy** tab. A test that failed on terms runs again once they are accepted.
+  </Step>
+
   <Step title="Connect">
     Review the summary and click **Connect**. Everything is set up in one go: an integration for the sync, the tracker's webhook, and a task subscription.
   </Step>
@@ -66,6 +70,10 @@ A connected tracker shows a card with a status pill:
 | **Update available** | A newer version of the sync is ready to apply |
 
 The card shows the workspace and member the connection acts as, and the Space it syncs.
+
+Until setup is finished, the card reads **Setup: n of m done** with a **Continue setup** button. A connection with nothing linked to it yet reads "No links yet" and explains how to link one; **Sync now** stays disabled until something is linked. A "Terms not accepted" error carries a button that opens the terms step.
+
+Credentials a connection asks for are saved to the account's Secrets. The Secrets page tags each secret a connection uses ("Used by …") and warns, naming the connection that will stop working, before you delete one.
 
 ### Activity
 

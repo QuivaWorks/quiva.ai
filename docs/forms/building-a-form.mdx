@@ -117,6 +117,8 @@ The switcher shows `Record Set › Form` and carries icon controls for:
 - **Add flow** / **Edit flow** — see [Form flows](/forms/form-flows)
 - **Delete form** — disabled on the last remaining form
 
+A pill beside the switcher shows the record set's current version, or **Not published** if it has never been published. It opens the **Versions** panel.
+
 <Note>
 A warning triangle appears in the header when the schema marks a field required but the form does
 not place it. Hover it for the list. Such a form can never be submitted successfully: the service
@@ -165,5 +167,21 @@ same time will therefore undo each other's work. Edit one at a time.
 
 Switching to another form in the switcher with unsaved edits prompts first: **Unsaved changes —
 switch forms and discard them?** Switching discards them; there is no per-form draft.
+
+## Versions and publishing
+
+**Save** keeps working on the record set; **Publish** records it as a named version. The **Versions** panel lists every published version, with the current one marked **Current**.
+
+<Steps>
+  <Step title="Save first">
+    Publish takes the saved record set. If you have unsaved changes, the **Publish version** dialog offers to save them.
+  </Step>
+  <Step title="Publish">
+    Click **Publish** in the Versions panel, give the version a **Title**, and confirm. The dialog shows the change from the current published version to this one.
+  </Step>
+  <Step title="Compare">
+    Open any earlier version to view it, **Inline** or **Side by side**, as the **Full config** or just the **Form view**.
+  </Step>
+</Steps>
 
 Changing a form never touches records already saved. It changes only what is asked for next time.

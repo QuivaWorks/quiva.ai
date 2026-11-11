@@ -10,6 +10,14 @@ The **Model pool** tab controls which underlying AI models power Abbie, and the 
 
 Toggle which built-in providers (Anthropic, OpenAI, Gemini) are active for your account. Only active providers are considered when Abbie routes a request.
 
+Each provider tile expands to list the models it serves. Some models are labelled **opt-in**: they are left unticked, and Abbie only routes to them once you tick them one by one. Ticking a provider no longer admits its opt-in models.
+
+<Warning>
+If your account had ticked a provider with opt-in models, such as SCX, Abbie stops routing to those models until you tick each one you want. Models you pin to a tier or stage keep working.
+</Warning>
+
+Gemini 4 Argon is part of the routing pool as a premium model.
+
 <Frame caption="The Model pool tab: providers, then routing mode.">
   <img src="/images/abbie/model-pool.png" alt="The Model pool settings tab showing Anthropic, Gemini and OpenAI provider toggles and a Cost/Balanced/Performance/Accuracy routing mode selector" />
 </Frame>

@@ -1,0 +1,15 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Microsoft 365 Service API",
+    "version": "1.0.0",
+    "description": "Placeholder. The spec is synced in from the olympus repository."
+  },
+  "servers": [
+    {
+      "url": "https://api.quiva.ai",
+      "description": "Production API server"
+    }
+  ],
+  "paths": {}
+}

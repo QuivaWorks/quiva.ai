@@ -6,7 +6,7 @@ icon: "terminal"
 
 Most people should use the [hosted remote server](/developers/mcp/remote-setup) instead — nothing to clone or run. Run the servers locally when you're developing against them, or where a hosted HTTP connection isn't an option for your client.
 
-This repository is separate from the main Quiva application.
+The repository is public and separate from the main Quiva application.
 
 ## Requirements
 
@@ -21,29 +21,30 @@ cd mcp
 npm install
 ```
 
-<Note>
-If you can't access this repository, contact support.
-</Note>
-
 Each server lives in its own package (`quiva-flows-mcp`, `quiva-records-mcp`, `quiva-documents-mcp`, `quiva-workspaces-mcp`, `quiva-agents-mcp`, `quiva-distribution-mcp`, `quiva-coworker-mcp`) and runs as an independent stdio process — connect to only the ones you need.
 
 ## Configure credentials
 
-Each server reads its own `.env` file:
+The recommended credential is a **profile**: set `QUIVA_PROFILE=<name>` and the server reads the environment, account and API key from `~/.config/quiva/profiles.json`. See [Local AI agents](/developers/agents/overview) to create one. Otherwise each server reads its own `.env` file:
 
 ```sh
 cp quiva-flows-mcp/.env.example quiva-flows-mcp/.env
 ```
 
-Fill in **one** of the following (checked in this order if more than one is set):
+Fill in **one** of the following. Credentials are looked up in this order: `QUIVA_PROFILE`, then `QUIVA_API_KEY_<PROFILE>`, then `QUIVA_API_KEY`, then the bearer token and email fallbacks:
 
 | Env var | Sent as |
 |---|---|
+| `QUIVA_PROFILE` | Names a profile in `~/.config/quiva/profiles.json` (recommended) |
 | `QUIVA_API_KEY` | `X-Api-Key` header |
 | `QUIVA_BEARER_TOKEN` | `Authorization: Bearer` |
 | `QUIVA_EMAIL` + `QUIVA_PASSWORD` (+ optional `QUIVA_ACCOUNT`) | Logs in, caches the resulting JWT, and re-logs in once on a `401` |
 
 `QUIVA_API_URL` defaults to production (`https://api.quiva.ai`); leave it unset unless you're pointed at a different environment.
+
+<Warning>
+An [API integration](/essentials/account/api-integrations) credential is not an MCP credential. It only reaches the task-sync routes, so the servers cannot use it. Use a user API key.
+</Warning>
 
 <Warning>
 The Abbie coworker server needs an admin or root user for its account-wide writes (organisation profile, task space, organisation environment). An email/password login or bearer token for such a user works; an API key does too, since the gateway resolves it to the same token.
@@ -62,7 +63,7 @@ claude mcp add quiva-flows \
   -- sh /path/to/mcp/quiva-flows-mcp/bin/run.sh
 ```
 
-Repeat for the other packages, changing the directory and env prefix. If the repository ships a `.mcp.json` at its root, opening a session inside that checkout registers everything in it automatically — approve the servers when Claude Code prompts you, and restart the session after adding credentials (MCP servers connect at session start).
+Repeat for the other packages, changing the server name (`quiva-records`, `quiva-documents` and so on) and the path to its `bin/run.sh`. The `-e` variables stay the same. To avoid writing the key into your Claude Code config, use `-e QUIVA_PROFILE=<name>` instead of `QUIVA_API_KEY`. If the repository ships a `.mcp.json` at its root, opening a session inside that checkout registers everything in it automatically — approve the servers when Claude Code prompts you, and restart the session after adding credentials (MCP servers connect at session start).
 
 ### Other clients
 
@@ -75,3 +76,7 @@ Running locally, each server's tools are unprefixed — `list_workflows`, not `f
 <Card title="Tool reference" icon="list-check" href="/developers/mcp/tools">
   Every tool, by server, with what it does
 </Card>
+
+<Note>
+Using Claude Code, Codex or another local AI agent? See [Local AI agents](/developers/agents/overview).
+</Note>
