@@ -28,6 +28,10 @@ A profile is tied to one account. You do not need to look the id up: `profile ad
 
 You can also copy it from the app: open **Account**, and the **Account ID** row (under **Sign-in address**) has a copy button.
 
+<Frame caption="The Sign-in address and Account ID rows on Account, Branding. The address has a Set address or Change button; the Account ID has a copy button. Values shown are examples.">
+  <img src="/images/essentials/account-sign-in-id.png" alt="The Account Branding App name card with a Sign-in address row and an Account ID row with a copy button" />
+</Frame>
+
 If you use an environment variable and want to see the account a key belongs to:
 
 ```sh
@@ -37,6 +41,10 @@ curl -H "x-api-key: $QUIVA_API_KEY" https://api.quiva.ai/accounts/info
 <Note>
 The `/u/<code>/` segment in a QuivaWorks address is a session code, not the account id.
 </Note>
+
+<Frame caption="Settings, API keys: your keys with the account, last four characters and expiry. Names shown are examples.">
+  <img src="/images/essentials/api-keys.png" alt="The API keys page listing keys with Name, Account, Last 4 Characters, Created and Expires columns and an Add button" />
+</Frame>
 
 ## Store the key
 
