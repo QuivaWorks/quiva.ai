@@ -1,0 +1,52 @@
+---
+title: "Codex"
+description: "Connect Codex to your QuivaWorks account and give it repository guidance"
+icon: "terminal"
+---
+
+Before you start, create a key and store it as described in [Local AI agents](/developers/agents/overview#store-the-key). The examples assume `QUIVA_API_KEY` is exported in the environment Codex starts from.
+
+Codex reads MCP servers from `~/.codex/config.toml` (or `.codex/config.toml` in a trusted project).
+
+## Remote server
+
+```toml
+[mcp_servers.quiva]
+url = "https://api.quiva.ai/mcp"
+bearer_token_env_var = "QUIVA_API_KEY"
+```
+
+`bearer_token_env_var` names the environment variable that holds the key, so the key itself never sits in the file. Run `codex mcp list` to see configured servers.
+
+## Local stdio servers
+
+Use a profile so every server shares one key store:
+
+```toml
+[mcp_servers.quiva-flows]
+command = "sh"
+args = ["/path/to/mcp/quiva-flows-mcp/bin/run.sh"]
+
+[mcp_servers.quiva-flows.env]
+QUIVA_PROFILE = "<name>"
+```
+
+Add one table per server you want. See [Run the servers locally](/developers/mcp/local-setup) for the list and requirements.
+
+
+## Guide Codex with AGENTS.md
+
+Codex reads `AGENTS.md` from your repository (from the project root down to the folder you are working in) and from `~/.codex`. A short note keeps it safe and consistent:
+
+```md
+## QuivaWorks
+
+- Use the `quiva` MCP server for flows, records, documents, spaces and tasks.
+- For pulling, diffing, pushing or copying account configuration, use the quiva-config script
+  (`node <skill dir>/scripts/quiva.mjs`). Run a dry run first and show me the diff before `--yes`.
+- Never ask me for an API key in chat. If a profile is missing, tell me to run `profile add` in my own terminal.
+```
+
+## The quiva-config script from Codex
+
+Codex does not load Claude Code plugins. Copy the repository's `skills/quiva-config` folder somewhere Codex can read it and refer to it from `AGENTS.md` as above. See [Skills](/developers/agents/skills).
