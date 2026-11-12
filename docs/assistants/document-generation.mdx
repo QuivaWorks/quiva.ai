@@ -7,7 +7,9 @@ icon: "wand-magic-sparkles"
 Generate any document you can imagine—from polished reports and presentations to interactive web applications—simply by describing what you need. Your AI assistant handles the creation, letting you focus on refining the output to perfection.
 
 <Tip>
-Global instructions, including brand guidelines, can be set on your account and applied to an assistant's generated documents — but this is opt-in per assistant and off by default. [Explore global instructions in detail →](/essentials/account/global-admin-branding-settings).
+Every generated Word document, PDF, slide deck and spreadsheet uses your account's **document theme** automatically: fonts, colours, page setup, header logo, footer and, for decks, chart colours and the cover. Set it in **Account → Branding → Documents**. [Set up the document theme →](/essentials/account/global-admin-branding-settings#document-theme)
+
+Global instructions, such as tone or wording rules, are separate: they apply to an assistant's documents only when you turn them on for that assistant.
 </Tip>
 
 ## Key Features at a Glance
@@ -20,7 +22,7 @@ Global instructions, including brand guidelines, can be set on your account and 
 
 **Diagrams** — Generate Mermaid diagrams as a standalone, shareable HTML file for flowcharts, timelines, and visualisations.
 
-**Presentation Styling** — Describe a theme or colour scheme in your prompt and the assistant applies it while building the presentation.
+**Your Brand by Default** — Documents and decks come out in your account's document theme, with your logo, without you describing it.
 
 **Deploy to the Web** — Take interactive HTML applications live with a single request—no deployment expertise required.
 
@@ -42,7 +44,7 @@ Creating a document is straightforward. Simply tell your assistant what you need
 5. **Download or deploy** your finished document
 
 <Tip>
-The more specific you are in your description, the better the result. Include details about tone, audience, specific data points, visual style, and any branding guidelines.
+The more specific you are in your description, the better the result. Include details about tone, audience, specific data points, and visual emphasis. Fonts, colours and your logo come from the account's document theme, so you don't need to describe them.
 </Tip>
 
 ---
@@ -60,7 +62,7 @@ Create editable Word documents that teams can collaborate on after generation. G
 ### Presentations & Data
 
 **PowerPoint Presentations**
-Generate complete slide decks with multiple layouts and professional designs. Describe a theme or colour scheme in your prompt (for example, "use a modern blue theme") and the assistant applies it while building the deck.
+Generate complete slide decks with multiple layouts. Decks use your account's document theme: its fonts and colours, chart colours in series order, gain and loss colours, the cover colour or image, and your logo in the slide corner you chose.
 
 <Note>
 `.pptx` files don't preview directly in the UI. A companion PDF version is generated alongside it so you can preview the content before downloading the `.pptx`.
@@ -105,7 +107,7 @@ The generation process is iterative. You can refine your document as many times 
 Your assistant can generate images from a text description using AI image generation — useful for illustrations, banners, or custom graphics referenced in a conversation. Image generation is billed in credits based on the resolution you request, rather than a flat price.
 
 <Note>
-Generated images aren't automatically embedded into a Word, PDF, PowerPoint, or Excel document — the document generators work from your text description alone and don't have access to images generated elsewhere in the conversation. This also means an existing image or logo you reference can't be embedded into a generated document.
+Generated images aren't automatically embedded into a Word, PDF, PowerPoint, or Excel document — the document generators work from your text description alone and don't have access to images generated elsewhere in the conversation. Your account's document logo is the exception: it is added to every generated document and deck from **Branding → Documents**.
 </Note>
 
 <Frame>
@@ -119,7 +121,7 @@ Generated images aren't automatically embedded into a Word, PDF, PowerPoint, or 
 
 For PowerPoint presentations, you can request:
 
-- **Themes & Colour Schemes** — "Apply a modern blue theme" or "Use our company branding colours"
+- **Emphasis** — "Show the total in red" or "Highlight the recommended option". Fonts, page setup and the logo come from the document theme, so change those in **Branding → Documents** rather than in the prompt
 - **Layout Variations** — "Title slide, then 5 content slides with left-aligned text and right-side images"
 - **Design Elements** — "Include page numbers" or "Add a title slide with a subtitle"
 
@@ -197,7 +199,7 @@ That's completely normal. Simply tell the assistant what needs to change. You ca
 </Accordion>
 
 <Accordion title="Can I add my company branding to documents?">
-You can describe colour schemes, fonts, and styling in your prompt, and the assistant applies them while generating the document. Logos and other existing images can't be embedded into a generated document — the generator only works from your text description, not from files or images.
+Yes. Set the **document theme** and **document logo** in **Account → Branding → Documents**, and every generated document and deck uses them. Importing a branded Word, PowerPoint or Excel file fills in the fonts, colours, chart colours and cover for you. Within that theme, you can still ask for emphasis such as a coloured total. For a fixed layout of your own, such as a letterhead or a proposal, upload it as a document template and the assistant fills it in.
 </Accordion>
 
 <Accordion title="How do I know if my HTML app needs to be deployed?">
