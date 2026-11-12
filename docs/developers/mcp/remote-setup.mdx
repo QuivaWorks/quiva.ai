@@ -15,7 +15,7 @@ The fastest path is Claude Code — one command. Cursor, VS Code and Claude Desk
   <Step title="Add the server">
     ```sh
     claude mcp add --transport http quiva https://api.quiva.ai/mcp \
-      --header "Authorization: Bearer <API_KEY>"
+      --header "x-api-key: <API_KEY>"
     ```
   </Step>
   <Step title="Verify">
@@ -43,14 +43,13 @@ The fastest path is Claude Code — one command. Cursor, VS Code and Claude Desk
 https://api.quiva.ai/mcp
 ```
 
-Authenticate with a Quiva API key, sent as a bearer token:
+Authenticate with a Quiva API key, sent in the `x-api-key` header:
 
 ```
-Authorization: Bearer <API_KEY>
+x-api-key: <API_KEY>
 ```
 
-`X-Api-Key: <API_KEY>` also works. A request with neither gets `401`. If a request carries both
-headers, `Authorization` wins and `X-Api-Key` is ignored. See [API keys](/developers/mcp/api-keys)
+The API gateway accepts API keys only in the `x-api-key` header; `Authorization: Bearer` is for JWT session tokens. A request without a credential gets `401`. See [API keys](/developers/mcp/api-keys)
 for how to create one.
 
 <Info>
@@ -63,7 +62,7 @@ The server is stateless — it builds a client from the key on each request and 
   <Tab title="Claude Code">
     ```sh
     claude mcp add --transport http quiva https://api.quiva.ai/mcp \
-      --header "Authorization: Bearer <API_KEY>"
+      --header "x-api-key: <API_KEY>"
     ```
 
     Add `--scope user` to make it available in every project rather than just the current one.
@@ -78,7 +77,7 @@ The server is stateless — it builds a client from the key on each request and 
       "mcpServers": {
         "quiva": {
           "url": "https://api.quiva.ai/mcp",
-          "headers": { "Authorization": "Bearer <API_KEY>" }
+          "headers": { "x-api-key": "<API_KEY>" }
         }
       }
     }
@@ -107,7 +106,7 @@ The server is stateless — it builds a client from the key on each request and 
         "quiva": {
           "type": "http",
           "url": "https://api.quiva.ai/mcp",
-          "headers": { "Authorization": "Bearer ${input:quiva-api-key}" }
+          "headers": { "x-api-key": "${input:quiva-api-key}" }
         }
       }
     }
@@ -128,16 +127,16 @@ The server is stateless — it builds a client from the key on each request and 
             "mcp-remote",
             "https://api.quiva.ai/mcp",
             "--header",
-            "Authorization:${QUIVA_AUTH}"
+            "x-api-key:${QUIVA_API_KEY}"
           ],
-          "env": { "QUIVA_AUTH": "Bearer <API_KEY>" }
+          "env": { "QUIVA_API_KEY": "<API_KEY>" }
         }
       }
     }
     ```
 
     <Note>
-    Keep the `--header` argument itself space-free (`Authorization:${QUIVA_AUTH}`, no space after the colon) and put `Bearer <API_KEY>` — space included — in the environment variable instead. Some hosts mangle spaces inside `args`; this sidesteps it.
+    Keep the `--header` argument itself space-free (`x-api-key:${QUIVA_API_KEY}`, no space after the colon) and put the key in the environment variable instead. Some hosts mangle spaces inside `args`; this sidesteps it.
     </Note>
 
     Restart Claude Desktop after saving.
@@ -150,7 +149,7 @@ The server is stateless — it builds a client from the key on each request and 
 
 | Response | Meaning |
 |---|---|
-| `401` on every call | No key was sent, or it doesn't parse as `Bearer <key>`. Check the header name and prefix. |
+| `401` on every call | No key was sent. Check that it is in the `x-api-key` header. |
 | `401` or `403` from a specific tool | The key is expired or revoked, or — for a **restricted key** — it doesn't allow the endpoint that tool calls. Restricted keys are scoped to a fixed list of method/path pairs; widen the key's allowed endpoints or issue a less restricted one. See [API keys](/developers/mcp/api-keys). |
 | `403` on a flow write (`create_workflow`, `update_workflow`, `publish_workflow`, `delete_workflow`, or creating/deleting a collection) | The key's owning user doesn't hold the root, admin or developer role. Flow authoring is gated to those roles regardless of the key's own scope. |
 | `403 Origin not allowed` | A browser-based client is calling from an origin that isn't on the allowed list. Use a desktop or CLI client instead. |

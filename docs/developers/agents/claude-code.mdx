@@ -22,7 +22,7 @@ The first command registers the repository as a marketplace. The second installs
 
 ```sh
 claude mcp add --transport http quiva https://api.quiva.ai/mcp \
-  --header "Authorization: Bearer $QUIVA_API_KEY"
+  --header "x-api-key: $QUIVA_API_KEY"
 ```
 
 The shell expands `$QUIVA_API_KEY` when you run the command, so the key is stored in your Claude Code configuration. Add `--scope user` to use it in every project. The default, `local`, is only you in the current project, and `project` writes a shared `.mcp.json`.
@@ -40,7 +40,7 @@ To share the setup with your team without sharing a key, commit a `.mcp.json` th
       "type": "http",
       "url": "https://api.quiva.ai/mcp",
       "headers": {
-        "Authorization": "Bearer ${QUIVA_API_KEY}"
+        "x-api-key": "${QUIVA_API_KEY}"
       }
     }
   }
