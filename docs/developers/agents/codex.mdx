@@ -13,10 +13,10 @@ Codex reads MCP servers from `~/.codex/config.toml` (or `.codex/config.toml` in 
 ```toml
 [mcp_servers.quiva]
 url = "https://api.quiva.ai/mcp"
-bearer_token_env_var = "QUIVA_API_KEY"
+env_http_headers = { "x-api-key" = "QUIVA_API_KEY" }
 ```
 
-`bearer_token_env_var` names the environment variable that holds the key, so the key itself never sits in the file. Run `codex mcp list` to see configured servers.
+`env_http_headers` maps the `x-api-key` header to the environment variable that holds the key, so the key itself never sits in the file. Run `codex mcp list` to see configured servers.
 
 ## Local stdio servers
 
