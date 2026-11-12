@@ -14,7 +14,7 @@ Task sync clients authenticate with the **client credentials** flow. You create 
 | Refresh token | None. Mint a new token. |
 | Sending the token | `Authorization: Bearer <access_token>` |
 
-The token works on the task routes in the [Workspaces API](/api-reference/endpoint/workspaces/openapi). It is not an API key: sending it as `x-api-key` is refused, and anywhere outside the task routes the gateway answers `403 integration_not_allowed`. An integration cannot open a WebSocket.
+The token works on the task routes in the Workspaces API ([OpenAPI spec](/api-reference/endpoint/workspaces/openapi.json)). It is not an API key: sending it as `x-api-key` is refused, and anywhere outside the task routes the gateway answers `403 integration_not_allowed`. An integration cannot open a WebSocket.
 
 ## Get a token
 
