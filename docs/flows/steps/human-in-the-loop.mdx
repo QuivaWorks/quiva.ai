@@ -80,6 +80,8 @@ Add form fields to let the assignee answer on the task itself instead of from Mo
   </Step>
   <Step title="Somebody continues it">
     If the step has form fields, the task carries an action that opens the form. Submitting it resumes the run with the answers, and a comment on the task names who answered. Otherwise, or in addition, a paused run shows a green **Continue** button on the Monitoring page. It opens a dialog with one field — a message to pass as the output of the paused step — and resuming restarts the run from that step.
+
+    To resume through the API (`POST /hub/workflows/run`), pass the run's full tracking ID as `run_id`, in the form `ms.hub.run.<uuid>.<flow subject>`, and the response as `trigger`. A bare run uuid is rejected with `400`, and a run that isn't paused or errored returns `409`.
   </Step>
 </Steps>
 
