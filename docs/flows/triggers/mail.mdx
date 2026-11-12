@@ -1,0 +1,18 @@
+---
+title: "Mail Trigger"
+description: "Start a flow for each email that an email automation saves"
+icon: "envelope-open-text"
+---
+
+A Mail trigger starts a flow once for each email that someone's [email automation](/flows/automations) saves, when that automation's action is **Run a flow** and it picks this flow. Which mail starts it, and whether past mail does, is set on each automation, not on the flow.
+
+Save the flow first: automations pick a saved flow by name, and only published flows are listed.
+
+## On the node
+
+- **Started by** lists the automations that run this flow, with their owner and status. Only an automation's owner can change which mail starts the flow, from their Automations page. You can open your own from here, and **New automation for this flow** starts one.
+- **Test with newest email** runs the draft flow with the newest email saved by any listed automation. A test run is not recorded in the automation's history. Publish the flow to make the trigger live.
+
+## What the flow receives
+
+The trigger payload holds the filed email's details: automation, space, folder, file key, message subject, sender and received time. The saved `.eml` and its attachment files reach agent steps as knowledge.

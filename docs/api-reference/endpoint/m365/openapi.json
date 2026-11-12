@@ -1,0 +1,3611 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "quiva.ai Microsoft 365 API",
+    "description": "Outlook mail connection, mail filing into space folders, and mail automations. All routes act on the caller's own mailbox unless marked admin. The `/m365/rules` routes were withdrawn. Files and SharePoint sync routes are not part of this spec.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "quiva.ai Support",
+      "url": "https://app.quiva.ai"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.quiva.ai",
+      "description": "Production API server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Mail",
+      "description": "The caller's Outlook mailbox connection"
+    },
+    {
+      "name": "Mail filing",
+      "description": "Filing mail from a mailbox into space folders"
+    },
+    {
+      "name": "Mail automations",
+      "description": "Actions that run on each filed message"
+    },
+    {
+      "name": "Files connection",
+      "description": "Connecting a Microsoft 365 tenant for SharePoint files"
+    },
+    {
+      "name": "SharePoint browse",
+      "description": "Browsing sites, libraries and folders with a setup session"
+    },
+    {
+      "name": "SharePoint sync sources",
+      "description": "Syncing a SharePoint library folder into a space"
+    }
+  ],
+  "paths": {
+    "/m365/mail/connect-url": {
+      "get": {
+        "summary": "Start connecting the caller's mailbox",
+        "description": "Returns the Microsoft sign-in URL for the caller's own Outlook mailbox. Writes the connection as pending first.",
+        "operationId": "getMailConnectUrl",
+        "tags": [
+          "Mail"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MailConnectStart"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Throttled by Microsoft",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/connect-result": {
+      "post": {
+        "summary": "Record a connect error that needs admin approval",
+        "description": "Records an Outlook authorize error, such as a tenant that has not approved the Mail app, so the admin can be asked.",
+        "operationId": "postMailConnectResult",
+        "tags": [
+          "Mail"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "type": "string"
+                  },
+                  "error_description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recorded": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/connection": {
+      "get": {
+        "summary": "Get the caller's mailbox connection",
+        "description": "The caller's own mailbox connection. Connected is false when there is none.",
+        "operationId": "getMailConnection",
+        "tags": [
+          "Mail"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MailConnection"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update the caller's mailbox connection",
+        "description": "Folders to sync, polling interval, pause, and an immediate sync.",
+        "operationId": "patchMailConnection",
+        "tags": [
+          "Mail"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MailConnectionPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MailConnection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Throttled by Microsoft",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Disconnect the caller's mailbox",
+        "description": "Disconnects the caller's own mailbox and deletes its indexed mail. Filed copies in spaces are kept.",
+        "operationId": "deleteMailConnection",
+        "tags": [
+          "Mail"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/connections": {
+      "get": {
+        "summary": "List who has connected mail",
+        "description": "Admin only. Who in the account has connected a mailbox, and when. No content.",
+        "operationId": "listMailConnections",
+        "tags": [
+          "Mail"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "connections": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MailRosterEntry"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/connections/{user_id}": {
+      "delete": {
+        "summary": "Remove a member's mailbox",
+        "description": "Admin only. Removes a member's mailbox and its indexed mail from the roster.",
+        "operationId": "deleteMemberMailConnection",
+        "tags": [
+          "Mail"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "Account user id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/folders": {
+      "get": {
+        "summary": "List the caller's mail folders",
+        "description": "For the folder picker.",
+        "operationId": "listMailFolders",
+        "tags": [
+          "Mail"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "folders": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MailFolder"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Throttled by Microsoft",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/consent-url": {
+      "get": {
+        "summary": "Get the tenant admin-consent URL",
+        "description": "Admin only. The Microsoft URL an organisation's admin opens to approve the Mail app for the tenant.",
+        "operationId": "getMailConsentUrl",
+        "tags": [
+          "Mail"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "consent_url": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "type": "string"
+                    },
+                    "expires_in": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/consent-callback": {
+      "get": {
+        "summary": "Mail admin-consent callback",
+        "description": "Public. Microsoft redirects the admin here after approving or declining. Account binding comes from the single-use `state`, not a session. Answers `ok: false` with an error and detail on any failure.",
+        "operationId": "mailConsentCallback",
+        "tags": [
+          "Mail"
+        ],
+        "x-resource-type": "service",
+        "security": [],
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "description": "Single-use state from the consent URL",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tenant",
+            "in": "query",
+            "required": false,
+            "description": "Microsoft tenant id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "admin_consent",
+            "in": "query",
+            "required": false,
+            "description": "`True` when approval was granted",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "description": "Error code when approval was declined",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "tenant_id": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "return_to": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/filings": {
+      "get": {
+        "summary": "List mail filters and automations",
+        "description": "Filters on one folder (`space_id` and `folder`) or, without `folder`, every filter in the space. With `kind=automation`, a space's read-only automations list.",
+        "operationId": "listMailFilings",
+        "tags": [
+          "Mail filing"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "description": "Space id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "folder",
+            "in": "query",
+            "required": false,
+            "description": "Space-relative folder path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "description": "`automation` for automations",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "filter",
+                "automation"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "filings": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MailFiling"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a mail filter or automation",
+        "description": "Links the caller's mailbox to a folder. Matching mail is saved there as .eml files. For an automation (`kind: automation`) an action runs on each filed message. 409 when the caller already has a filter on this folder. 403 when the caller has no mailbox connected.",
+        "operationId": "createMailFiling",
+        "tags": [
+          "Mail filing"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMailFilingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MailFiling"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/filings/{id}": {
+      "patch": {
+        "summary": "Update a mail filter or automation",
+        "description": "Match, attachments, action, folder, pause, or a restarted history import.",
+        "operationId": "patchMailFiling",
+        "tags": [
+          "Mail filing"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Filing or automation id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchMailFilingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MailFiling"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Stop a mail filter or automation",
+        "description": "The mailbox owner or an admin. Stops it and keeps the filed files.",
+        "operationId": "deleteMailFiling",
+        "tags": [
+          "Mail filing"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Filing or automation id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "removed": {
+                      "type": "boolean"
+                    },
+                    "files_kept": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/recent": {
+      "get": {
+        "summary": "Recent inbox items for the filing picker",
+        "description": "The caller's recent inbox items matching any of the given senders, domains or subject words, newest first. The three lists are comma-separated. `address` is still accepted for one sender.",
+        "operationId": "listRecentMail",
+        "tags": [
+          "Mail filing"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "addresses",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated sender addresses",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "domains",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated domains",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subjects",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated subject words",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "description": "Only messages received after this date",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "top",
+            "in": "query",
+            "required": false,
+            "description": "Maximum messages to return",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "messages": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RecentMessage"
+                      }
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "How many matched before the cut to `top`"
+                    },
+                    "partial": {
+                      "type": "boolean",
+                      "description": "Only the first 12 terms were searched, so `total` is a lower bound"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Throttled by Microsoft",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/automations": {
+      "get": {
+        "summary": "List automations",
+        "description": "The caller's own automations. With `flow=<flow subject>`, every automation in the account that starts that flow.",
+        "operationId": "listMailAutomations",
+        "tags": [
+          "Mail automations"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "flow",
+            "in": "query",
+            "required": false,
+            "description": "Flow subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "filings": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MailFiling"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Microsoft Graph or a downstream service failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/automations/{id}/runs": {
+      "get": {
+        "summary": "List an automation's runs",
+        "description": "Run history, newest first. The owner or an admin.",
+        "operationId": "listMailAutomationRuns",
+        "tags": [
+          "Mail automations"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Filing or automation id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum runs to return",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "runs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AutomationRun"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/mail/activity": {
+      "get": {
+        "summary": "Get the actions run on a filed message",
+        "description": "Every automation action run on one filed message.",
+        "operationId": "getMailActivity",
+        "tags": [
+          "Mail automations"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "query",
+            "required": true,
+            "description": "Message id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "runs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AutomationRun"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/files/consent-url": {
+      "get": {
+        "summary": "Get the files admin-consent URL",
+        "description": "Returns the Microsoft admin-consent URL for the caller's account, and the single-use `state` that binds the tenant to the account. Admin only.",
+        "operationId": "getFilesConsentUrl",
+        "tags": [
+          "Files connection"
+        ],
+        "x-resource-type": "service",
+        "x-path-derived": true,
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "consent_url": {
+                      "type": "string",
+                      "description": "URL to open"
+                    },
+                    "state": {
+                      "type": "string",
+                      "description": "Single-use nonce"
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "description": "Seconds until the state expires"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an account admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/files/consent-callback": {
+      "get": {
+        "summary": "Files admin-consent callback",
+        "description": "Public. Microsoft redirects the admin here after approving or declining. Account binding comes from the single-use `state`, not a session.",
+        "operationId": "filesConsentCallback",
+        "tags": [
+          "Files connection"
+        ],
+        "x-resource-type": "service",
+        "security": [],
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "description": "Single-use state from the consent URL",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tenant",
+            "in": "query",
+            "required": false,
+            "description": "Microsoft tenant id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "admin_consent",
+            "in": "query",
+            "required": false,
+            "description": "`True` when approval was granted",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "description": "Error code when declined",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "error_description",
+            "in": "query",
+            "required": false,
+            "description": "Error detail",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "admin_auth_url": {
+                      "type": "string",
+                      "description": "Where to send the popup next"
+                    },
+                    "tenant_id": {
+                      "type": "string",
+                      "description": "Tenant id"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Message"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Error code"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/files/admin-auth-url": {
+      "get": {
+        "summary": "Get the files admin sign-in URL",
+        "description": "Returns the Microsoft sign-in URL for an already-connected tenant, used to open a setup session. Admin only.",
+        "operationId": "getFilesAdminAuthUrl",
+        "tags": [
+          "Files connection"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "query",
+            "required": true,
+            "description": "Connected tenant id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "admin_auth_url": {
+                      "type": "string",
+                      "description": "URL to open"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an account admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/files/admin-callback": {
+      "get": {
+        "summary": "Files admin sign-in callback",
+        "description": "Public. Exchanges the sign-in `code` for a short-lived setup session, bound to the account by the single-use `state`.",
+        "operationId": "filesAdminCallback",
+        "tags": [
+          "Files connection"
+        ],
+        "x-resource-type": "service",
+        "security": [],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "description": "Authorization code",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "description": "Single-use state",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "description": "Error code when declined",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "error_description",
+            "in": "query",
+            "required": false,
+            "description": "Error detail",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "setup_session": {
+                      "type": "string",
+                      "description": "Setup session id"
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Error code"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "App configuration missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/files/connection": {
+      "get": {
+        "summary": "Get the files connection",
+        "description": "Whether the caller's account has connected Microsoft 365, and which tenants. Any member can read it.",
+        "operationId": "getFilesConnection",
+        "tags": [
+          "Files connection"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "connected": {
+                      "type": "boolean"
+                    },
+                    "tenants": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/files/browse/sites": {
+      "get": {
+        "summary": "Search SharePoint sites",
+        "description": "Lists SharePoint sites visible to the setup session's admin. Admin only.",
+        "operationId": "browseFilesSites",
+        "tags": [
+          "SharePoint browse"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "setup_session",
+            "in": "query",
+            "required": true,
+            "description": "Setup session id from the admin sign-in callback",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Search text",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sites": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Site id"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Site name"
+                          },
+                          "web_url": {
+                            "type": "string",
+                            "description": "Site URL"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an account admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/files/browse/drives": {
+      "get": {
+        "summary": "List document libraries",
+        "description": "Lists the document libraries of a SharePoint site. Admin only.",
+        "operationId": "browseFilesDrives",
+        "tags": [
+          "SharePoint browse"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "setup_session",
+            "in": "query",
+            "required": true,
+            "description": "Setup session id from the admin sign-in callback",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "site_id",
+            "in": "query",
+            "required": true,
+            "description": "Site id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "drives": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Drive id"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Library name"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an account admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/files/browse/children": {
+      "get": {
+        "summary": "List folders in a library",
+        "description": "Lists the folders inside a library or folder, with the count and size of the files directly in it. Omit `item_id` for the library root. Admin only.",
+        "operationId": "browseFilesChildren",
+        "tags": [
+          "SharePoint browse"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "setup_session",
+            "in": "query",
+            "required": true,
+            "description": "Setup session id from the admin sign-in callback",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "drive_id",
+            "in": "query",
+            "required": true,
+            "description": "Drive id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "item_id",
+            "in": "query",
+            "required": false,
+            "description": "Folder item id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "folders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "file_count": {
+                      "type": "integer"
+                    },
+                    "file_bytes": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an account admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/sources": {
+      "get": {
+        "summary": "List sync sources",
+        "description": "The account's SharePoint sync sources. Any member.",
+        "operationId": "listSyncSources",
+        "tags": [
+          "SharePoint sync sources"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sources": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SyncSource"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a sync source",
+        "description": "Grants access to the site, verifies the folder and creates a source that syncs it into a space folder on a schedule. Admin only; needs a setup session from the admin sign-in.",
+        "operationId": "createSyncSource",
+        "tags": [
+          "SharePoint sync sources"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "setup_session": {
+                    "type": "string",
+                    "description": "Setup session id"
+                  },
+                  "site": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": ""
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": ""
+                      },
+                      "web_url": {
+                        "type": "string",
+                        "description": ""
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ]
+                  },
+                  "drive": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": ""
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": ""
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ]
+                  },
+                  "root": {
+                    "type": "object",
+                    "properties": {
+                      "item_id": {
+                        "type": "string",
+                        "description": ""
+                      },
+                      "path": {
+                        "type": "string",
+                        "description": ""
+                      }
+                    }
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "space_id": {
+                        "type": "string",
+                        "description": "Space receiving the files"
+                      },
+                      "folder_path": {
+                        "type": "string",
+                        "description": "Folder inside the space"
+                      }
+                    },
+                    "required": [
+                      "space_id"
+                    ]
+                  },
+                  "storage_mode": {
+                    "type": "string",
+                    "description": "mirror copies files into the space; shadow keeps them in SharePoint",
+                    "enum": [
+                      "mirror",
+                      "shadow"
+                    ]
+                  },
+                  "rules": {
+                    "$ref": "#/components/schemas/SyncRules"
+                  },
+                  "interval_minutes": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "setup_session",
+                  "site",
+                  "drive",
+                  "target"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncSource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an account admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/sources/{id}": {
+      "get": {
+        "summary": "Get a sync source",
+        "description": "One source with its recent runs. Any member.",
+        "operationId": "getSyncSource",
+        "tags": [
+          "SharePoint sync sources"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Source id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "$ref": "#/components/schemas/SyncSource"
+                    },
+                    "runs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "changed_runs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "Recent runs that touched a file or failed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a sync source",
+        "description": "Changes rules, interval, storage mode or state. With `regrant: true` and a `setup_session` it rewrites the site grant and runs the source now. Admin only.",
+        "operationId": "patchSyncSource",
+        "tags": [
+          "SharePoint sync sources"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Source id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rules": {
+                    "$ref": "#/components/schemas/SyncRules"
+                  },
+                  "interval_minutes": {
+                    "type": "integer"
+                  },
+                  "storage_mode": {
+                    "type": "string",
+                    "description": "mirror copies files into the space; shadow keeps them in SharePoint",
+                    "enum": [
+                      "mirror",
+                      "shadow"
+                    ]
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Source state",
+                    "enum": [
+                      "active",
+                      "paused"
+                    ]
+                  },
+                  "regrant": {
+                    "type": "boolean"
+                  },
+                  "setup_session": {
+                    "type": "string",
+                    "description": "Required with regrant"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncSource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an account admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove a sync source",
+        "description": "Removes the source; teardown continues in the background. Admin only.",
+        "operationId": "deleteSyncSource",
+        "tags": [
+          "SharePoint sync sources"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Source id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "delete_files": {
+                    "type": "boolean",
+                    "description": "Also remove the files already synced"
+                  }
+                },
+                "required": [
+                  "delete_files"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an account admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/sources/{id}/run": {
+      "post": {
+        "summary": "Sync a source now",
+        "description": "Replaces the pending schedule with an immediate run. Admin only.",
+        "operationId": "runSyncSource",
+        "tags": [
+          "SharePoint sync sources"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Source id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "started": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Caller is not an account admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/sources/{id}/runs/{run_id}": {
+      "get": {
+        "summary": "Get a sync run",
+        "description": "One run of a source. Any member.",
+        "operationId": "getSyncSourceRun",
+        "tags": [
+          "SharePoint sync sources"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Source id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "description": "Run id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Run not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/m365/sources/{id}/runs": {
+      "get": {
+        "summary": "List sync runs",
+        "description": "The recent runs of a source, newest first. With `changes=true` only runs that touched a file or failed.",
+        "operationId": "listSyncSourceRuns",
+        "tags": [
+          "SharePoint sync sources"
+        ],
+        "x-resource-type": "service",
+        "x-path-derived": true,
+        "parameters": [
+          {
+            "name": "changes",
+            "in": "query",
+            "required": false,
+            "description": "Only runs with changes or failures",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Source id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "runs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "description": "API integration client credentials. Tokens only work on the task-sync routes in workspaces.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.quiva.ai/oauth/token",
+            "scopes": {}
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "Attention": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "since": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MailConnection": {
+        "type": "object",
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          },
+          "admin_consent_required": {
+            "type": "boolean",
+            "description": "True when the organisation's Microsoft 365 tenant has not approved the Mail app yet"
+          },
+          "folder_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Mail folders being synced"
+          },
+          "state": {
+            "type": "string",
+            "description": "For example `active`, `paused` or `needs_attention`"
+          },
+          "attention": {
+            "$ref": "#/components/schemas/Attention"
+          },
+          "interval_minutes": {
+            "type": "integer"
+          },
+          "last_sync_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "connected_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MailConnectionPatch": {
+        "type": "object",
+        "properties": {
+          "folder_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "interval_minutes": {
+            "type": "integer"
+          },
+          "paused": {
+            "type": "boolean"
+          },
+          "sync_now": {
+            "type": "boolean",
+            "description": "Poll the mailbox now instead of at the next interval. This also advances a filing's history import. A paused mailbox stays paused."
+          }
+        }
+      },
+      "MailConnectStart": {
+        "type": "object",
+        "properties": {
+          "connect_url": {
+            "type": "string",
+            "description": "Microsoft sign-in URL to open for the user"
+          },
+          "state": {
+            "type": "string"
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Seconds"
+          }
+        }
+      },
+      "MailFolder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "well_known_name": {
+            "type": "string"
+          }
+        }
+      },
+      "MailRosterEntry": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "connected_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "FilingAction": {
+        "type": "object",
+        "description": "An automation's action, run once per message it files.",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "agent",
+              "flow",
+              "notification"
+            ],
+            "description": "`agent` asks Abbie with `prompt`, `flow` starts the flow at `flow_subject` with the filed copy, `notification` tells `user_ids`."
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "flow_subject": {
+            "type": "string"
+          },
+          "user_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Members of the destination space"
+          }
+        }
+      },
+      "MailFiling": {
+        "type": "object",
+        "description": "A mail filter or an automation. Matching messages from the owner's mailbox are saved into `folder` as .eml files, and an automation then runs its action on each.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "filter",
+              "automation"
+            ],
+            "description": "A record with no kind is a filter"
+          },
+          "name": {
+            "type": "string",
+            "description": "Automations only"
+          },
+          "space_id": {
+            "type": "string"
+          },
+          "folder": {
+            "type": "string",
+            "description": "Space-relative dot path the files land in"
+          },
+          "entity_type": {
+            "type": "string"
+          },
+          "entity_folder": {
+            "type": "string",
+            "description": "Contact or organisation folder the filter was set up from"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Subject words to match"
+          },
+          "attachments": {
+            "type": "boolean",
+            "description": "Also save attachments beside the copy"
+          },
+          "then": {
+            "$ref": "#/components/schemas/FilingAction"
+          },
+          "run_on_import": {
+            "type": "boolean",
+            "description": "Whether the action also runs for imported history. Off by default."
+          },
+          "mailbox_user_id": {
+            "type": "string"
+          },
+          "mailbox_display_name": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "removed"
+            ]
+          },
+          "stopped": {
+            "type": "object",
+            "description": "Why a filter paused by itself",
+            "properties": {
+              "reason": {
+                "type": "string"
+              },
+              "at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "backfill": {
+            "type": "object",
+            "description": "History import progress",
+            "properties": {
+              "since": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "started_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "done_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "expected": {
+                "type": "integer"
+              },
+              "filed": {
+                "type": "integer"
+              },
+              "skipped": {
+                "type": "integer"
+              },
+              "seen": {
+                "type": "integer"
+              }
+            }
+          },
+          "last_filed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "filed_count": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateMailFilingRequest": {
+        "type": "object",
+        "required": [
+          "space_id",
+          "folder"
+        ],
+        "description": "The caller must have a connected mailbox and the match must name at least one address, domain or subject word.",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "filter",
+              "automation"
+            ],
+            "default": "filter"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "description": "Required for an automation"
+          },
+          "run_on_import": {
+            "type": "boolean"
+          },
+          "space_id": {
+            "type": "string"
+          },
+          "folder": {
+            "type": "string",
+            "description": "The folder or its parent must exist"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attachments": {
+            "type": "boolean"
+          },
+          "then": {
+            "$ref": "#/components/schemas/FilingAction"
+          },
+          "backfill_since": {
+            "type": "string",
+            "description": "Start a history import from this date. At most 90 days back."
+          },
+          "backfill_expected": {
+            "type": "integer",
+            "description": "The matching count the preview showed, for progress"
+          }
+        }
+      },
+      "PatchMailFilingRequest": {
+        "type": "object",
+        "description": "Omitted fields are left alone. The match, attachments, `then` and `backfill` belong to the mailbox owner. `folder`, `paused` and `use_my_mailbox` are also an admin's on anyone's filing.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "run_on_import": {
+            "type": "boolean"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attachments": {
+            "type": "boolean"
+          },
+          "then": {
+            "$ref": "#/components/schemas/FilingAction"
+          },
+          "folder": {
+            "type": "string"
+          },
+          "paused": {
+            "type": "boolean"
+          },
+          "backfill": {
+            "type": "boolean",
+            "description": "True restarts the history import over the full window. Messages already filed are not filed twice."
+          },
+          "use_my_mailbox": {
+            "type": "boolean",
+            "description": "Move a stopped or someone else's filing onto the caller's own mailbox"
+          }
+        }
+      },
+      "RecentMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "from_name": {
+            "type": "string"
+          },
+          "received_at": {
+            "type": "string"
+          },
+          "has_attachments": {
+            "type": "boolean"
+          },
+          "web_link": {
+            "type": "string"
+          }
+        }
+      },
+      "AutomationRun": {
+        "type": "object",
+        "description": "One action run on one filed message",
+        "properties": {
+          "automation_id": {
+            "type": "string"
+          },
+          "automation_name": {
+            "type": "string"
+          },
+          "space_id": {
+            "type": "string"
+          },
+          "folder": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "message_id": {
+            "type": "string"
+          },
+          "message": {
+            "type": "object",
+            "properties": {
+              "subject": {
+                "type": "string"
+              },
+              "from": {
+                "type": "string"
+              },
+              "from_name": {
+                "type": "string"
+              },
+              "received_at": {
+                "type": "string"
+              }
+            }
+          },
+          "action": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "For example `ok`, `failed` or `skipped`"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "imported": {
+            "type": "boolean"
+          },
+          "item_id": {
+            "type": "string",
+            "description": "Backlog item the action opened"
+          },
+          "run_id": {
+            "type": "string",
+            "description": "Flow run the action started"
+          },
+          "recipients": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "SyncRules": {
+        "type": "object",
+        "properties": {
+          "extensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "max_bytes": {
+            "type": "integer"
+          },
+          "skip_labelled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SyncSource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Source id"
+          },
+          "tenant_id": {
+            "type": "string",
+            "description": "Microsoft tenant id"
+          },
+          "site": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": ""
+              },
+              "name": {
+                "type": "string",
+                "description": ""
+              },
+              "web_url": {
+                "type": "string",
+                "description": ""
+              }
+            }
+          },
+          "drive": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": ""
+              },
+              "name": {
+                "type": "string",
+                "description": ""
+              }
+            }
+          },
+          "root": {
+            "type": "object",
+            "properties": {
+              "item_id": {
+                "type": "string",
+                "description": "Folder item id; empty is the whole library"
+              },
+              "path": {
+                "type": "string",
+                "description": "Folder path"
+              }
+            }
+          },
+          "target": {
+            "type": "object",
+            "properties": {
+              "space_id": {
+                "type": "string",
+                "description": "Space receiving the files"
+              },
+              "folder_path": {
+                "type": "string",
+                "description": "Folder inside the space"
+              }
+            }
+          },
+          "storage_mode": {
+            "type": "string",
+            "description": "mirror copies files into the space; shadow keeps them in SharePoint",
+            "enum": [
+              "mirror",
+              "shadow"
+            ]
+          },
+          "rules": {
+            "$ref": "#/components/schemas/SyncRules"
+          },
+          "interval_minutes": {
+            "type": "integer"
+          },
+          "state": {
+            "type": "string",
+            "description": "active or paused"
+          },
+          "attention": {
+            "$ref": "#/components/schemas/Attention"
+          },
+          "stats": {
+            "type": "object",
+            "properties": {
+              "files": {
+                "type": "integer"
+              },
+              "skipped": {
+                "type": "integer"
+              },
+              "bytes": {
+                "type": "integer"
+              },
+              "last_run_at": {
+                "type": "string"
+              },
+              "last_change_at": {
+                "type": "string"
+              }
+            }
+          },
+          "created_by": {
+            "type": "string",
+            "description": "Creator user id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

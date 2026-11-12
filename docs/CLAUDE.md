@@ -22,10 +22,11 @@ This is a **Mintlify v4** documentation site for QuivaWorks, an AI assistant and
 
 ### Configuration
 
-All site-level config — navigation structure, colors, logo, fonts, navbar, footer — lives in **`docs.json`**. The navigation is organized into three top-level tabs:
+All site-level config — navigation structure, colors, logo, fonts, navbar, footer — lives in **`docs.json`**. The navigation is organized into four top-level tabs:
 
-- **Guides** — User-facing documentation grouped into: Get Started, Assistants, Flows, Account Management, Advanced
+- **Guides** — User-facing documentation grouped into: Get Started, Spaces, Meetings, Forms, Assistants, Collaboration, Flows, Account Management, Advanced, Developers
 - **API Reference** — Auto-generated from OpenAPI JSON specs located in `api-reference/endpoint/<group>/openapi.json`
+- **Abbie** — Abbie, the AI coworker: setup, chat, memory, model pool and integrations
 - **Change Log** — Release notes in `changelog/`
 
 Adding a new page requires both creating the `.mdx` file **and** registering its path in the `docs.json` navigation tree. The path in `docs.json` is relative to the repo root and omits the `.mdx` extension.
@@ -62,7 +63,7 @@ Images are stored under `images/` and referenced with absolute paths (e.g. `/ima
 | `essentials/security/` | Auth, API keys, sessions, incident response |
 | `advanced/variable-mapping/` | JSONPath-based variable mapping syntax |
 | `advanced/rules/` | Rules engine — concepts, operations, patterns |
-| `api-reference/endpoint/` | OpenAPI specs (accounts, secrets, hub-flows, gateway, storage, trigger, monitoring) |
+| `api-reference/endpoint/` | OpenAPI specs (accounts, workspaces, records, documents, secrets-manager, hub-flows, assistants, gateway, storage, trigger, monitoring, m365) |
 | `changelog/` | Latest release and product updates |
 
 # QuivaWorks — Complete Feature Summary

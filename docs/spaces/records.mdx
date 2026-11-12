@@ -53,6 +53,14 @@ A record set carries:
   </Card>
 </CardGroup>
 
+### Seeing every record of a set
+
+In the record sets manager, a record set's menu has **View records**. It opens a page listing that set's records across all Spaces, with a Space filter and 25 rows a page. The manager itself is paged and searchable, so long lists are no longer cut off.
+
+### Creating a record once from a flow
+
+A flow can create a record under an ID it chooses, exactly once, with the `record-once` operation. A repeat with the same ID is refused with a `409`, so retries never create duplicates.
+
 ### The schema is enforced
 
 A record is validated against its record set's schema when it is created and every time it is updated. A record that fails validation is **rejected outright** — nothing is coerced, and nothing is partially saved.

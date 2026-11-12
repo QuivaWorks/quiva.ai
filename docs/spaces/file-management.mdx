@@ -72,6 +72,14 @@ description you can edit in place, who created it and when, and its total size (
 including subfolders). Click the chevron to collapse it down to a single line when you want more
 room for the list below.
 
+### Renaming a folder
+
+Choose **Rename** from the folder's menu to change its label. The label changes but the folder's URL and path stay the same, so existing links keep working. Rename is not offered on managed, Microsoft 365 or locked folders, and a name that clashes with a sibling folder (compared without regard to case) is refused.
+
+### Previewing files
+
+HTML files open in the preview as an interactive page, in a sandbox, with a source view and an **Open in new tab** button. The preview follows the file you select, and closes on Escape or a click outside it; if you have unsaved edits it asks first. Generated documents refresh the Files tab when they finish.
+
 ## Files, tasks and contacts
 
 Folders inside a Space come in two kinds.
@@ -131,12 +139,24 @@ them access.
 On the same Spaces, a file's context menu can also offer:
 
 - **Assign Approval** — ask someone (a teammate, or an external person by email) to approve the
-  file. A file can have more than one approval outstanding at once.
+  file. A file can have more than one approval outstanding at once. The request carries a
+  **Jurisdiction** (AU, NZ, UK or US), which decides the consent wording the signer sees; the US
+  wording includes the ESIGN disclosures.
 - **View Approvals** — once a file has at least one approval, review its status and any feedback
   left on approval or rejection.
 - **Review & sign** — shown only on documents the system has marked as signable. Opens a signing
   flow: some documents route you to a dedicated signing session; others use a simple in-app
   approve-or-decline.
+
+When a document is approved:
+
+- The approval is recorded against the exact version of the document. If the document changes after the request, it can't be approved.
+- The audit trail is written as a separate `<name>-approval-certificate.pdf` beside the document, not appended to it.
+- A decided approval can't be deleted.
+
+<Warning>
+Approval links sent to external people expire after **30 days**. Links sent before November 2026 no longer work: request those approvals again.
+</Warning>
 
 <Note>
 This is the same requirement a [task action](/spaces/task-actions#document) can put on a

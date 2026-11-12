@@ -1,8 +1,8 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "quiva.ai Gateway",
-    "description": "A comprehensive interface for managing key-value stores, object stores, streams, and search indexing",
+    "description": "A comprehensive interface for managing key-value stores, object stores, streams",
     "contact": {
       "name": "quiva.ai Support",
       "url": "https://quiva.ai/help-center/"
@@ -17,15 +17,25 @@
   ],
   "components": {
     "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      },
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       },
-      "apiKeyAuth": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "X-Api-Key"
+      "oauth2": {
+        "type": "oauth2",
+        "description": "API integration client credentials. Tokens only work on the task-sync routes in workspaces.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.quiva.ai/oauth/token",
+            "scopes": {}
+          }
+        }
       }
     },
     "parameters": {
@@ -1026,28 +1036,6 @@
           }
         }
       },
-      "SearchResponse": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "results": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/SearchKVItem"
-                }
-              },
-              "results_total": {
-                "type": "integer"
-              }
-            }
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/Metadata"
-          }
-        }
-      },
       "SearchByKeyResponse": {
         "type": "object",
         "properties": {
@@ -1095,123 +1083,6 @@
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/SearchStreamItem"
-                }
-              },
-              "results_total": {
-                "type": "integer"
-              }
-            }
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/Metadata"
-          }
-        }
-      },
-      "IndexSearchItem": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique identifier for the result"
-          },
-          "stream": {
-            "type": "string"
-          },
-          "subject": {
-            "type": "string"
-          },
-          "fields": {
-            "type": "object",
-            "description": "Indexed fields and their values",
-            "additionalProperties": true
-          },
-          "score": {
-            "type": "number",
-            "description": "Relevance score of the result"
-          },
-          "partition": {
-            "type": "integer"
-          },
-          "sequence": {
-            "type": "integer"
-          },
-          "timestamp": {
-            "type": "integer"
-          }
-        }
-      },
-      "IndexSearchResponse": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "results": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/IndexSearchItem"
-                }
-              },
-              "results_total": {
-                "type": "integer"
-              }
-            }
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/Metadata"
-          }
-        }
-      },
-      "IndexerListItem": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "subjects": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "index_config": {
-            "type": "object",
-            "properties": {
-              "mappings": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/IndexMapping"
-                }
-              },
-              "engine": {
-                "type": "string"
-              },
-              "idBy": {
-                "type": "string"
-              },
-              "partitions": {
-                "type": "integer"
-              },
-              "version": {
-                "type": "integer"
-              }
-            }
-          }
-        }
-      },
-      "IndexerListResponse": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "results": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/IndexerListItem"
                 }
               },
               "results_total": {
@@ -1777,6 +1648,96 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
+      },
+      "put": {
+        "summary": "Create or update several KV entries",
+        "description": "Writes several entries in one call.",
+        "operationId": "putKVEntries",
+        "tags": [
+          "KV Entries"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        },
+        "x-path-derived": true
+      },
+      "delete": {
+        "summary": "Delete several KV entries",
+        "description": "Deletes the entries named by repeated key query parameters.",
+        "operationId": "deleteKVEntries",
+        "tags": [
+          "KV Entries"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
       }
     },
     "/storage/kv/{bucket}/entries/{key}": {
@@ -1902,136 +1863,6 @@
         "responses": {
           "200": {
             "$ref": "#/components/responses/SuccessResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/storage/kv/{bucket}/search": {
-      "get": {
-        "tags": [
-          "KV Search"
-        ],
-        "summary": "Search KV entries",
-        "description": "Searches for entries in a KV bucket based on indexed fields",
-        "operationId": "searchKVEntries",
-        "x-resource-type": "service",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/bucketName"
-          },
-          {
-            "name": "field",
-            "in": "query",
-            "description": "Field to search in",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "name"
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "description": "Search term",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "keyboard"
-          },
-          {
-            "name": "search_type",
-            "in": "query",
-            "description": "Type of search to perform",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "exact",
-                "fuzzy",
-                "prefix",
-                "range"
-              ]
-            },
-            "example": "fuzzy"
-          },
-          {
-            "name": "min",
-            "in": "query",
-            "description": "Minimum value for range searches",
-            "required": false,
-            "schema": {
-              "type": "number"
-            },
-            "example": 50
-          },
-          {
-            "name": "max",
-            "in": "query",
-            "description": "Maximum value for range searches",
-            "required": false,
-            "schema": {
-              "type": "number"
-            },
-            "example": 200
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Maximum number of results to return",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "minimum": 1,
-              "maximum": 1000
-            },
-            "example": 20
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Search results",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchResponse"
-                },
-                "example": {
-                  "body": {
-                    "results": [
-                      {
-                        "key": "user123",
-                        "value": {
-                          "name": "John Doe",
-                          "age": 30
-                        }
-                      }
-                    ],
-                    "results_total": 1
-                  },
-                  "metadata": {
-                    "bucket": "my-bucket",
-                    "field": "name",
-                    "search": "John",
-                    "index_duration": "3ms",
-                    "index_hits": 1
-                  }
-                }
-              }
-            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -2605,6 +2436,49 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
+      },
+      "delete": {
+        "summary": "Delete several object store entries",
+        "description": "Deletes the entries named by repeated key query parameters.",
+        "operationId": "deleteObjectStoreEntries",
+        "tags": [
+          "Object Store"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
       }
     },
     "/storage/obj/{bucket}/entries/{key}": {
@@ -2641,6 +2515,50 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
+      },
+      "get": {
+        "summary": "Get an object store entry",
+        "description": "Returns one object's content as base64, so binary files survive the JSON reply. Refused when the encoded object would exceed the reply limit.",
+        "operationId": "getObjectStoreEntry",
+        "tags": [
+          "Object Store"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        },
+        "x-path-derived": true
       }
     },
     "/storage/streams": {
@@ -3435,515 +3353,450 @@
         }
       }
     },
-    "/storage/search/{index}": {
+    "/storage/agent-sessions/{session_id}/files": {
       "get": {
+        "summary": "List an assistant session's files",
+        "description": "Lists the files kept for a chat session: work, outputs, uploads and scratch. Session access rules apply.",
+        "operationId": "listAgentSessionFiles",
         "tags": [
-          "Search"
+          "Agent Sessions"
         ],
-        "summary": "Search an index",
-        "description": "Performs a search on an index",
-        "operationId": "searchIndex",
         "x-resource-type": "service",
         "parameters": [
           {
-            "name": "index",
+            "name": "session_id",
             "in": "path",
-            "description": "Name of the index to search",
             "required": true,
             "schema": {
               "type": "string"
-            },
-            "examples": {
-              "users": {
-                "summary": "Users index",
-                "value": "users-index"
-              },
-              "products": {
-                "summary": "Products index",
-                "value": "products-index"
-              }
-            }
-          },
-          {
-            "name": "field",
-            "in": "query",
-            "description": "Field to search in",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "examples": {
-              "name": {
-                "summary": "Search by name",
-                "value": "name"
-              },
-              "email": {
-                "summary": "Search by email",
-                "value": "email"
-              },
-              "description": {
-                "summary": "Search by description",
-                "value": "description"
-              }
-            }
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "description": "Search term",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "examples": {
-              "name_search": {
-                "summary": "Search for name",
-                "value": "John"
-              },
-              "partial_search": {
-                "summary": "Partial term search",
-                "value": "acme"
-              }
-            }
-          },
-          {
-            "name": "search_type",
-            "in": "query",
-            "description": "Type of search to perform",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "exact",
-                "fuzzy",
-                "prefix",
-                "range"
-              ]
-            },
-            "examples": {
-              "exact": {
-                "summary": "Exact match",
-                "value": "exact"
-              },
-              "fuzzy": {
-                "summary": "Fuzzy match (typo-tolerant)",
-                "value": "fuzzy"
-              },
-              "prefix": {
-                "summary": "Prefix match",
-                "value": "prefix"
-              }
-            }
-          },
-          {
-            "name": "min",
-            "in": "query",
-            "description": "Minimum value for range searches",
-            "required": false,
-            "schema": {
-              "type": "number"
-            },
-            "examples": {
-              "age_min": {
-                "summary": "Minimum age",
-                "value": 18
-              },
-              "price_min": {
-                "summary": "Minimum price",
-                "value": 9.99
-              }
-            }
-          },
-          {
-            "name": "max",
-            "in": "query",
-            "description": "Maximum value for range searches",
-            "required": false,
-            "schema": {
-              "type": "number"
-            },
-            "examples": {
-              "age_max": {
-                "summary": "Maximum age",
-                "value": 65
-              },
-              "price_max": {
-                "summary": "Maximum price",
-                "value": 99.99
-              }
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Maximum number of results to return",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "minimum": 1,
-              "maximum": 1000
-            },
-            "examples": {
-              "small": {
-                "summary": "Small result set",
-                "value": 5
-              },
-              "medium": {
-                "summary": "Medium result set",
-                "value": 25
-              },
-              "large": {
-                "summary": "Large result set",
-                "value": 100
-              }
-            }
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "description": "Field to sort results by",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "examples": {
-              "by_name": {
-                "summary": "Sort by name",
-                "value": "name"
-              },
-              "by_date": {
-                "summary": "Sort by date",
-                "value": "created_at"
-              },
-              "by_score": {
-                "summary": "Sort by relevance score",
-                "value": "_score"
-              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Search results",
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IndexSearchResponse"
-                },
-                "examples": {
-                  "user_search": {
-                    "summary": "User search results",
-                    "value": {
-                      "body": {
-                        "results": [
-                          {
-                            "id": "usr_abc123",
-                            "stream": "user-events",
-                            "subject": "users.profiles",
-                            "fields": {
-                              "name": "John Doe",
-                              "email": "john.doe@example.com",
-                              "age": 32,
-                              "department": "Engineering"
-                            },
-                            "score": 0.98,
-                            "partition": 0,
-                            "sequence": 1542,
-                            "timestamp": 1710512400
-                          },
-                          {
-                            "id": "usr_def456",
-                            "stream": "user-events",
-                            "subject": "users.profiles",
-                            "fields": {
-                              "name": "Johnny Smith",
-                              "email": "johnny.smith@example.com",
-                              "age": 28,
-                              "department": "Marketing"
-                            },
-                            "score": 0.85,
-                            "partition": 1,
-                            "sequence": 2103,
-                            "timestamp": 1710598800
-                          }
-                        ],
-                        "results_total": 2
-                      },
-                      "metadata": {
-                        "field": "name",
-                        "search": "John",
-                        "index_name": "users-index",
-                        "index_duration": "5ms",
-                        "index_hits": 2,
-                        "index_partitions": 4
-                      }
-                    }
-                  },
-                  "range_search": {
-                    "summary": "Range search results",
-                    "value": {
-                      "body": {
-                        "results": [
-                          {
-                            "id": "prod_001",
-                            "fields": {
-                              "name": "Basic Widget",
-                              "price": 19.99,
-                              "category": "widgets"
-                            },
-                            "score": 1.0,
-                            "partition": 0,
-                            "sequence": 501
-                          },
-                          {
-                            "id": "prod_002",
-                            "fields": {
-                              "name": "Premium Widget",
-                              "price": 49.99,
-                              "category": "widgets"
-                            },
-                            "score": 1.0,
-                            "partition": 0,
-                            "sequence": 502
-                          }
-                        ],
-                        "results_total": 2
-                      },
-                      "metadata": {
-                        "field": "price",
-                        "search": "range",
-                        "index_name": "products-index",
-                        "index_duration": "3ms",
-                        "index_hits": 2
-                      }
-                    }
-                  },
-                  "no_results": {
-                    "summary": "No matching results",
-                    "value": {
-                      "body": {
-                        "results": [],
-                        "results_total": 0
-                      },
-                      "metadata": {
-                        "field": "name",
-                        "search": "nonexistent",
-                        "index_name": "users-index",
-                        "index_duration": "1ms",
-                        "index_hits": 0
-                      }
-                    }
-                  }
+                  "type": "object",
+                  "additionalProperties": true
                 }
               }
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "description": "Request refused or invalid"
           }
         }
-      }
-    },
-    "/storage/indexers": {
-      "get": {
+      },
+      "post": {
+        "summary": "Add a file to an assistant session",
+        "description": "Stores a file under the session.",
+        "operationId": "createAgentSessionFile",
         "tags": [
-          "Indexers"
+          "Agent Sessions"
         ],
-        "summary": "List all indexers",
-        "description": "Retrieves a list of all indexers",
-        "operationId": "getIndexerList",
         "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "Successfully retrieved indexer list",
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IndexerListResponse"
-                },
-                "examples": {
-                  "multiple_indexers": {
-                    "summary": "Multiple indexers configured",
-                    "value": {
-                      "body": {
-                        "results": [
-                          {
-                            "name": "users-index",
-                            "description": "Full-text search index for user profiles",
-                            "subjects": [
-                              "users.profiles.*"
-                            ],
-                            "index_config": {
-                              "mappings": [
-                                {
-                                  "field": "name",
-                                  "field_type": "text"
-                                },
-                                {
-                                  "field": "email",
-                                  "field_type": "keyword"
-                                },
-                                {
-                                  "field": "age",
-                                  "field_type": "number"
-                                },
-                                {
-                                  "field": "created_at",
-                                  "field_type": "date"
-                                },
-                                {
-                                  "field": "active",
-                                  "field_type": "boolean"
-                                }
-                              ],
-                              "engine": "bleve",
-                              "idBy": "user_id",
-                              "partitions": 4,
-                              "version": 1
-                            }
-                          },
-                          {
-                            "name": "products-index",
-                            "description": "Product catalog search index",
-                            "subjects": [
-                              "products.*"
-                            ],
-                            "index_config": {
-                              "mappings": [
-                                {
-                                  "field": "name",
-                                  "field_type": "text"
-                                },
-                                {
-                                  "field": "description",
-                                  "field_type": "text"
-                                },
-                                {
-                                  "field": "price",
-                                  "field_type": "number"
-                                },
-                                {
-                                  "field": "category",
-                                  "field_type": "keyword"
-                                },
-                                {
-                                  "field": "in_stock",
-                                  "field_type": "boolean"
-                                }
-                              ],
-                              "engine": "bleve",
-                              "idBy": "product_id",
-                              "partitions": 2,
-                              "version": 1
-                            }
-                          },
-                          {
-                            "name": "logs-index",
-                            "description": "System logs search index",
-                            "subjects": [
-                              "logs.system.*",
-                              "logs.app.*"
-                            ],
-                            "index_config": {
-                              "mappings": [
-                                {
-                                  "field": "message",
-                                  "field_type": "text"
-                                },
-                                {
-                                  "field": "level",
-                                  "field_type": "keyword"
-                                },
-                                {
-                                  "field": "service",
-                                  "field_type": "keyword"
-                                },
-                                {
-                                  "field": "timestamp",
-                                  "field_type": "date"
-                                }
-                              ],
-                              "engine": "bleve",
-                              "idBy": "log_id",
-                              "partitions": 8,
-                              "version": 2
-                            }
-                          }
-                        ],
-                        "results_total": 3
-                      },
-                      "metadata": {
-                        "duration": "15ms"
-                      }
-                    }
-                  },
-                  "single_indexer": {
-                    "summary": "Single indexer configured",
-                    "value": {
-                      "body": {
-                        "results": [
-                          {
-                            "name": "default-index",
-                            "description": "Default search index",
-                            "subjects": [
-                              "data.*"
-                            ],
-                            "index_config": {
-                              "mappings": [
-                                {
-                                  "field": "content",
-                                  "field_type": "text"
-                                },
-                                {
-                                  "field": "tags",
-                                  "field_type": "keyword"
-                                }
-                              ],
-                              "engine": "bleve",
-                              "idBy": "id",
-                              "partitions": 1,
-                              "version": 1
-                            }
-                          }
-                        ],
-                        "results_total": 1
-                      },
-                      "metadata": {
-                        "duration": "5ms"
-                      }
-                    }
-                  },
-                  "empty_list": {
-                    "summary": "No indexers configured",
-                    "value": {
-                      "body": {
-                        "results": [],
-                        "results_total": 0
-                      },
-                      "metadata": {
-                        "duration": "2ms"
-                      }
-                    }
-                  }
+                  "type": "object",
+                  "additionalProperties": true
                 }
               }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/files/{key}": {
+      "get": {
+        "summary": "Read a session file",
+        "description": "Returns the live object, base64 encoded in body.data, with its content type. The reply carries the object's current digest in a header.",
+        "operationId": "getAgentSessionFile",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      },
+      "put": {
+        "summary": "Overwrite a session file",
+        "description": "Overwrites a work or outputs file. Other kinds are refused.",
+        "operationId": "putAgentSessionFile",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/files/{key}/versions": {
+      "get": {
+        "summary": "List a session file's versions",
+        "description": "Lists the live object first, then archived copies. Each entry's key is what the read endpoints take.",
+        "operationId": "listAgentSessionFileVersions",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/files/{key}/versions/{content_key}": {
+      "get": {
+        "summary": "Read an archived session file version",
+        "description": "Returns one archived copy, base64 encoded. Only the content key is used server side.",
+        "operationId": "getAgentSessionFileVersion",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/tool-responses": {
+      "get": {
+        "summary": "List a session's stored tool responses",
+        "description": "Lists tool responses kept for the session.",
+        "operationId": "listAgentToolResponses",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/agent-sessions/{session_id}/tool-responses/{key}": {
+      "get": {
+        "summary": "Read a stored tool response",
+        "description": "Returns one tool response, base64 encoded in body.data.",
+        "operationId": "getAgentToolResponse",
+        "tags": [
+          "Agent Sessions"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/obj/sync": {
+      "put": {
+        "summary": "Sync an object store entry",
+        "description": "Synchronises one object store entry through the data point service.",
+        "operationId": "syncObjectEntry",
+        "tags": [
+          "Object Store"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/storage/index/{name}/query": {
+      "post": {
+        "summary": "Query a search index",
+        "description": "Runs a query against the named index.",
+        "operationId": "queryIndex",
+        "tags": [
+          "Index"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
           }
         }
       }

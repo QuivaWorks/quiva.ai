@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "quiva.ai Gateway",
+    "title": "quiva.ai Gateways API",
     "description": "quiva.ai Gateway API for managing gateway infrastructure and routing API requests.",
     "version": "1.0.0",
     "contact": {
@@ -27,14 +27,26 @@
     {
       "name": "Mapping Versions",
       "description": "Gateway Mapping Version management endpoints"
+    },
+    {
+      "name": "DNS Zones",
+      "description": "Custom domain zones managed on the gateway"
+    },
+    {
+      "name": "DNS Records",
+      "description": "Records inside a DNS zone, and the domains a gateway answers on"
+    },
+    {
+      "name": "Certificates",
+      "description": "TLS certificates for a DNS record"
     }
   ],
   "security": [
     {
-      "bearer_auth": []
+      "bearerAuth": []
     },
     {
-      "api_key_auth": []
+      "apiKeyAuth": []
     }
   ],
   "paths": {
@@ -1023,19 +1035,1610 @@
           }
         }
       }
+    },
+    "/gateway/dns-zone": {
+      "post": {
+        "summary": "Create a DNS zone",
+        "description": "Registers a custom domain as a DNS zone owned by the caller's account. The domain must be valid and not already registered.",
+        "operationId": "postDnsZone",
+        "tags": [
+          "DNS Zones"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "domain": {
+                    "type": "string",
+                    "description": "Domain name"
+                  },
+                  "soa": {
+                    "type": "object",
+                    "properties": {
+                      "domain": {
+                        "type": "string",
+                        "description": "Zone domain"
+                      },
+                      "primary": {
+                        "type": "string",
+                        "description": "Primary name server"
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "Admin email"
+                      },
+                      "serial": {
+                        "type": "integer"
+                      },
+                      "refresh": {
+                        "type": "integer"
+                      },
+                      "retry": {
+                        "type": "integer"
+                      },
+                      "expire": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "domain"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "subject": {
+                          "type": "string",
+                          "description": "Zone subject"
+                        },
+                        "account_id": {
+                          "type": "string",
+                          "description": "Owning account"
+                        },
+                        "domain": {
+                          "type": "string",
+                          "description": "Zone domain"
+                        },
+                        "soa": {
+                          "type": "object",
+                          "properties": {
+                            "domain": {
+                              "type": "string",
+                              "description": "Zone domain"
+                            },
+                            "primary": {
+                              "type": "string",
+                              "description": "Primary name server"
+                            },
+                            "email": {
+                              "type": "string",
+                              "description": "Admin email"
+                            },
+                            "serial": {
+                              "type": "integer"
+                            },
+                            "refresh": {
+                              "type": "integer"
+                            },
+                            "retry": {
+                              "type": "integer"
+                            },
+                            "expire": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "version": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Zone domain exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/dns-zone/all": {
+      "get": {
+        "summary": "List DNS zones",
+        "description": "Lists the DNS zones visible to the caller.",
+        "operationId": "getDnsZones",
+        "tags": [
+          "DNS Zones"
+        ],
+        "x-resource-type": "service",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "results": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "subject": {
+                                "type": "string",
+                                "description": "Zone subject"
+                              },
+                              "account_id": {
+                                "type": "string",
+                                "description": "Owning account"
+                              },
+                              "domain": {
+                                "type": "string",
+                                "description": "Zone domain"
+                              },
+                              "soa": {
+                                "type": "object",
+                                "properties": {
+                                  "domain": {
+                                    "type": "string",
+                                    "description": "Zone domain"
+                                  },
+                                  "primary": {
+                                    "type": "string",
+                                    "description": "Primary name server"
+                                  },
+                                  "email": {
+                                    "type": "string",
+                                    "description": "Admin email"
+                                  },
+                                  "serial": {
+                                    "type": "integer"
+                                  },
+                                  "refresh": {
+                                    "type": "integer"
+                                  },
+                                  "retry": {
+                                    "type": "integer"
+                                  },
+                                  "expire": {
+                                    "type": "integer"
+                                  }
+                                }
+                              },
+                              "version": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        },
+                        "results_total": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/dns-zone/{zone_id}": {
+      "get": {
+        "summary": "Get a DNS zone",
+        "description": "Returns one DNS zone.",
+        "operationId": "getDnsZone",
+        "tags": [
+          "DNS Zones"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "subject": {
+                          "type": "string",
+                          "description": "Zone subject"
+                        },
+                        "account_id": {
+                          "type": "string",
+                          "description": "Owning account"
+                        },
+                        "domain": {
+                          "type": "string",
+                          "description": "Zone domain"
+                        },
+                        "soa": {
+                          "type": "object",
+                          "properties": {
+                            "domain": {
+                              "type": "string",
+                              "description": "Zone domain"
+                            },
+                            "primary": {
+                              "type": "string",
+                              "description": "Primary name server"
+                            },
+                            "email": {
+                              "type": "string",
+                              "description": "Admin email"
+                            },
+                            "serial": {
+                              "type": "integer"
+                            },
+                            "refresh": {
+                              "type": "integer"
+                            },
+                            "retry": {
+                              "type": "integer"
+                            },
+                            "expire": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "version": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a DNS zone",
+        "description": "Updates the zone's SOA record. `version` is the version read with the zone.",
+        "operationId": "patchDnsZone",
+        "tags": [
+          "DNS Zones"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "soa": {
+                    "type": "object",
+                    "properties": {
+                      "domain": {
+                        "type": "string",
+                        "description": "Zone domain"
+                      },
+                      "primary": {
+                        "type": "string",
+                        "description": "Primary name server"
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "Admin email"
+                      },
+                      "serial": {
+                        "type": "integer"
+                      },
+                      "refresh": {
+                        "type": "integer"
+                      },
+                      "retry": {
+                        "type": "integer"
+                      },
+                      "expire": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "version": {
+                    "type": "integer",
+                    "description": "Zone version the update is based on"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "subject": {
+                          "type": "string",
+                          "description": "Zone subject"
+                        },
+                        "account_id": {
+                          "type": "string",
+                          "description": "Owning account"
+                        },
+                        "domain": {
+                          "type": "string",
+                          "description": "Zone domain"
+                        },
+                        "soa": {
+                          "type": "object",
+                          "properties": {
+                            "domain": {
+                              "type": "string",
+                              "description": "Zone domain"
+                            },
+                            "primary": {
+                              "type": "string",
+                              "description": "Primary name server"
+                            },
+                            "email": {
+                              "type": "string",
+                              "description": "Admin email"
+                            },
+                            "serial": {
+                              "type": "integer"
+                            },
+                            "refresh": {
+                              "type": "integer"
+                            },
+                            "retry": {
+                              "type": "integer"
+                            },
+                            "expire": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "version": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a DNS zone",
+        "description": "Deletes the zone and its records.",
+        "operationId": "deleteDnsZone",
+        "tags": [
+          "DNS Zones"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/dns-zone/{zone_id}/record": {
+      "get": {
+        "summary": "List DNS records",
+        "description": "Lists the records of a zone.",
+        "operationId": "getDnsRecords",
+        "tags": [
+          "DNS Records"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "results": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "subject": {
+                                "type": "string",
+                                "description": "Record subject"
+                              },
+                              "domain_name": {
+                                "type": "string",
+                                "description": "Zone domain"
+                              },
+                              "type": {
+                                "type": "string",
+                                "description": "A, CNAME, MX, TXT and so on"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "Record name; `@` is the zone apex"
+                              },
+                              "value": {
+                                "type": "string",
+                                "description": "Record value"
+                              },
+                              "priority": {
+                                "type": "integer",
+                                "description": "MX priority"
+                              },
+                              "ttl": {
+                                "type": "integer",
+                                "description": "Time to live in seconds"
+                              }
+                            }
+                          }
+                        },
+                        "results_total": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a DNS record",
+        "description": "Adds a record to the zone. A CNAME pointing at a gateway also registers that domain for the gateway.",
+        "operationId": "postDnsRecord",
+        "tags": [
+          "DNS Records"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "Record type"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Record name; `@` is the apex"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Record value"
+                  },
+                  "priority": {
+                    "type": "integer"
+                  },
+                  "ttl": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "type",
+                  "name",
+                  "value"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "subject": {
+                          "type": "string",
+                          "description": "Record subject"
+                        },
+                        "domain_name": {
+                          "type": "string",
+                          "description": "Zone domain"
+                        },
+                        "type": {
+                          "type": "string",
+                          "description": "A, CNAME, MX, TXT and so on"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Record name; `@` is the zone apex"
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "Record value"
+                        },
+                        "priority": {
+                          "type": "integer",
+                          "description": "MX priority"
+                        },
+                        "ttl": {
+                          "type": "integer",
+                          "description": "Time to live in seconds"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/dns-zone/{zone_id}/record/{record_id}": {
+      "get": {
+        "summary": "Get a DNS record",
+        "description": "Returns one record of a zone.",
+        "operationId": "getDnsRecord",
+        "tags": [
+          "DNS Records"
+        ],
+        "x-resource-type": "service",
+        "x-path-derived": true,
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "record_id",
+            "in": "path",
+            "required": true,
+            "description": "Record id, as returned in the record subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "subject": {
+                          "type": "string",
+                          "description": "Record subject"
+                        },
+                        "domain_name": {
+                          "type": "string",
+                          "description": "Zone domain"
+                        },
+                        "type": {
+                          "type": "string",
+                          "description": "A, CNAME, MX, TXT and so on"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Record name; `@` is the zone apex"
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "Record value"
+                        },
+                        "priority": {
+                          "type": "integer",
+                          "description": "MX priority"
+                        },
+                        "ttl": {
+                          "type": "integer",
+                          "description": "Time to live in seconds"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a DNS record",
+        "description": "Changes a record's type, value, priority or ttl.",
+        "operationId": "patchDnsRecord",
+        "tags": [
+          "DNS Records"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "record_id",
+            "in": "path",
+            "required": true,
+            "description": "Record id, as returned in the record subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "Record type"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Record value"
+                  },
+                  "priority": {
+                    "type": "integer"
+                  },
+                  "ttl": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "subject": {
+                          "type": "string",
+                          "description": "Record subject"
+                        },
+                        "domain_name": {
+                          "type": "string",
+                          "description": "Zone domain"
+                        },
+                        "type": {
+                          "type": "string",
+                          "description": "A, CNAME, MX, TXT and so on"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Record name; `@` is the zone apex"
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "Record value"
+                        },
+                        "priority": {
+                          "type": "integer",
+                          "description": "MX priority"
+                        },
+                        "ttl": {
+                          "type": "integer",
+                          "description": "Time to live in seconds"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a DNS record",
+        "description": "Deletes one record.",
+        "operationId": "deleteDnsRecord",
+        "tags": [
+          "DNS Records"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "record_id",
+            "in": "path",
+            "required": true,
+            "description": "Record id, as returned in the record subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/{gateway_topic}/dns-records": {
+      "get": {
+        "summary": "List a gateway's domains",
+        "description": "Lists the DNS records that point at the gateway.",
+        "operationId": "getGatewayDomains",
+        "tags": [
+          "DNS Records"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "gateway_topic",
+            "in": "path",
+            "required": true,
+            "description": "Gateway topic",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object",
+                      "properties": {
+                        "results": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "subject": {
+                                "type": "string",
+                                "description": "Record subject"
+                              },
+                              "domain_name": {
+                                "type": "string",
+                                "description": "Zone domain"
+                              },
+                              "type": {
+                                "type": "string",
+                                "description": "A, CNAME, MX, TXT and so on"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "Record name; `@` is the zone apex"
+                              },
+                              "value": {
+                                "type": "string",
+                                "description": "Record value"
+                              },
+                              "priority": {
+                                "type": "integer",
+                                "description": "MX priority"
+                              },
+                              "ttl": {
+                                "type": "integer",
+                                "description": "Time to live in seconds"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Gateway not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/cert/{zone_id}/{record_id}": {
+      "get": {
+        "summary": "Get a certificate",
+        "description": "Returns the certificate issued for a record, if any.",
+        "operationId": "getDnsCert",
+        "tags": [
+          "Certificates"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "record_id",
+            "in": "path",
+            "required": true,
+            "description": "Record id, as returned in the record subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Request a certificate",
+        "description": "Requests a certificate for the record's domain. The domain list is taken from the record, not the body.",
+        "operationId": "requestDnsCert",
+        "tags": [
+          "Certificates"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "record_id",
+            "in": "path",
+            "required": true,
+            "description": "Record id, as returned in the record subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "Contact email for the certificate authority"
+                  },
+                  "production": {
+                    "type": "boolean",
+                    "description": "Use the production authority rather than staging"
+                  },
+                  "renewDays": {
+                    "type": "integer",
+                    "description": "Days before expiry to renew"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Renew a certificate",
+        "description": "Renews the record's certificate now.",
+        "operationId": "renewDnsCert",
+        "tags": [
+          "Certificates"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "record_id",
+            "in": "path",
+            "required": true,
+            "description": "Record id, as returned in the record subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "body": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Revoke a certificate",
+        "description": "Revokes the record's certificate.",
+        "operationId": "revokeDnsCert",
+        "tags": [
+          "Certificates"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "zone_id",
+            "in": "path",
+            "required": true,
+            "description": "Zone id, as returned in the zone subject",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "record_id",
+            "in": "path",
+            "required": true,
+            "description": "Record id, as returned in the record subject",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Zone or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "securitySchemes": {
-      "bearer_auth": {
+      "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       },
-      "api_key_auth": {
+      "apiKeyAuth": {
         "type": "apiKey",
         "in": "header",
-        "name": "X-Api-Key"
+        "name": "x-api-key"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "description": "API integration client credentials. Tokens only work on the task-sync routes in workspaces.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.quiva.ai/oauth/token",
+            "scopes": {}
+          }
+        }
       }
     },
     "parameters": {
@@ -1772,6 +3375,14 @@
           "message": {
             "type": "string",
             "example": "success"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
           }
         }
       }

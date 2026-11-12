@@ -1,6 +1,6 @@
 ---
 title: "Task Actions"
-description: "The checklist of things a task asks someone to do — forms to fill in, documents to read or sign, a conversation to have, or a list to work through"
+description: "The checklist of things a task asks someone to do — forms to fill in, documents to read or sign, a conversation to have, a list to work through, or records to work in"
 icon: "circle-check"
 ---
 
@@ -18,7 +18,7 @@ Each action carries:
 Actions are the mechanism a client-facing workflow runs on. An onboarding task might carry three:
 sign the engagement letter, complete the intake form, upload identification.
 
-## The four kinds
+## The five kinds
 
 <CardGroup cols={2}>
   <Card title="Form" icon="file-signature">
@@ -33,7 +33,18 @@ sign the engagement letter, complete the intake form, upload identification.
   <Card title="Todo list" icon="list-check">
     The assignee works through a checklist of items.
   </Card>
+  <Card title="Records" icon="table-list">
+    The assignee works in a record set, then marks it done. Not offered for client assignees.
+  </Card>
 </CardGroup>
+
+<Frame caption="The kind picker that Add action opens: Chat, Form, Document, Todo list and Records.">
+  <img src="/images/spaces/task-add-action.png" alt="The Add action dialog with five kinds to choose from: Chat, Form, Document, Todo list and Records" />
+</Frame>
+
+<Note>
+Actions that a flow's [Checkpoint](/flows/steps/human-in-the-loop) raises appear on the task as a form to answer. Answering it resumes the run.
+</Note>
 
 ## Adding an action to a task
 
@@ -42,10 +53,10 @@ sign the engagement letter, complete the intake form, upload identification.
     Actions live in their own section on the task form, showing the progress across all of them.
   </Step>
   <Step title="Choose a kind">
-    **Add** opens the kind picker — Chat, Form, Document or Todo list.
+    **Add** opens the kind picker — Chat, Form, Document, Todo list or Records.
   </Step>
   <Step title="Fill in that kind's panel">
-    Each kind asks for different things. See below.
+    Each kind asks for different things. See below. A new action must have a resource — the form, document, conversation, checklist or record set behind it — and cannot be saved without one.
   </Step>
   <Step title="Write the description">
     Required for every kind. This is the line the recipient reads, so write it as an instruction:
@@ -102,6 +113,14 @@ Type the items, one per row. Blank rows are ignored. The whole checklist lives o
 itself, so no separate entity is created and a half-finished checklist survives the recipient
 closing the page.
 
+### Records
+
+Pick a record set attached to the Space. The recipient works in that record set and marks the action done by hand. The row offers **Open records** to jump straight to it, and **Mark as done** when they have finished.
+
+<Warning>
+**A new action needs a resource.** Creating one through the API without a resource, with an unknown type, with an empty todo list or with a record set that isn't attached to the Space is refused with a `400`. A todo action must carry its items in `metadata.todos`, and a Records action links a record set through a `record_config` resource.
+</Warning>
+
 ## What a recipient sees
 
 Each action appears as a row: an icon, your description, a progress note, and one control.
@@ -115,6 +134,7 @@ Each action appears as a row: an icon, your description, a progress note, and on
 | Form, several forms | **Fill in forms**, then **Continue** | *2 / 5 steps completed* | Completed |
 | Chat | **Open chat** | Continue this conversation. | Submitted |
 | Todo list | **Open checklist** | *2 / 5 items completed* | Completed |
+| Records | **Mark as done**, with **Open records** beside it | — | Completed |
 
 A completed action stays on the task and can still be reopened — a finished form reopens as a
 read-through rather than an editable form, and a completed checklist can be reviewed but not

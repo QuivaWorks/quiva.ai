@@ -10,6 +10,14 @@ The **Model pool** tab controls which underlying AI models power Abbie, and the 
 
 Toggle which built-in providers (Anthropic, OpenAI, Gemini) are active for your account. Only active providers are considered when Abbie routes a request.
 
+Each provider tile expands to list the models it serves. Some models are labelled **opt-in**: they are left unticked, and Abbie only routes to them once you tick them one by one. Ticking a provider no longer admits its opt-in models.
+
+<Warning>
+If your account had ticked a provider with opt-in models, such as SCX, Abbie stops routing to those models until you tick each one you want. Models you pin to a tier or stage keep working.
+</Warning>
+
+Claude Fable 5.2 and Gemini 4 Carbon are part of the routing pool. Fable 5.2 replaces Fable 5.1 in routing, and Carbon replaces Gemini 4 Argon. You can still pin Fable 5.1 to a tier or stage.
+
 <Frame caption="The Model pool tab: providers, then routing mode.">
   <img src="/images/abbie/model-pool.png" alt="The Model pool settings tab showing Anthropic, Gemini and OpenAI provider toggles and a Cost/Balanced/Performance/Accuracy routing mode selector" />
 </Frame>

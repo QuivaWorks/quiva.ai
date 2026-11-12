@@ -1,9 +1,9 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
-    "title": "Workspaces Service API",
-    "version": "1.0.0",
-    "description": "API for managing workspaces, tasks, and comments"
+    "title": "Workspaces API",
+    "version": "1.1.0",
+    "description": "Spaces, tasks, task actions, comments, folders and the task-sync routes. Task-sync routes also accept an integration token (`oauth2`); every other route needs a user session or API key."
   },
   "servers": [
     {
@@ -40,7 +40,21 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/space": {
@@ -72,7 +86,18 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/space/{id}": {
@@ -104,7 +129,21 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       },
       "patch": {
         "summary": "Update a space",
@@ -154,7 +193,21 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       },
       "delete": {
         "summary": "Delete a space",
@@ -181,7 +234,18 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/space/{space_id}/tasks": {
@@ -331,6 +395,69 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "folder",
+            "in": "query",
+            "required": false,
+            "description": "Exact folder (every task for one base record).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated; at least one must match.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "required": false,
+            "description": "Parent task id, to list subtasks.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "description": "Exact source.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "description": "Exact currency.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "due_date",
+            "in": "query",
+            "required": false,
+            "description": "Due date filter.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "exclude_subtasks",
+            "in": "query",
+            "required": false,
+            "description": "`true` leaves subtasks out.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -368,7 +495,21 @@
             }
           }
         },
-        "description": "Changed: `external_id` exact-match filter, `has_more` on the reply, and `sort_by=activity_at`. The other filters are unchanged."
+        "description": "Changed: `external_id` exact-match filter, `has_more` on the reply, and `sort_by=activity_at`. The other filters are unchanged.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/task": {
@@ -421,7 +562,21 @@
             }
           }
         },
-        "description": "Changed: accepts `external_id`, which is a plain indexed attribute here (no uniqueness, no map entry; use the upsert route for that). Integration callers get strict ids."
+        "description": "Changed: accepts `external_id`, which is a plain indexed attribute here (no uniqueness, no map entry; use the upsert route for that). Integration callers get strict ids.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/tasks": {
@@ -454,7 +609,62 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
+      },
+      "delete": {
+        "summary": "Delete every task in a folder",
+        "description": "Deletes every task in one space with one folder. Both space_id and folder are required; an empty folder is refused rather than meaning every folder.",
+        "operationId": "deleteTasksByFolder",
+        "tags": [
+          "Tasks"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "folder",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        },
+        "x-path-derived": true
       }
     },
     "/workspaces/task/{id}": {
@@ -483,9 +693,6 @@
               }
             }
           },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
           "401": {
             "description": "Not authenticated, or the integration token was revoked (`token_revoked`).",
             "content": {
@@ -505,9 +712,26 @@
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "The reply carries `version`, `external_id` and `activity_at`. Subtasks the caller cannot read are left out."
+        "description": "The reply carries `version`, `external_id` and `activity_at`. Subtasks the caller cannot read are left out.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       },
       "patch": {
         "summary": "Update a task",
@@ -584,6 +808,9 @@
               }
             }
           },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
           "409": {
             "description": "`version_conflict` (with `task`) or `external_id_immutable`.",
             "content": {
@@ -602,7 +829,21 @@
             }
           }
         },
-        "description": "Changed: optional `If-Match`. Compare-and-set: a lost race is re-checked up to 3 times, then 409 with the current task. Changing or clearing the `external_id` of a mapped task answers `409 external_id_immutable`. A `parent` needs `tasks:read` on the parent's space."
+        "description": "Changed: optional `If-Match`. Compare-and-set: a lost race is re-checked up to 3 times, then 409 with the current task. Changing or clearing the `external_id` of a mapped task answers `409 external_id_immutable`. A `parent` needs `tasks:read` on the parent's space.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       },
       "delete": {
         "summary": "Delete a task",
@@ -641,9 +882,6 @@
           "200": {
             "description": "Task deleted"
           },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
           "400": {
             "description": "`bad_if_match`, or the delete failed.",
             "content": {
@@ -674,6 +912,9 @@
               }
             }
           },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
           "409": {
             "description": "`version_conflict` (with `task`).",
             "content": {
@@ -692,13 +933,27 @@
             }
           }
         },
-        "description": "Changed: optional `If-Match`. Check-then-purge, with no compare-and-set. Publishes `task-deleted` and tombstones the task's external ids. With `delete_subtasks=true`, subtasks in spaces the caller cannot write are left behind."
+        "description": "Changed: optional `If-Match`. Check-then-purge, with no compare-and-set. Publishes `task-deleted` and tombstones the task's external ids. With `delete_subtasks=true`, subtasks in spaces the caller cannot write are left behind.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/task/{task_id}/action": {
       "put": {
         "summary": "Create or update a task checklist action",
-        "description": "Upsert a checklist action on a task. There is no separate create endpoint — PUT is used for both create and update.\n\nOmit `id` to create a new action (the server assigns one); pass an existing `id` to update that action. `description` is required on every write, including updates that only change `done`.\n\nThe response echoes back the action as submitted, not the stored record — it does not reflect how a partial update merged with the existing action.",
+        "description": "Upsert a checklist action on a task. There is no separate create endpoint — PUT is used for both create and update.\n\nOmit `id` to create a new action (the server assigns one); pass an existing `id` to update that action. `description` is required on every write, including updates that only change `done`.\n\nThe response echoes back the action as submitted, not the stored record — it does not reflect how a partial update merged with the existing action.\n\nA new action without a valid resource is refused with 400, and the error names the accepted resource types. Editing a stored action keeps its existing shape.",
         "operationId": "setTaskAction",
         "tags": [
           "Task Actions"
@@ -737,12 +992,30 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequest"
+            "description": "Bad request: missing description, a new action with no resource, an unknown `resource_type`, a malformed `resource_id`, a `record_config` not attached to the task's space, or a `todo` with no items.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
       },
       "get": {
         "summary": "List task checklist actions — currently unavailable",
@@ -789,7 +1062,18 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
       }
     },
     "/workspaces/task/{task_id}/action/{id}": {
@@ -828,7 +1112,18 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
       }
     },
     "/workspaces/task/{task_id}/comment": {
@@ -873,7 +1168,21 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/task/{task_id}/comments": {
@@ -905,7 +1214,21 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/task/{task_id}/comment/{id}/reaction": {
@@ -958,7 +1281,21 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/task/{task_id}/comment/{id}": {
@@ -998,7 +1335,21 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       },
       "patch": {
         "summary": "Update a comment",
@@ -1049,7 +1400,21 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       },
       "delete": {
         "summary": "Delete a comment",
@@ -1080,7 +1445,21 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/space/{space_id}/tasks/external/{external_id}": {
@@ -1219,7 +1598,20 @@
               }
             }
           }
-        }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "operationId": "upsertExternalTask"
       }
     },
     "/workspaces/space/{space_id}/changes": {
@@ -1331,7 +1723,20 @@
               }
             }
           }
-        }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "operationId": "listSpaceChanges"
       }
     },
     "/workspaces/space/{space_id}/copy-structure": {
@@ -1443,7 +1848,17 @@
               }
             }
           }
-        }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "operationId": "copySpaceStructure"
       }
     },
     "/workspaces/space/{space_id}/reset": {
@@ -1535,7 +1950,17 @@
               }
             }
           }
-        }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "operationId": "resetSpace"
       }
     },
     "/workspaces/task/{task_id}/time-log": {
@@ -1568,7 +1993,21 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       },
       "put": {
         "summary": "Log time against a task",
@@ -1613,7 +2052,21 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/task-templates": {
@@ -1641,7 +2094,18 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/task-template": {
@@ -1674,7 +2138,18 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/task-template/{id}": {
@@ -1707,7 +2182,18 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       },
       "patch": {
         "summary": "Update a task template",
@@ -1752,7 +2238,18 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       },
       "delete": {
         "summary": "Delete a task template",
@@ -1776,7 +2273,18 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/client": {
@@ -1831,7 +2339,18 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
       }
     },
     "/workspaces/meetings": {
@@ -1902,6 +2421,2650 @@
               }
             }
           }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/workspaces/entity/{entity_type}/{entity_id}/comments": {
+      "get": {
+        "summary": "List entity comments",
+        "description": "Comments on an entity such as a record. Private comments belong to the caller's account; pass `visibility=shared` with `counterparty_account_id` to read the thread shared with a connected account.",
+        "operationId": "listEntityComments",
+        "tags": [
+          "Entity Comments"
+        ],
+        "parameters": [
+          {
+            "name": "entity_type",
+            "in": "path",
+            "required": true,
+            "description": "Entity type, letters, digits, `_` or `-`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "description": "Entity id, same character set.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "description": "`private` (this account only, default) or `shared` (with the connected account).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private",
+                "shared"
+              ]
+            }
+          },
+          {
+            "name": "counterparty_account_id",
+            "in": "query",
+            "required": false,
+            "description": "Required to find a shared comment.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "target_type",
+            "in": "query",
+            "required": false,
+            "description": "Only comments about this part of the entity.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "target_id",
+            "in": "query",
+            "required": false,
+            "description": "With `target_type`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityCommentList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/entity/{entity_type}/{entity_id}/comment": {
+      "post": {
+        "summary": "Create an entity comment",
+        "operationId": "createEntityComment",
+        "tags": [
+          "Entity Comments"
+        ],
+        "parameters": [
+          {
+            "name": "entity_type",
+            "in": "path",
+            "required": true,
+            "description": "Entity type, letters, digits, `_` or `-`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "description": "Entity id, same character set.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEntityCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityComment"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "description": "Forbidden, or the distribution is suspended and shared comments are read only (`code` is set for the latter).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/entity/{entity_type}/{entity_id}/comment/{id}": {
+      "get": {
+        "summary": "Get an entity comment",
+        "operationId": "getEntityComment",
+        "tags": [
+          "Entity Comments"
+        ],
+        "parameters": [
+          {
+            "name": "entity_type",
+            "in": "path",
+            "required": true,
+            "description": "Entity type, letters, digits, `_` or `-`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "description": "Entity id, same character set.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Comment id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "description": "`private` (this account only, default) or `shared` (with the connected account).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private",
+                "shared"
+              ]
+            }
+          },
+          {
+            "name": "counterparty_account_id",
+            "in": "query",
+            "required": false,
+            "description": "Required to find a shared comment.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityComment"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Update an entity comment",
+        "description": "Only the comment's author can change it.",
+        "operationId": "updateEntityComment",
+        "tags": [
+          "Entity Comments"
+        ],
+        "parameters": [
+          {
+            "name": "entity_type",
+            "in": "path",
+            "required": true,
+            "description": "Entity type, letters, digits, `_` or `-`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "description": "Entity id, same character set.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Comment id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "description": "`private` (this account only, default) or `shared` (with the connected account).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private",
+                "shared"
+              ]
+            }
+          },
+          {
+            "name": "counterparty_account_id",
+            "in": "query",
+            "required": false,
+            "description": "Required to find a shared comment.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEntityCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityComment"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete an entity comment",
+        "operationId": "deleteEntityComment",
+        "tags": [
+          "Entity Comments"
+        ],
+        "parameters": [
+          {
+            "name": "entity_type",
+            "in": "path",
+            "required": true,
+            "description": "Entity type, letters, digits, `_` or `-`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "description": "Entity id, same character set.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Comment id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "description": "`private` (this account only, default) or `shared` (with the connected account).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private",
+                "shared"
+              ]
+            }
+          },
+          {
+            "name": "counterparty_account_id",
+            "in": "query",
+            "required": false,
+            "description": "Required to find a shared comment.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/entity/{entity_type}/{entity_id}/comment/{id}/reaction": {
+      "post": {
+        "summary": "Add or remove a reaction on an entity comment",
+        "operationId": "reactToEntityComment",
+        "tags": [
+          "Entity Comments"
+        ],
+        "parameters": [
+          {
+            "name": "entity_type",
+            "in": "path",
+            "required": true,
+            "description": "Entity type, letters, digits, `_` or `-`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "description": "Entity id, same character set.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Comment id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "description": "`private` (this account only, default) or `shared` (with the connected account).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private",
+                "shared"
+              ]
+            }
+          },
+          {
+            "name": "counterparty_account_id",
+            "in": "query",
+            "required": false,
+            "description": "Required to find a shared comment.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentReactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated reactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reactions": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/entity/{entity_type}/{entity_id}/comment/{id}/attachment": {
+      "get": {
+        "summary": "Download an entity comment attachment",
+        "operationId": "getEntityCommentAttachment",
+        "tags": [
+          "Entity Comments"
+        ],
+        "parameters": [
+          {
+            "name": "entity_type",
+            "in": "path",
+            "required": true,
+            "description": "Entity type, letters, digits, `_` or `-`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "description": "Entity id, same character set.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Comment id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "description": "`private` (this account only, default) or `shared` (with the connected account).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "private",
+                "shared"
+              ]
+            }
+          },
+          {
+            "name": "counterparty_account_id",
+            "in": "query",
+            "required": false,
+            "description": "Required to find a shared comment.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "attachment",
+            "in": "query",
+            "required": true,
+            "description": "The attachment to read, as listed on the comment.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file, base64 encoded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "encoding": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/task/{task_id}/relations": {
+      "get": {
+        "summary": "List related tasks",
+        "operationId": "listTaskRelations",
+        "tags": [
+          "Task Relations"
+        ],
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "Task id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Related tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRelationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/task-relation": {
+      "put": {
+        "summary": "Link two tasks",
+        "description": "Links both sides. Linking a pair again replaces its type. The task's space must have related tasks switched on, and a task can have at most 50 links.",
+        "operationId": "linkTasks",
+        "tags": [
+          "Task Relations"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "task_id",
+                  "related_task_id",
+                  "type"
+                ],
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  },
+                  "related_task_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "$ref": "#/components/schemas/TaskRelationType"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The task's links after the change",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRelationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "description": "Related tasks are off in the space.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/task/{task_id}/relation/{related_task_id}": {
+      "delete": {
+        "summary": "Unlink two tasks",
+        "description": "Removes the link from both sides, whichever side asks.",
+        "operationId": "unlinkTasks",
+        "tags": [
+          "Task Relations"
+        ],
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "Task id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "related_task_id",
+            "in": "path",
+            "required": true,
+            "description": "The linked task.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The task's links after the change",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRelationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/space-collections": {
+      "get": {
+        "summary": "List space collections",
+        "description": "The caller's own groups for the spaces sidebar. A user who has saved none gets computed defaults (`is_default: true`).",
+        "operationId": "listSpaceCollections",
+        "tags": [
+          "Space Collections"
+        ],
+        "responses": {
+          "200": {
+            "description": "The user's collections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceCollectionsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/space-collection": {
+      "post": {
+        "summary": "Create a space collection",
+        "description": "At most 50 collections per user.",
+        "operationId": "createSpaceCollection",
+        "tags": [
+          "Space Collections"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpaceCollection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The user's collections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceCollectionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/space-collection/{id}": {
+      "patch": {
+        "summary": "Update a space collection",
+        "description": "Only the fields sent change; `space_ids` replaces the whole list.",
+        "operationId": "updateSpaceCollection",
+        "tags": [
+          "Space Collections"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Collection id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpaceCollection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The user's collections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceCollectionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete a space collection",
+        "description": "Its spaces move to the catch-all collection.",
+        "operationId": "deleteSpaceCollection",
+        "tags": [
+          "Space Collections"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Collection id.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The user's collections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceCollectionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/space-collections-order": {
+      "put": {
+        "summary": "Reorder space collections",
+        "operationId": "setSpaceCollectionsOrder",
+        "tags": [
+          "Space Collections"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "collection_ids"
+                ],
+                "properties": {
+                  "collection_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The user's collections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceCollectionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/folder-name": {
+      "patch": {
+        "summary": "Rename a folder",
+        "description": "Sets the folder's display label; its key and path do not change. An empty `display_name` clears the label. Names are unique among siblings, ignoring case.",
+        "operationId": "renameFolder",
+        "tags": [
+          "Folders"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "space_id",
+                  "folder",
+                  "display_name"
+                ],
+                "properties": {
+                  "space_id": {
+                    "type": "string"
+                  },
+                  "folder": {
+                    "type": "string",
+                    "description": "Space-relative dot path, for example `Projects.Alpha`."
+                  },
+                  "display_name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "What was stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "space_id": {
+                      "type": "string"
+                    },
+                    "folder": {
+                      "type": "string"
+                    },
+                    "display_name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "description": "The space root or a Microsoft 365 managed folder cannot be renamed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "A sibling already uses the name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/resolve-folder": {
+      "get": {
+        "summary": "Resolve a folder display path",
+        "description": "Walks a display path, with `/` or `.` between segments, to the key path it names. Creates nothing. A label wins over a raw key segment.",
+        "operationId": "resolveFolder",
+        "tags": [
+          "Folders"
+        ],
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "description": "Space id.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "description": "Display path.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The resolved path",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "space_id": {
+                      "type": "string"
+                    },
+                    "folder": {
+                      "type": "string",
+                      "description": "Space-relative dot path of the segments that matched."
+                    },
+                    "resolved": {
+                      "type": "boolean"
+                    },
+                    "missing_from": {
+                      "type": "integer",
+                      "description": "Index of the first segment that did not match. Present only when `resolved` is false."
+                    },
+                    "key_path": {
+                      "type": "string"
+                    },
+                    "labels": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/case-folder": {
+      "post": {
+        "summary": "File a case under its client folder",
+        "description": "Finds or creates the space's base-record entity folder, then opens a case folder under it. Safe to repeat: an existing case marker is never rewritten. Client users get 403.",
+        "operationId": "createCaseFolder",
+        "tags": [
+          "Folders"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "space_id",
+                  "case_key",
+                  "case_config_id"
+                ],
+                "properties": {
+                  "space_id": {
+                    "type": "string"
+                  },
+                  "entity_folder": {
+                    "type": "string",
+                    "description": "File under this existing client folder instead of resolving identity."
+                  },
+                  "identity": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "display": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Values for the base record's display fields, written only when this call creates the entity."
+                  },
+                  "address": {
+                    "description": "Text or an object, as the base record's address field takes it."
+                  },
+                  "case_key": {
+                    "type": "object",
+                    "required": [
+                      "field",
+                      "value"
+                    ],
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "case_config_id": {
+                    "type": "string"
+                  },
+                  "primary_config": {
+                    "type": "string"
+                  },
+                  "primary_record_id": {
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "At most 20 entries, values up to 512 characters. Reserved marker keys are ignored."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Folder tokens, not paths",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entity_folder": {
+                      "type": "string"
+                    },
+                    "case_folder": {
+                      "type": "string"
+                    },
+                    "created_entity": {
+                      "type": "boolean"
+                    },
+                    "created_case": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "The case is already being filed (`code` is `case_being_filed`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-resource-type": "service",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/workspaces/task-from-template": {
+      "post": {
+        "summary": "Create a task from a template",
+        "description": "Creates a task from a stored task template.",
+        "operationId": "createTaskFromTemplate",
+        "tags": [
+          "Tasks"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        },
+        "x-path-derived": true
+      }
+    },
+    "/workspaces/task/{task_id}/watch": {
+      "post": {
+        "summary": "Watch a task",
+        "description": "Adds the caller to the task's watchers.",
+        "operationId": "watchTask",
+        "tags": [
+          "Tasks"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Stop watching a task",
+        "description": "Removes the caller from the task's watchers.",
+        "operationId": "unwatchTask",
+        "tags": [
+          "Tasks"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/task/{task_id}/mute": {
+      "post": {
+        "summary": "Mute a task",
+        "description": "Silences notifications about the task for the caller.",
+        "operationId": "muteTask",
+        "tags": [
+          "Tasks"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Unmute a task",
+        "description": "Restores notifications about the task for the caller.",
+        "operationId": "unmuteTask",
+        "tags": [
+          "Tasks"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/tasks/my-tasks": {
+      "get": {
+        "summary": "List my tasks",
+        "description": "Every non-archived task across all spaces assigned to the caller. dated=true (default) keeps tasks with a due date or scheduled time, dated=false only those with neither, dated=any everything.",
+        "operationId": "listMyTasks",
+        "tags": [
+          "Tasks"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "dated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/client/tasks": {
+      "get": {
+        "summary": "List a client's tasks",
+        "description": "Lists the tasks visible to a client user.",
+        "operationId": "listClientTasks",
+        "tags": [
+          "Tasks"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/task/{task_id}/change-log": {
+      "get": {
+        "summary": "Get a task's change log",
+        "description": "Reads the recorded changes to one task.",
+        "operationId": "getTaskChangeLog",
+        "tags": [
+          "Tasks"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/space/{space_id}/export-tasks": {
+      "get": {
+        "summary": "Export a space's tasks",
+        "description": "Exports the space's tasks matching the list filters.",
+        "operationId": "exportTasks",
+        "tags": [
+          "Tasks"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/task/{task_id}/scheduled-events": {
+      "get": {
+        "summary": "List a task's scheduled events",
+        "description": "Lists the scheduled events on one task.",
+        "operationId": "listTaskScheduledEvents",
+        "tags": [
+          "Task Schedules"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      },
+      "post": {
+        "summary": "Schedule a task event",
+        "description": "Arms a one-off or recurring event on a task. A recurring schedule armed by a root-substituted request must carry trigger_end.",
+        "operationId": "scheduleTaskEvent",
+        "tags": [
+          "Task Schedules"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/task/scheduled-events": {
+      "get": {
+        "summary": "List scheduled events in a space",
+        "description": "Lists the scheduled task events in a space.",
+        "operationId": "listScheduledTaskEvents",
+        "tags": [
+          "Task Schedules"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/task/{task_id}/scheduled-events/{id}": {
+      "put": {
+        "summary": "Update a scheduled task event",
+        "description": "Replaces a scheduled event's schedule.",
+        "operationId": "updateScheduledTaskEvent",
+        "tags": [
+          "Task Schedules"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Cancel a scheduled task event",
+        "description": "Removes a scheduled event from the task.",
+        "operationId": "unscheduleTaskEvent",
+        "tags": [
+          "Task Schedules"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/task/{task_id}/scheduled-events/{id}/read": {
+      "post": {
+        "summary": "Mark a task event notification read",
+        "description": "Marks the notification a scheduled event raised as read.",
+        "operationId": "markTaskEventNotificationRead",
+        "tags": [
+          "Task Schedules"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        },
+        "x-path-derived": true
+      }
+    },
+    "/workspaces/files": {
+      "get": {
+        "summary": "List a space's files",
+        "description": "Lists files and folder markers in a space, one level at a time.",
+        "operationId": "listFiles",
+        "tags": [
+          "Files"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subfolder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "exact",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "only_folder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a file",
+        "description": "Moves one file to the workspaces trash. path is the space-relative object path.",
+        "operationId": "deleteFile",
+        "tags": [
+          "Files"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/files/trash": {
+      "get": {
+        "summary": "List trashed files",
+        "description": "Lists files in the workspaces trash.",
+        "operationId": "listTrashFiles",
+        "tags": [
+          "Files"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/files/restore": {
+      "post": {
+        "summary": "Restore from trash",
+        "description": "Restores trashed entries under a prefix.",
+        "operationId": "restoreFromTrash",
+        "tags": [
+          "Files"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "prefix",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/file/{name}/metadata": {
+      "patch": {
+        "summary": "Update a file's metadata",
+        "description": "Updates the metadata of one file.",
+        "operationId": "updateFileMetadata",
+        "tags": [
+          "Files"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/files/versions": {
+      "get": {
+        "summary": "List a file's versions",
+        "description": "Lists saved versions of a file, newest first.",
+        "operationId": "listFileVersions",
+        "tags": [
+          "Files"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/files/version": {
+      "get": {
+        "summary": "Get one file version",
+        "description": "Reads one saved version of a file.",
+        "operationId": "getFileVersion",
+        "tags": [
+          "Files"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sequence",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/files/version/restore": {
+      "post": {
+        "summary": "Restore a file version",
+        "description": "Restores a saved version as the file's current content.",
+        "operationId": "restoreFileVersion",
+        "tags": [
+          "Files"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/save-session-file": {
+      "post": {
+        "summary": "Save a chat-session file to a space",
+        "description": "Copies a work or outputs file from an assistant session into a space folder.",
+        "operationId": "saveSessionFile",
+        "tags": [
+          "Files"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "space_id": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "session_id",
+                  "key",
+                  "space_id",
+                  "path"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/files/folder": {
+      "post": {
+        "summary": "Create a folder",
+        "description": "Creates a folder in a space.",
+        "operationId": "createFolder",
+        "tags": [
+          "Folders"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a folder",
+        "description": "Moves a folder and its contents to the trash.",
+        "operationId": "deleteFolder",
+        "tags": [
+          "Folders"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "folder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subfolder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      }
+    },
+    "/workspaces/distribution-binding": {
+      "post": {
+        "summary": "Bind a distribution",
+        "description": "Writes one distribution binding by distribution_id. Role-gated.",
+        "operationId": "upsertDistributionBinding",
+        "tags": [
+          "Distribution"
+        ],
+        "x-resource-type": "service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove a distribution binding",
+        "description": "Removes one binding. Absent is not an error.",
+        "operationId": "deleteDistributionBinding",
+        "tags": [
+          "Distribution"
+        ],
+        "x-resource-type": "service",
+        "parameters": [
+          {
+            "name": "distribution_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request refused or invalid"
+          }
         }
       }
     }
@@ -1929,8 +5092,10 @@
             "type": "integer"
           },
           "is_visible": {
-            "type": "boolean",
-            "nullable": true
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "complete": {
             "type": "boolean",
@@ -2065,6 +5230,108 @@
           "staging": {
             "type": "boolean",
             "description": "Marks a Space for testing so it can be reset. Only root and admin users can set it."
+          },
+          "related_tasks": {
+            "type": "boolean",
+            "description": "Shows the Related tickets section on tasks in this space and lets them link to others."
+          },
+          "allow_linking": {
+            "type": "boolean",
+            "description": "Opens the space to links with other accounts."
+          },
+          "task_automations": {
+            "type": "array",
+            "description": "Rules that act on tasks left in given statuses for a number of days.",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "statuses",
+                "after_days",
+                "action"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "statuses": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "after_days": {
+                  "type": "integer"
+                },
+                "action": {
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": true
+                },
+                "run_as_user_id": {
+                  "type": "string",
+                  "readOnly": true,
+                  "description": "Stamped by the server from the session of whoever last changed the rule."
+                }
+              }
+            }
+          },
+          "view": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Presentation settings: `tasks`, `records` (including `saved_views`), `front_page` (including `layouts`), `dashboard`, `entities`, `assistant_skills`."
+          },
+          "base_record": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "The record config and identity fields that define the space's client or organisation entity."
+          },
+          "hidden_tabs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Built-in tabs the space does not offer."
+          },
+          "assigned_qa_users": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Users offered as a task's `assigned_qa`. Empty hides the field."
+          },
+          "task_export_fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "key"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Columns of a task export, in order."
+          },
+          "custom_tab": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "The space's own tab of buttons."
           }
         }
       },
@@ -2188,6 +5455,124 @@
                 }
               }
             }
+          },
+          "related_tasks": {
+            "type": "boolean",
+            "description": "Shows the Related tickets section on tasks in this space and lets them link to others."
+          },
+          "allow_linking": {
+            "type": "boolean",
+            "description": "Opens the space to links with other accounts."
+          },
+          "task_automations": {
+            "type": "array",
+            "description": "Rules that act on tasks left in given statuses for a number of days.",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "statuses",
+                "after_days",
+                "action"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "statuses": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "after_days": {
+                  "type": "integer"
+                },
+                "action": {
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": true
+                },
+                "run_as_user_id": {
+                  "type": "string",
+                  "readOnly": true,
+                  "description": "Stamped by the server from the session of whoever last changed the rule."
+                }
+              }
+            }
+          },
+          "view": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Presentation settings: `tasks`, `records` (including `saved_views`), `front_page` (including `layouts`), `dashboard`, `entities`, `assistant_skills`."
+          },
+          "base_record": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "The record config and identity fields that define the space's client or organisation entity."
+          },
+          "custom_tab": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "The space's own tab of buttons."
+          },
+          "hidden_tabs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Built-in tabs the space does not offer."
+          },
+          "assigned_qa_users": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Users offered as a task's `assigned_qa`. Empty hides the field."
+          },
+          "task_export_fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "key"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Columns of a task export, in order."
+          },
+          "logo_key": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Key of a logo in the public profile-images bucket, set when the space was built from a template. Create-only."
+          },
+          "template": {
+            "type": "object",
+            "additionalProperties": true,
+            "readOnly": true,
+            "description": "Stamp left by the template the space was installed from. Kept as sent and read only by the platform."
+          },
+          "editing_disabled": {
+            "type": "boolean",
+            "readOnly": true,
+            "description": "When true the space is locked: update and delete are refused. Create-only, with no unlock."
           }
         }
       },
@@ -2225,19 +5610,23 @@
             "description": "Markdown / rich-text content"
           },
           "assignees": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "type": "string"
             },
-            "nullable": true,
             "description": "Assigned user IDs."
           },
           "attachments": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "created_at": {
             "type": "string",
@@ -2403,19 +5792,23 @@
             "description": "Markdown / rich-text content"
           },
           "assignees": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "description": "Assigned user IDs."
+            "description": "Assigned user IDs. A client user can only be assigned tasks in their own folder."
           },
           "attachments": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "priority": {
             "type": "string"
@@ -2424,7 +5817,8 @@
             "type": "string"
           },
           "reporter": {
-            "type": "string"
+            "type": "string",
+            "description": " A client user can only report tasks in their own folder."
           },
           "status": {
             "type": "string",
@@ -2540,6 +5934,19 @@
               "distribution_share": {
                 "type": "boolean",
                 "description": "Shares a task that existed before its space was connected, with the connected account."
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Replaces the task metadata wholesale; `{}` clears it. Not synced across accounts."
+              },
+              "move_subtasks": {
+                "type": "boolean",
+                "description": "On a space move, moves the subtasks with the task."
+              },
+              "updated_at": {
+                "type": "string",
+                "description": "Optimistic-concurrency token: the `updated_at` you last read."
               }
             }
           }
@@ -2605,7 +6012,15 @@
             "items": {
               "$ref": "#/components/schemas/TaskActionResource"
             },
-            "description": "Platform resources linked from this action."
+            "description": "Resources the action opens. Required (at least one) when the action is new."
+          },
+          "keep_status": {
+            "type": "boolean",
+            "description": "Leaves this action out of the task's status automation."
+          },
+          "suppress_events": {
+            "type": "boolean",
+            "description": "Request-only. Stops this write publishing a task event."
           }
         }
       },
@@ -2615,20 +6030,29 @@
           "resource_id",
           "resource_type"
         ],
-        "description": "A platform resource linked from a checklist action. Both fields are free-form strings — the resource is not validated to exist.",
+        "description": "A platform resource a checklist action opens. A new action must carry at least one valid resource; an action without one is refused with 400 (a step with nothing to open takes a `todo` resource). Stored actions that predate this stay editable.",
         "properties": {
-          "resource_id": {
-            "type": "string",
-            "example": "onboarding-checklist"
-          },
           "resource_type": {
             "type": "string",
-            "example": "record-config"
+            "enum": [
+              "record",
+              "record_config",
+              "file",
+              "assistant_session",
+              "todo",
+              "flow_input"
+            ],
+            "description": "`record` (id `{configId}.{recordId}`), `record_config` (id of a record config attached to the task's space), `file`, `assistant_session` (id `{agentSubject}.{sessionId}`), `todo` (id of your choice, with `metadata.todos`), or `flow_input` (added by a paused flow run, id is the run tracking id)."
+          },
+          "resource_id": {
+            "type": "string",
+            "example": "customers.rec_123",
+            "description": "Required. Format depends on `resource_type`."
           },
           "metadata": {
             "type": "object",
             "additionalProperties": true,
-            "description": "Free-form metadata carried alongside the link."
+            "description": "For `todo`: `{\"todos\":[{\"text\":\"...\",\"done\":false}]}` with at least one item. Free-form for the other types."
           }
         }
       },
@@ -2667,7 +6091,8 @@
             }
           },
           "reply_id": {
-            "type": "string"
+            "type": "string",
+            "description": "Id of the comment this replies to."
           },
           "created_at": {
             "type": "string",
@@ -2681,6 +6106,18 @@
           },
           "external_author": {
             "$ref": "#/components/schemas/ExternalAuthor"
+          },
+          "mentions": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "string"
+            },
+            "description": "User ids mentioned in the comment (max 50)."
+          },
+          "internal": {
+            "type": "boolean",
+            "description": "Marks the comment as team-only, hidden from client users."
           }
         }
       },
@@ -2701,7 +6138,20 @@
             }
           },
           "reply_id": {
-            "type": "string"
+            "type": "string",
+            "description": "Id of the comment this replies to."
+          },
+          "mentions": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "string"
+            },
+            "description": "User ids mentioned in the comment (max 50)."
+          },
+          "internal": {
+            "type": "boolean",
+            "description": "Marks the comment as team-only, hidden from client users."
           }
         }
       },
@@ -2712,9 +6162,20 @@
             "type": "string"
           },
           "reply_id": {
-            "type": "object",
-            "additionalProperties": true,
-            "nullable": true
+            "type": "string",
+            "description": "Id of the comment this replies to."
+          },
+          "mentions": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "string"
+            },
+            "description": "User ids mentioned in the comment (max 50)."
+          },
+          "internal": {
+            "type": "boolean",
+            "description": "Marks the comment as team-only, hidden from client users."
           }
         }
       },
@@ -3038,13 +6499,17 @@
             "description": "Set only on a move."
           },
           "comment": {
-            "type": "object",
-            "nullable": true,
+            "type": [
+              "object",
+              "null"
+            ],
             "additionalProperties": true
           },
           "action": {
-            "type": "object",
-            "nullable": true,
+            "type": [
+              "object",
+              "null"
+            ],
             "additionalProperties": true
           },
           "old_folder": {
@@ -3515,6 +6980,390 @@
           }
         },
         "description": "Every field is optional. Tags, assignees and `task_actions` replace the stored list when sent."
+      },
+      "EntityRef": {
+        "type": "object",
+        "required": [
+          "type",
+          "id"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "EntityComment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "author_name": {
+            "type": "string"
+          },
+          "account_id": {
+            "type": "string"
+          },
+          "reply_id": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "private",
+              "shared"
+            ]
+          },
+          "counterparty_account_id": {
+            "type": "string"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/EntityRef"
+          },
+          "target": {
+            "$ref": "#/components/schemas/EntityRef"
+          },
+          "mentions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "counterparty_mentions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reactions": {
+            "type": "object",
+            "readOnly": true,
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer"
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "reactors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "account_id": {
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "EntityCommentList": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntityComment"
+            }
+          },
+          "results_total": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreateEntityCommentRequest": {
+        "type": "object",
+        "required": [
+          "body"
+        ],
+        "properties": {
+          "body": {
+            "type": "string",
+            "maxLength": 20000,
+            "description": "Up to 20,000 characters."
+          },
+          "reply_id": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "private",
+              "shared"
+            ],
+            "default": "private"
+          },
+          "counterparty_account_id": {
+            "type": "string",
+            "description": "Required for a shared comment."
+          },
+          "target": {
+            "$ref": "#/components/schemas/EntityRef",
+            "description": "A part of the entity the comment is about."
+          },
+          "mentions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "With `counterparty_mentions`, at most 50."
+          },
+          "counterparty_mentions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "string"
+            },
+            "description": "Workspace file paths copied onto the comment (max 20)."
+          }
+        }
+      },
+      "UpdateEntityCommentRequest": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "private",
+              "shared"
+            ]
+          },
+          "target": {
+            "$ref": "#/components/schemas/EntityRef"
+          },
+          "mentions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "counterparty_mentions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TaskRelationType": {
+        "type": "string",
+        "enum": [
+          "relates_to",
+          "blocks",
+          "is_blocked_by",
+          "duplicates",
+          "is_duplicated_by",
+          "clones",
+          "is_cloned_by"
+        ],
+        "description": "The link as read from `task_id`'s side."
+      },
+      "TaskRelation": {
+        "type": "object",
+        "properties": {
+          "related_task_id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "relates_to",
+              "blocks",
+              "duplicates",
+              "clones"
+            ]
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "outward",
+              "inward"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "example": "is blocked by"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "task": {
+            "type": "object",
+            "description": "The related task as it stands now.",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "status_name": {
+                "type": "string"
+              },
+              "status_color": {
+                "type": "string"
+              },
+              "status_complete": {
+                "type": "boolean"
+              },
+              "space_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "archived": {
+                "type": "boolean"
+              },
+              "parent": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "TaskRelationList": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskRelation"
+            }
+          },
+          "results_total": {
+            "type": "integer"
+          }
+        }
+      },
+      "SpaceCollection": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "icon": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "color": {
+                "type": "string",
+                "description": "Hex colour such as `#2563EB`."
+              }
+            }
+          },
+          "space_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Spaces in the collection, in display order. A space sits in one collection; adding it here removes it from the others."
+          },
+          "catch_all": {
+            "type": "boolean",
+            "description": "Receives every visible space not placed elsewhere."
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        }
+      },
+      "SpaceCollectionsResponse": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpaceCollection"
+            }
+          },
+          "results_total": {
+            "type": "integer"
+          },
+          "is_default": {
+            "type": "boolean",
+            "description": "True when the user has saved nothing and the list is computed."
+          },
+          "collection": {
+            "$ref": "#/components/schemas/SpaceCollection",
+            "description": "The collection a create or update wrote."
+          }
+        }
       }
     },
     "responses": {
@@ -3557,20 +7406,56 @@
             }
           }
         }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
       }
     },
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "JWT Authorization header using the Bearer scheme"
-      },
       "apiKeyAuth": {
         "type": "apiKey",
         "in": "header",
-        "name": "X-Api-Key"
+        "name": "x-api-key"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "description": "API integration client credentials. Tokens only work on the task-sync routes in workspaces.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.quiva.ai/oauth/token",
+            "scopes": {}
+          }
+        }
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Tasks"
+    },
+    {
+      "name": "Files"
+    },
+    {
+      "name": "Folders"
+    },
+    {
+      "name": "Task Schedules"
+    },
+    {
+      "name": "Distribution"
+    }
+  ]
 }

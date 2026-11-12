@@ -1,0 +1,97 @@
+---
+title: "Local AI agents"
+description: "Drive your QuivaWorks account from Claude Code or Codex running on your own machine"
+icon: "terminal"
+---
+
+An AI coding agent running on your machine, such as Claude Code or Codex, can work on your QuivaWorks account directly: build and publish [flows](/flows/overview), define record sets, pull a configuration to a file, change it and push it back, or copy a setup from one account to another.
+
+There are three pieces, and you can use any of them:
+
+| Piece | What it gives the agent | Page |
+|---|---|---|
+| **MCP servers** | Tools for flows, records, documents, spaces and tasks, assistants and more | [Claude Code](/developers/agents/claude-code), [Codex](/developers/agents/codex) |
+| **The `quiva-config` skill** | Pull, diff, push and copy account configuration safely, with dry runs and backups | [Skills](/developers/agents/skills) |
+| **OpenAPI specs** | The exact request shapes for every endpoint, for agents that call the API directly | [OpenAPI specs](/developers/agents/openapi-specs) |
+
+## The credential: a user API key
+
+Everything here authenticates with a **user API key**. Create one in **Settings → API keys → Add** (see [API keys for MCP](/developers/mcp/api-keys)). It acts as you: it reaches every endpoint your user can, with your role. A key created in Settings expires after 90 days.
+
+<Note>
+**API integrations** (Account → Connections, with a client ID and secret) are a different thing. They are the machine identity for [task sync](/spaces/task-sync) and are not used to drive your account from an agent.
+</Note>
+
+## Your account id
+
+A profile is tied to one account. You do not need to look the id up: `profile add` asks the API which account the key belongs to (`GET /accounts/info`, which returns the account's id, name and display name) and saves it. `--account <account id>` is optional.
+
+You can also copy it from the app: open **Account**, and the **Account ID** row (under **Sign-in address**) has a copy button.
+
+<Frame caption="The Sign-in address and Account ID rows on Account, Branding. The address has a Set address or Change button; the Account ID has a copy button. Values shown are examples.">
+  <img src="/images/essentials/account-sign-in-id.png" alt="The Account Branding App name card with a Sign-in address row and an Account ID row with a copy button" />
+</Frame>
+
+If you use an environment variable and want to see the account a key belongs to:
+
+```sh
+curl -H "x-api-key: $QUIVA_API_KEY" https://api.quiva.ai/accounts/info
+```
+
+<Note>
+The `/u/<code>/` segment in a QuivaWorks address is a session code, not the account id.
+</Note>
+
+<Frame caption="Settings, API keys: your keys with the account, last four characters and expiry. Names shown are examples.">
+  <img src="/images/essentials/api-keys.png" alt="The API keys page listing keys with Name, Account, Last 4 Characters, Created and Expires columns and an Add button" />
+</Frame>
+
+## Store the key
+
+<Tabs>
+  <Tab title="Profile (recommended)">
+    A profile keeps one key for one account in `~/.config/quiva/profiles.json` (readable only by you, mode 600). You can hold one profile per account and switch accounts by name.
+
+    Run this **in your own terminal**, not in an agent chat. It asks for the key at a hidden prompt:
+
+    ```sh
+    node <skill dir>/scripts/quiva.mjs profile add <name>
+    ```
+
+    `<skill dir>` is the folder of the [`quiva-config` skill](/developers/agents/skills), `skills/quiva-config` in the plugin or repository, so the script is `skills/quiva-config/scripts/quiva.mjs`. Then:
+
+    ```sh
+    node <skill dir>/scripts/quiva.mjs profile list
+    node <skill dir>/scripts/quiva.mjs check <name>
+    ```
+
+    `check` confirms the key works and prints the account it belongs to, as `account <id> (<name>)`. Use a different `<name>` for each account you work on.
+  </Tab>
+  <Tab title="Environment variable">
+    Export the key in your shell profile or load it from a secret manager:
+
+    ```sh
+    export QUIVA_API_KEY="<your key>"
+    ```
+
+    To override the key for a single profile, set `QUIVA_API_KEY_<PROFILE>` (the profile name in capitals).
+  </Tab>
+</Tabs>
+
+The **local** MCP servers look for a key in this order: the profile named by `QUIVA_PROFILE`, then `QUIVA_API_KEY_<PROFILE>`, then `QUIVA_API_KEY`. The **remote** server takes the key in a request header instead, so set it up with an environment variable.
+
+## Remote or local MCP
+
+- **Remote** (`https://api.quiva.ai/mcp`): nothing to install. Your client sends the key on every request. Start here.
+- **Local**: you run the [servers from the repository](/developers/mcp/local-setup) as processes on your machine. Use them when you develop against the servers or your client cannot make a hosted HTTP connection.
+
+## Keep the key safe
+
+<Warning>
+Never paste an API key into a chat with an agent: anyone who can read the conversation can act as you. Enter it only at the hidden profile prompt or in an environment variable.
+</Warning>
+
+- Create one key per tool or machine, named for what uses it, so you can revoke one without breaking the rest.
+- Rotate by creating the replacement first, switching your tools to it, then deleting the old key. See [API keys](/essentials/security/api-keys).
+- Prefer a restricted key when an agent only needs one area. See [API keys for MCP](/developers/mcp/api-keys#restricted-keys).
+- Do not commit files that contain a key. Use `${QUIVA_API_KEY}` references in shared config.

@@ -258,7 +258,7 @@ read it.
 
 ## Views
 
-The task panel has three views, switched from the toolbar. Your choice is remembered per Space and
+The task panel has three views, switched from the segmented control in the toolbar. Your choice is remembered per Space and
 is also carried in the URL, so a filtered view can be linked and shared.
 
 <CardGroup cols={3}>
@@ -323,7 +323,8 @@ Calendar entries can be dragged to reschedule the task behind them.
 
 The toolbar carries:
 
-- **Search** — matches a task's title and description
+- **Search** — matches a task's title and description, or its task ID
+- **Saved views** — a menu in the queue bar that keeps a set of filters and tag chips for reuse
 - **Assignees**
 - **Priority**
 - **Status**
@@ -385,10 +386,16 @@ unrelated.
 **Archive** takes a task out of the active list without destroying it. Archived tasks are reachable
 through the **Archived** filter and can be unarchived from the task menu.
 
+Collaborators can archive tasks too.
+
 **Delete** removes the task. If it has subtasks, you are asked whether to delete those too.
 
 **Change log** shows the task's history — field changes, comments and time logs assembled into one
 timeline, filterable, and exportable as JSON or CSV.
+
+## Related tickets
+
+A task has a **Related tickets** section for linking it to other tasks. Linked tasks are listed with their ID and tags, and each link opens the other task.
 
 ## Exporting tasks
 

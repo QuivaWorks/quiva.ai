@@ -111,6 +111,7 @@
             "group": "Flows",
             "pages": [
               "flows/overview",
+              "flows/automations",
               {
                 "group": "Triggers",
                 "icon": "bolt",
@@ -122,6 +123,8 @@
                   "flows/triggers/schedule",
                   "flows/triggers/upload",
                   "flows/triggers/email",
+                  "flows/triggers/email-delivery",
+                  "flows/triggers/mail",
                   "flows/triggers/stream-triggers"
                 ]
               },
@@ -134,6 +137,7 @@
                   "flows/steps/human-in-the-loop",
                   "flows/steps/delay",
                   "flows/steps/condition",
+                  "flows/steps/email",
                   "flows/steps/http-request",
                   "flows/steps/map",
                   "flows/steps/rules",
@@ -170,6 +174,7 @@
                   "essentials/account/global-admin-branding-settings",
                   "essentials/account/api-integrations",
                   "essentials/account/connections",
+                  "essentials/account/email-sending",
                   "essentials/account/billing-subscriptions",
                   "essentials/account/closing-account"
                 ]
@@ -235,6 +240,17 @@
                   "developers/mcp/api-keys",
                   "developers/mcp/local-setup",
                   "developers/mcp/tools"
+                ]
+              },
+              {
+                "group": "Local AI agents",
+                "icon": "terminal",
+                "pages": [
+                  "developers/agents/overview",
+                  "developers/agents/claude-code",
+                  "developers/agents/codex",
+                  "developers/agents/openapi-specs",
+                  "developers/agents/skills"
                 ]
               },
               {
@@ -330,6 +346,7 @@
             "pages": [
               "abbie/connecting/slack",
               "abbie/connecting/teams",
+              "abbie/connecting/microsoft-365",
               "abbie/connecting/integrations-and-mcp",
               "abbie/connecting/credential-identity"
             ]
@@ -377,6 +394,18 @@
             }
           },
           {
+            "group": "Records",
+            "openapi": {
+              "source": "api-reference/endpoint/records/openapi.json"
+            }
+          },
+          {
+            "group": "Documents",
+            "openapi": {
+              "source": "api-reference/endpoint/documents/openapi.json"
+            }
+          },
+          {
             "group": "Secrets Manager",
             "openapi": {
               "source": "api-reference/endpoint/secrets-manager/openapi.json"
@@ -416,6 +445,24 @@
             "group": "Monitoring",
             "openapi": {
               "source": "api-reference/endpoint/monitoring/openapi.json"
+            }
+          },
+          {
+            "group": "Microsoft 365",
+            "openapi": {
+              "source": "api-reference/endpoint/m365/openapi.json"
+            }
+          },
+          {
+            "group": "Distribution",
+            "openapi": {
+              "source": "api-reference/endpoint/distribution/openapi.json"
+            }
+          },
+          {
+            "group": "Abbie (beta)",
+            "openapi": {
+              "source": "api-reference/endpoint/abbie/openapi.json"
             }
           }
         ]
