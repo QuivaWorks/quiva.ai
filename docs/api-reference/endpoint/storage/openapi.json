@@ -2363,6 +2363,24 @@
               "minimum": 1,
               "maximum": 1000
             }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "The next_cursor from the previous page; omit to start from the beginning",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "description": "Dot-separated key prefix; returns that key and the keys under it (spaces.S1 matches spaces.S1.a.pdf, not spaces.S10.a.pdf)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
