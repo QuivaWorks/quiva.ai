@@ -33,7 +33,7 @@ in the entity list, and above its folder.
 
 A Space with a contact anchor shows a panel in its panel row named after that record —
 **Contacts** by default, or whatever the Space calls one instead (for example, **Clients**) — see
-[Spaces Overview](/spaces/spaces#the-panel-model). What it looks like depends on whether the Space
+[Menu and pages](/spaces/menu-and-pages). What it looks like depends on whether the Space
 also declares an organisation:
 
 <Tabs>
@@ -41,9 +41,8 @@ also declares an organisation:
     One flat list of every contact in the Space. There is no organisation grouping.
   </Tab>
   <Tab title="Contact + organisation">
-    A **folder-scoped panel**: it shows the organisations and contacts filed in whatever folder
-    you're currently browsing, the same way the Files panel shows files and folders for that
-    location.
+    A **folder-scoped panel** with two columns: organisations on one side, contacts on the other,
+    for whatever folder you're currently browsing.
 
     - At the Space root or inside a plain folder, you see every organisation and every
       contact filed there.
@@ -51,6 +50,14 @@ also declares an organisation:
     - Open a contact and the panel disappears — a contact doesn't hold further entities.
   </Tab>
 </Tabs>
+
+When a column has more entries than fit, **Show more** loads the next set. The empty state names
+the contact or organisation label as configured for your Space, for example "No clients in this
+folder yet."
+
+If the Space runs journeys, two chips filter the panel: **Your turn** shows the people waiting on
+you, and **Waiting on** (followed by the contact or organisation label) shows those you have
+handed on.
 
 <Frame caption="The Contacts panel at a Space root: every organisation and contact filed there.">
   <img src="/images/spaces/entities-panel.png" alt="A Space Contacts panel with an Organisations card listing one organisation and a Contacts card listing five contacts, each with its organisation or No organisation" />
@@ -61,6 +68,27 @@ Contacts and organisations created before folder scoping existed still show up: 
 by the record config their folder marker points at, falling back to the old literal label it was
 created with. Nothing is lost by the switch to the newer panel.
 </Note>
+
+### A contact's page
+
+Opening a contact shows a header with the contact's name and avatar, and the actions your Space
+has set up for a contact, such as creating a task or filing mail. Below it are the contact's own
+pages.
+
+- The landing page is the contact's **Home**, a page of cards for that one contact. See
+  [Home and cards](/spaces/home-and-cards).
+- The other tabs, such as files, tasks and journey, are the client-level pages. Their order and
+  which are on is set in the Space's **Pages and actions** settings. See
+  [Menu and pages](/spaces/menu-and-pages).
+
+{/* IMAGE: S11 — a client's Home */}
+
+### Start a journey
+
+If the Space has a journey, a **Start a journey** button lets you pick a contact and a journey and
+begin it. Choose **New** followed by the contact label to add a contact from the same dialog. If
+the person already has a round open, the dialog tells you which step it is at. See
+[Journeys](/spaces/journeys).
 
 ### The Folder field on a task
 
@@ -101,6 +129,9 @@ full listing for that folder.
 <CardGroup cols={2}>
   <Card title="Spaces Overview" icon="folder-tree" href="/spaces/spaces#configuring-a-space">
     Setting a Space's base record and organisation record.
+  </Card>
+  <Card title="Cases" icon="briefcase" href="/spaces/cases">
+    The pieces of work held under a contact.
   </Card>
   <Card title="Tasks" icon="list-check" href="/spaces/tasks#folders-and-contacts">
     How a task's Folder field relates to contacts.
