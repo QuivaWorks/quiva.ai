@@ -99,7 +99,7 @@ The chat page documents the **Files** panel, with **Save to space** and **Downlo
 
 ## API
 
-Four new endpoints manage a record's history: `GET /records/{config_id}/{id}/history` lists it, `DELETE` on the same path erases it, and `POST .../history/{version}/amend`, `hide`, `erase` and `restore` act on one version. `DELETE /records/config/{config_id}/history` erases the history of a deleted record set. `POST /records/export-records` exports a record set as a file. Task lists gain search by task ID and a `parents_only` filter, storage lists take `cursor` and `prefix`, and converting a document or presentation to PDF reuses a stored preview while the source is unchanged.
+New endpoints manage a record's history: `GET /records/{config_id}/{id}/history` lists it, `DELETE` on the same path erases it, and `POST .../history/{version}/amend`, `hide`, `erase` and `restore` act on one version. `DELETE /records/config/{config_id}/history` erases the history of a deleted record set. `POST /records/export-records` exports a record set as a file. Task lists gain search by task ID and a `parents_only` filter, storage lists take `cursor` and `prefix`, and converting a document or presentation to PDF reuses a stored preview while the source is unchanged.
 
 ## Breaking or behaviour changes
 

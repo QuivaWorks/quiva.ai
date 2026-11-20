@@ -43,7 +43,7 @@ You build a journey in the form editor, on the form of a record set. Reach the e
 <Steps>
   <Step title="Open the Journey tab">
     In the form editor header, switch from **Editor** to **Journey**. The tab is offered to
-    administrators and developers only.
+    root users, administrators and developers only.
   </Step>
   <Step title="Make the form a journey">
     A form with no journey says **This form has no journey**. Click **Make this form a journey**. It
@@ -170,7 +170,7 @@ Members steps are also available over the API, for staff:
 | `POST /records/member-send` | Send, preview or remind every member under a folder, as a background job. |
 | `GET /records/member-send/{id}` | Read a job's progress and its failed members. |
 
-See the [API reference](/api-reference) for the request and response fields.
+See the Records section of the API reference for the request and response fields.
 
 <CardGroup cols={2}>
   <Card title="Building a form" icon="grid-2-plus" href="/forms/building-a-form">

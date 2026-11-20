@@ -32,7 +32,7 @@ That has two practical consequences:
   on a Space. People are invited at the account level.
 - **Creating a Space, and opening a Space's settings, is limited to the `root` and
   `admin` roles.** Everyone else sees the Space but not the New Space button or the
-  settings cog.
+  Space settings.
 
 <Card title="Roles and permissions" icon="users" href="/essentials/users/roles-permissions">
   How account roles are assigned and what each one can do.
@@ -40,7 +40,7 @@ That has two practical consequences:
 
 ## How a Space is laid out
 
-Opening a Space lands you on **Home** unless its **Default view** says otherwise. From
+Opening a Space lands you on **Home** unless its **Landing page** (or, on a Space whose pages have not been set up, its **Default view**) says otherwise. From
 there you move around with the **space menu** down the left side.
 
 {/* IMAGE: S03 — space Home with cards */}
@@ -50,7 +50,7 @@ there you move around with the **space menu** down the left side.
 - **The space menu** holds the folder tree and the pages the Space offers. Choose
   what appears, and in what order, in **Pages and actions**. See
   [Menu and pages](/spaces/menu-and-pages).
-- **Tabs** open from the menu and from inside a folder: Files & folders, Tasks,
+- **Tabs** open from the menu and from inside a folder: Files, Tasks,
   Records, Chats, Meetings, and others as configured for your Space. They follow you
   into a folder and describe that folder. The Space root is the outermost folder.
 - **Client pages** are the tabs inside each client, on a Space that tracks contacts as
@@ -62,7 +62,7 @@ What you see depends on the Space. A feature that is turned off, or a tab that i
 hidden, does not appear.
 
 <Warning>
-**Board is a view, not a page.** The Tasks page offers List, Board and Schedule views,
+**Board is a view, not a page.** The Tasks page offers List, Board and Calendar views,
 chosen with the switcher at the top right.
 </Warning>
 
@@ -140,7 +140,7 @@ any time afterwards.
 
 ## Configuring a Space
 
-The cog in the Space header opens **Edit space**. It has seven menus: **Information**, **General**, **Pages and actions**, **Tasks**, **Records**, **Files** and **Mail**. Under **Tasks** you will also find **Related tickets** and an **Automations** tab: rules that act on a task once it has stayed in chosen statuses for a number of days. Each rule reads *When a task stays in* the statuses you pick, *For (days)* between 1 and 365, *Then* **Archive the task**.
+Click the Space's name at the top of the space menu (**Space settings**) to open **Edit space**. It has seven menus: **Information**, **General**, **Pages and actions**, **Tasks**, **Records**, **Files** and **Mail**.
 
 <AccordionGroup>
   <Accordion title="Information" icon="circle-info">
@@ -157,13 +157,15 @@ The cog in the Space header opens **Edit space**. It has seven menus: **Informat
     |---|---|
     | Automatic | Home |
     | Home | Home, chosen on purpose |
-    | Files | Files & folders |
+    | Files | Files |
     | Tasks | Tasks |
     | Records | Records |
     | Chats | Chats |
 
     Files, Tasks, Records and Chats are offered only while that feature is on for the
     Space.
+
+    **Default view** is not shown once the Space's pages are set up in **Pages and actions**; **Landing page** replaces it.
 
     **Allow linking with other accounts** — lets the Space be shared with other
     accounts. See [Linked accounts and products](/spaces/linked-accounts-and-products).
@@ -173,7 +175,7 @@ The cog in the Space header opens **Edit space**. It has seven menus: **Informat
     at Space level only.
 
     **Hidden tabs** — withdraw individual tabs without turning off the whole feature:
-    Contacts, Files & Folders, Tasks, Records, Chats, Meetings, Linked accounts and
+    Contacts, Files, Tasks, Records, Chats, Meetings, Linked accounts and
     Submissions. Home can never be hidden, and a link to a hidden tab lands there
     instead. Hidden tabs are not offered on the built-in system Spaces, or on a Space
     whose pages are set up in **Pages and actions**.
@@ -210,14 +212,11 @@ The cog in the Space header opens **Edit space**. It has seven menus: **Informat
       renders your Space's real statuses, priorities and tags as you edit.
     - **Assistants** — the assistants offered from the Tasks page, and which one the
       Assistant button opens.
-    - **Exports**, **Automations** and **Related tickets**, as above.
+    - **Exports**, **Related tickets** and **Assigned QA**.
+    - **Automations** — rules that act on a task once it has stayed in chosen statuses for a number of days. Each rule reads *When a task stays in* the statuses you pick, *For (days)* between 1 and 365, *Then* **Archive the task**.
   </Accordion>
   <Accordion title="Records" icon="database">
-    **Base record** — the record kind this Space's tasks are tracked against, and what
-    this Space calls one (see [Entities & Contacts](/spaces/entities-contacts)).
-    **Organisation record** — the firm a contact belongs to, optional. **Assistants** —
-    the assistants offered from the Records page. A **Form views** tab also appears when
-    an attached record set exposes more than one form.
+    Tabs: **General**, **Form views** (when an attached record set has more than one form), **Record setup** and **Assistants**. See [Records](/spaces/records#the-records-menu-in-edit-space).
   </Accordion>
   <Accordion title="Files" icon="folder-tree">
     **Assistants** — the assistants offered from the Files page.
@@ -263,7 +262,7 @@ changes nothing rather than half-deleting the Space — retry it later.
 
 Choose **Customise** to organise your own Spaces into groups. Each group has a **Name**, a **Description**, an **Icon** and a **Colour**, and a **New spaces go here** option that makes it the home for Spaces you create from then on. Use **Add group** to make one, drag groups to reorder them or use **Move left** and **Move right**, and move a Space with **Move to group** in its menu. Choose **Reset to default** to return to the default groups, and **Done** when you have finished. Spaces that are in no group fall into a default group.
 
-Opening a Space takes you to its root folder, on the page its **Default view** names.
+Opening a Space takes you to its root folder, on its landing page.
 
 ## Built-in system Spaces
 
@@ -298,7 +297,7 @@ Both Spaces ship with a fixed status list that cannot be edited.
     | Cancelled | Yes |
 
     **Open** is the default status for a new escalation. The Escalations space has **no
-    Records tab** — its menu offers Home, Files & folders, Tasks, Chats and Meetings.
+    Records tab** — its menu offers Home, Files, Tasks, Chats and Meetings.
   </Accordion>
   <Accordion title="Leads statuses" icon="inbox">
     | Status | Complete |
@@ -329,8 +328,7 @@ A system Space accepts a small, fixed set of edits:
 | Description | Yes |
 | Default view | Yes |
 | Record sets attached to the Space | Yes |
-| Base record | Yes |
-| Organisation record | Yes |
+| Record setup (contact and organisation) | Yes |
 | Statuses and default status | **No** |
 | Priorities | **No** |
 | Tags | **No** |
@@ -341,8 +339,7 @@ A system Space accepts a small, fixed set of edits:
 | Per-page assistants | **No** |
 
 The Edit Space dialog reflects this: on a system Space the Tasks menu shows only
-Related tickets, the Files menu is not shown at all, and Records offers only Base record
-and Organisation record (plus Form views where they apply). Escalations has no Records
+Related tickets, the Files menu is not shown at all, and Records offers only General and Record setup (plus Form views where they apply). Escalations has no Records
 menu either, matching its missing Records tab. General still shows the Default view, but
 Hidden tabs and linking are not offered there.
 
@@ -362,7 +359,7 @@ set has to stay stable across every account.
     The space menu, tabs, and the pages you choose to offer.
   </Card>
   <Card title="Tasks" icon="list-check" href="/spaces/tasks">
-    The Tasks page: List, Board and Schedule views, filters, and how a task is put
+    The Tasks page: List, Board and Calendar views, filters, and how a task is put
     together.
   </Card>
   <Card title="Entities & Contacts" icon="address-book" href="/spaces/entities-contacts">
@@ -381,10 +378,10 @@ set has to stay stable across every account.
     Attaching record sets to a Space and working with the records inside them.
   </Card>
   <Card title="File management" icon="folder-tree" href="/spaces/file-management">
-    Folders, uploads, and everything the Files & folders page does.
+    Folders, uploads, and everything the Files page does.
   </Card>
   <Card title="Scheduling" icon="calendar" href="/spaces/scheduling">
-    The Schedule view, recurring work, and scheduled events on a task.
+    The Calendar view, recurring work, and scheduled events on a task.
   </Card>
   <Card title="Escalations" icon="angles-up" href="/spaces/escalations">
     How work reaches the Escalations space and what to do with it once it arrives.

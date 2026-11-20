@@ -21,7 +21,7 @@ Every space has a menu down the left side, labelled **Space menu**. It lists the
 Rows with a caret expand in place. Click the caret to open or close a row, and click the name to open the page.
 
 <Note>
-When the space shows clients, **Files & folders** is drawn as **Browse**, with **Folders** inside it. Rename the page under **Pages and actions** to keep your own name.
+When the space shows clients, **Files** is drawn as **Browse**, with **Folders** inside it. Rename the page under **Pages and actions** to keep your own name.
 </Note>
 
 ### Which pages appear
@@ -31,10 +31,9 @@ A space starts with a default set of pages. Each one shows only when it applies.
 | Page | Shown when |
 |---|---|
 | **Home** | Always. |
-| Journey | A journey is set up for the space. Named as configured for your space; the default is **Journey**. |
 | Contacts | The space has a contact record. Named as configured for your space. |
 | **Quotes**, **Policies** | The space offers them. |
-| **Files & folders** | The Files module is on. |
+| **Files** | The Files & folders feature is on. |
 | **Tasks** | The Tasks module is on. |
 | **Records** | The Records module is on. |
 | **Chats** | The Chats module is on. |
@@ -91,15 +90,15 @@ Click **Add a page** and pick a type. Pages you add can be removed with the bin 
 | **Meetings** | Meetings in the space. |
 | **Linked accounts** | Accounts linked to this space. |
 | **Submissions** | The submissions inbox. |
-| **Quotes** | The quotes pipeline. |
-| **Policies** | The policies list. |
-| **Journey** | The journey for the space. |
+| **Quotes** | The requests list of a linked space. See [Linked accounts and products](/spaces/linked-accounts-and-products). |
+| **Policies** | The accepted records of a linked space. See [Linked accounts and products](/spaces/linked-accounts-and-products). |
+| **Journey** | The client's journey. Client pages only. |
 
 Every type except **Card page** can appear once, and a type is offered only when the space supports it. A space can hold up to 30 pages, and record set pages count towards that limit.
 
 ### Client-level pages
 
-The same editor has a client-level view: the tabs inside every client. The order is the tab order, a page turned off leaves the tabs, and a client link opens the first client page shown, or Home when there is none.
+The same editor has a client-level view: the tabs inside every client. The order is the tab order, a page turned off leaves the tabs, and a client link opens the first client page shown, or Home when there is none. On a space with a contact record, switch from **Space pages** to **Client pages** to edit the tabs inside every client. A client that has a journey also gets a journey tab, named as configured for your space; the default is **Journey**.
 
 ### Header actions
 
@@ -127,7 +126,7 @@ Add these to the space URL to open a page or a settings screen directly.
 |---|---|---|
 | `?panel=` | A panel: `home`, `files`, `tasks`, `records`, `chats`, `meetings`, `entities`, `distribution`, `underwriting`, `quotes`, `policies`, `onboarding`, `record_set`, `schedule` | `?panel=tasks` |
 | `?page=` | A named page by its id, such as a card page or a record set page | `?panel=record_set&page=recordset:<CONFIG_ID>` |
-| `?edit=1&menu=` | **Edit space** on a given menu: `info`, `basic`, `pages`, `tasks`, `records`, `files`, `mail`. Add `&tab=` for a tab inside the menu. | `?edit=1&menu=pages` |
+| `?edit=space&menu=` | **Edit space** on a given menu: `info`, `basic`, `pages`, `tasks`, `records`, `files`, `mail`. Add `&tab=` for a tab inside the menu. | `?edit=space&menu=pages` |
 
 <Note>
 Old links with `?panel=overview` still work and open **Home**.
