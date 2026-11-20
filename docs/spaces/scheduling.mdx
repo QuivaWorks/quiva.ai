@@ -1,6 +1,6 @@
 ---
 title: "Scheduling"
-description: "Due dates, the Schedule view, and the recurring or one-time actions you can attach to a task"
+description: "Due dates, the Calendar view, and the recurring or one-time actions you can attach to a task"
 icon: "calendar"
 ---
 
@@ -43,10 +43,12 @@ A status marked **complete** closes the task to further scheduling activity — 
 anything.
 </Warning>
 
-## The Schedule view
+<a id="the-schedule-view" />
 
-The Tasks panel's third view — alongside List and Board — is **Schedule**: a calendar of
-everything time-based in the Space.
+## The Calendar view
+
+The Tasks panel's third view — alongside List and Board — is **Calendar** (`view=schedule` in
+the URL): a calendar of everything time-based in the Space.
 
 <CardGroup cols={2}>
   <Card title="Views" icon="calendar-days">
@@ -66,7 +68,8 @@ A due or scheduled entry can be dragged to a new date, which updates the task di
 one-time or recurring event cannot, since it isn't tied to a single date to move.
 
 Opening a folder scopes the same three-view switcher to that folder's tasks; open the whole
-Space's Tasks panel for everything at once.
+Space's Tasks panel for everything at once. The **Active / Scheduled / Archived** list filter and
+**Parent tasks only** are not offered in the Calendar view.
 
 ## Scheduled actions on a task
 
@@ -147,6 +150,6 @@ Complete flag are configured.
     Folders, uploads and document approvals.
   </Card>
   <Card title="Spaces Overview" icon="folder-tree" href="/spaces/spaces">
-    The panel model this page builds on.
+    How a Space is put together: Home, pages and cards.
   </Card>
 </CardGroup>

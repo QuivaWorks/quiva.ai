@@ -1,6 +1,6 @@
 ---
 title: "Records"
-description: "Structured data inside a Space — record sets, the schema they validate against, and how records tie tasks to the people they are about"
+description: "Structured data inside a Space — record sets, the schema they validate against, exporting, history, and how records tie tasks to the people they are about"
 icon: "database"
 ---
 
@@ -93,9 +93,43 @@ Nothing else is relaxed: types, patterns, choices and additional-property rules 
     Breaking in the same way as making a field required — every stored value outside the new rule blocks the next edit of the record holding it.
   </Accordion>
   <Accordion title="Deleting a record set" icon="trash">
-    Deleting a record set **purges every record under it**, and there is no undo. If a set is no longer wanted, rename it or detach it from the Spaces that use it instead.
+    Deleting a record set **purges every record under it**, and there is no undo. If the set kept [history](#record-history), that history is kept. If a set is no longer wanted, rename it or detach it from the Spaces that use it instead.
   </Accordion>
 </AccordionGroup>
+
+---
+
+## Exporting records
+
+From a record set's menu in the Records tab, **Import / Export → Export records** opens an **Export records** dialog.
+
+| Field | Options |
+|---|---|
+| **Delivery** | **Download** saves the file in your browser. **Email** sends it to the address you give; a large file arrives as a download link. |
+| **Format** | **CSV** or **JSON**. |
+| **Compress as .zip** | Packs the file into a zip. |
+| **Records** | **Whole record set** or **Current filters** — the records the table is showing. Offered only when a search or filter is narrowing the table. |
+
+Large sets run in the background. With **Download** the dialog shows progress and the file downloads when it is ready. With **Email** you can close the dialog straight away and the message arrives when the export is done.
+
+---
+
+## Record history
+
+Each record set can keep a history of its records. Open the set's menu and choose **Change history** to set it. The **History** dropdown offers:
+
+| Option | What it keeps |
+|---|---|
+| **Off** | Nothing. |
+| **Change history** | Every version of each record: who changed what, and when. |
+| **Time series** | The number fields you choose, day by day, so each record can be charted over time. |
+
+- History starts from when you turn it on. Nothing before that is recorded.
+- Recorded history is kept for as long as your account's retention setting allows. See [Account settings](/essentials/account/account-settings).
+- Turning history off stops recording. What was already recorded is kept but hidden while history is off, and turning it back on leaves a gap for the time it was off.
+- Deleting a record set keeps its history.
+- **Who can edit history** picks the roles that can correct, hide and restore past versions. Only a root user or an admin can erase a version permanently, with **Erase permanently**.
+- A record set that keeps history does not offer **Purge records** in its **Delete** menu. **Multi delete** is still there.
 
 ---
 
@@ -105,7 +139,7 @@ A record set exists at the account level. A Space uses the ones attached to it, 
 
 <Steps>
   <Step title="Open the Space's Records tab">
-    A Space has four tabs — Files, Tasks, Records and Chats. Records lists the attached record sets down the left and their records on the right.
+    Records is one of the Space's tabs. It lists the attached record sets down the left and their records on the right. The table shows the schema's first fields when no columns have been set up for the set.
   </Step>
   <Step title="Open the Record Sets menu">
     **Select Record Sets** opens a picker of everything that exists in the account; tick the ones this Space should use. **Manage Record Sets** opens the account-wide record set area, where sets are created and their forms edited.
@@ -119,7 +153,22 @@ A record set exists at the account level. A Space uses the ones attached to it, 
 Attaching and detaching record sets, and the per-set actions on the table, are limited to Space admins.
 </Note>
 
-**Pinning a form.** When at least one attached record set offers more than one form, **Edit Space → Records → Form views** appears, listing every attached set with a dropdown of its forms. Pick which form records of that set use *in this Space*. A set with a single form has nothing to choose.
+### The Records menu in Edit space
+
+**Edit Space → Records** has these tabs:
+
+| Tab | What it holds |
+|---|---|
+| **General** | **Open records** — where creating or editing a record opens by default — and **Record pages**, which sets up a page for one record of a set. |
+| **Form views** | Appears only when at least one attached record set offers more than one form. Lists every attached set with a dropdown of its forms; pick which form records of that set use *in this Space*. A set with a single form has nothing to choose. |
+| **Record setup** | What the Space anchors its contacts on. See [The base record](#the-base-record). |
+| **Assistants** | The assistants for this Space's records. |
+
+### Record set pages
+
+A Space's page setup can include a **record set page**: a page in the Space menu that lists one record set's records, at the root of the Space or inside a contact's folder. Inside a folder it lists the records filed there. For how pages are arranged, see [Menu and pages](/spaces/menu-and-pages).
+
+{/* IMAGE: S12 — record set page */}
 
 **Folder-scoped records.** Opening a folder inside a Space gives that folder its own Records tab, showing only the records filed there. It is the same record table, scoped down.
 
@@ -133,16 +182,15 @@ For API users: a Space's attached set list is **whole-value replace**, not a mer
 
 A Space can be told that its tasks are about **someone**. That is the base record: the record set a Space anchors its contacts on, so everything about one person sits in one place.
 
-It is configured at **Edit Space → Records → Base record**.
+It is configured at **Edit Space → Records → Record setup**, as two cards. **Contact** is the person the Space tracks. **Organisation** is the optional group contacts belong to.
 
 | Control | What it does |
 |---|---|
-| **Base record** | Which record set this Space's tasks are tracked against. Set it to *None* and the Space keeps no contacts at all. |
-| **What this space calls one** | The singular label — "Client", "Candidate", "Customer", "Supplier". Defaults to **Contact**. Every button that adds or invites one reads it. |
-| **Identifying fields** | Which of the record's fields identify a person. Tried in order. Only text fields can be chosen. |
-| **Grouped under** | Another record set contacts belong to — an organisation, a household. A record set cannot be its own parent, so the base record is not offered here. |
-| **What this space calls that** | The singular label for the parent. Defaults to **Organisation**. |
-| **Create a sign-in for new contacts** | **Off by default.** Entering someone's details does not enrol them — inviting stays a separate action. Turned on, their email address is confirmed twice, because it becomes their sign-in. |
+| **Record** | Which record set this Space's tasks are tracked against. Set it to *None* and the Space keeps no contacts at all. A record set cannot be both the contact and the organisation, so the other card's set is not offered. |
+| **Display entity name** | The singular label — "Client", "Candidate", "Customer", "Supplier". Defaults to **Contact** (**Organisation** on the other card). Every button that adds or invites one reads it. |
+| **Avatar placeholder**, **Display icon**, **Display name fields**, **Image** | What one contact looks like when it has no picture: initials or the icon, which fields make up its name, and which field holds its picture. |
+| **Email field**, **Phone field**, **Other identifying fields** | Which of the record's fields identify a person. Tried in order. Only top-level text fields can be chosen. |
+| **Create a sign-in when one is added** | **Off by default.** Entering someone's details does not enrol them — inviting stays a separate action. Turned on, their email address is confirmed twice, because it becomes their sign-in. |
 
 ### How a contact is matched
 
@@ -184,11 +232,11 @@ You do not have to manage that by hand. When a Space is pointed at a different r
 
 The built-in Leads Space is a base record set up end to end:
 
-- **Base record** — the `contact` record set
+- **Record** — the `contact` record set
 - **Identifying fields** — `email`, then `phone`
-- **What this space calls one** — Contact
-- **Grouped under** — the `organisation` record set, called Organisation
-- **Create a sign-in** — off
+- **Display entity name** — Contact
+- **Organisation** card — the `organisation` record set, called Organisation
+- **Create a sign-in when one is added** — off
 
 So an enquiry arriving with an email address is filed against the contact that address identifies, creating that contact if it is new; a second enquiry from the same address lands on the same contact.
 
@@ -196,7 +244,7 @@ So an enquiry arriving with an email address is filed against the contact that a
 
 ## Parent records
 
-**Grouped under** names a record that contacts belong to — an organisation, a household, a portfolio. Leave it as *None* and contacts stand alone.
+The **Organisation** card names a record that contacts belong to — an organisation, a household, a portfolio. Leave its **Record** as *None* and contacts stand alone.
 
 - A record stores a link to its parent record's key, and **that link is indexed**. It is what makes "everything under this organisation" answerable, in a system where the fields inside a record are not searchable.
 - Sending an empty parent detaches a record from its parent. Omitting the parent leaves whatever is there alone — silence never detaches.

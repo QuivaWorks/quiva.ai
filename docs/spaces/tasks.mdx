@@ -167,7 +167,7 @@ for everyone else.
 
 A task can carry a **due date**, a **scheduled at** date, or both. They are independent:
 
-- **Due date** — the deadline. Shown in the list view's *Due* column and on the Schedule view.
+- **Due date** — the deadline. Shown in the list view's *Due* column and on the Calendar view.
 - **Scheduled at** — when the work is planned to start. The task list's **Scheduled** filter shows
   tasks that have one.
 
@@ -268,7 +268,7 @@ is also carried in the URL, so a filtered view can be linked and shared.
   <Card title="Board" icon="table-columns">
     One column per status.
   </Card>
-  <Card title="Schedule" icon="calendar">
+  <Card title="Calendar" icon="calendar">
     A calendar of dates and events.
   </Card>
 </CardGroup>
@@ -299,9 +299,9 @@ or hidden independently:
 - Subtask progress — as a count, a percentage, or both
 - Action progress — as a count, a percentage, or both
 
-### Schedule
+### Calendar
 
-The Schedule view is a calendar with **day**, **week**, **month**, **year** and **list** modes. It
+The Calendar view (`view=schedule` in the URL) is a calendar with **day**, **week**, **month**, **year** and **list** modes. It
 shows three kinds of entry, each of which can be toggled on or off:
 
 | Entry type | What it plots |
@@ -311,9 +311,11 @@ shows three kinds of entry, each of which can be toggled on or off:
 | **Recurring Events** | Automation events configured on tasks in the Space |
 
 <Note>
-This view is called **Schedule**, and it is more than a deadline calendar — recurring automation
-events appear alongside task dates. There is no separate "Calendar View".
+This view is more than a deadline calendar — recurring automation events appear alongside task
+dates. See [Scheduling](/spaces/scheduling).
 </Note>
+
+{/* IMAGE: S13 — tasks board */}
 
 Calendar entries can be dragged to reschedule the task behind them.
 
@@ -329,7 +331,11 @@ The toolbar carries:
 - **Priority**
 - **Status**
 - **Tags**
-- **Active / Scheduled / Archived** — which set of tasks the list is drawn from
+- **Client** — narrow to the tasks for one or more clients. Offered only where the Space's tasks
+  can be told apart by client, such as a board that receives tasks from linked accounts.
+- **Parent tasks only** — a toggle that hides subtasks. Not offered in the Calendar view.
+- **Active / Scheduled / Archived** — which set of tasks the list is drawn from. Not offered in
+  the Calendar view.
 
 Applied filters appear as chips you can dismiss one at a time. Every filter is written into the
 URL, so the filtered view survives a refresh and can be sent to a colleague.
@@ -399,9 +405,10 @@ A task has a **Related tickets** section for linking it to other tasks. Linked t
 
 ## Exporting tasks
 
-**Export Tasks** in the toolbar's actions menu produces a **CSV** or **JSON** export. You can limit
-it to a date range on last-updated, or leave the range empty to export everything. The export is
-delivered to an email address you supply rather than downloaded in the browser.
+**Export tasks** in the toolbar's actions menu opens a dialog with three fields: **Email**,
+**Format** (**CSV** or **JSON**) and an optional date range on last-updated. Leave the range empty
+to export everything. Choose **Export** and the file is sent to the email address you supply
+rather than downloaded in the browser.
 
 ## Editing several tasks at once
 
