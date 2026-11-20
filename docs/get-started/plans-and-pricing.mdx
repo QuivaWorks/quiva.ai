@@ -75,6 +75,15 @@ Open **Billing & Plans** in the sidebar (it sits under **More**) and go to **Pla
 
 Each plan has a **storage ceiling**. It is a hard cap: writes are refused once you reach it, so it's set well above ordinary use rather than as a pricing lever. Usage is shown under **Plan & Balance → Storage & meetings**.
 
+You are warned before you get there:
+
+| Usage | Warning |
+|---|---|
+| 80% of your plan's included storage | **Your account is approaching its included storage.** The account keeps working past the included amount. |
+| 90% of the storage ceiling | **Your account is close to its storage limit.** At the limit, new data cannot be saved until you delete data or upgrade the plan. Existing data stays readable. |
+
+Each warning appears as a notice above **Storage & meetings** and is emailed once, to the root, admin and billing users. Usage is checked daily. A warning clears when usage falls back below 70% of the included storage or 85% of the ceiling. [Billing details →](/essentials/account/billing-subscriptions#storage-warnings)
+
 Meeting **recording** and **transcript** hours are counted separately, because a meeting that's recorded but not transcribed only draws on the recording allowance.
 
 ## Conversation retention
