@@ -49,7 +49,7 @@ Prefix on the remote server: **`flows_`**. Build, publish, run and debug workflo
 
 Prefix on the remote server: **`records_`**. Record configs (schema + form views) and the records in them.
 
-20 tools.
+21 tools.
 
 | Tool | Purpose | Notes |
 |---|---|---|
@@ -63,6 +63,7 @@ Prefix on the remote server: **`records_`**. Record configs (schema + form views
 | `create_record_config` | Create a record configuration. | Write |
 | `update_record_config` | Update a record configuration (PUT, partial — only the fields you pass are changed; each view key you pass replaces the stored one). | Write |
 | `delete_record_config` | Delete a record configuration AND all of its records (the records storage bucket is purged). | Delete, `confirm: true` |
+| `erase_record_config_history` | Erase the kept history of a DELETED record config (DELETE /records/config/`{config_id}`/history): every record's history events, amendments and series buckets. | Delete, `confirm: true` |
 | `list_records` | List the records of one config (index-backed, via query-records). | — |
 | `query_records` | Search records (index-backed, GET /records). | — |
 | `get_record` | Get a single record by config id and record id. | — |
