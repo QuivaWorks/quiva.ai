@@ -29,7 +29,12 @@
             "icon": "folder-tree",
             "pages": [
               "spaces/spaces",
+              "spaces/home-and-cards",
+              "spaces/menu-and-pages",
               "spaces/entities-contacts",
+              "spaces/cases",
+              "spaces/journeys",
+              "spaces/linked-accounts-and-products",
               "spaces/tasks",
               "spaces/task-actions",
               "spaces/records",
