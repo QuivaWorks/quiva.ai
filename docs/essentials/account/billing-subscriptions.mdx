@@ -87,6 +87,19 @@ Buy a pack from **Plan & Balance → Buy credits**. The same section carries **A
 
 You can **Refresh** it, **Export CSV**, or have the export emailed to you.
 
+## Storage warnings
+
+Storage is checked once a day. You are warned at two points:
+
+| When | What it says | What happens |
+|---|---|---|
+| Usage reaches **80%** of your plan's included storage | *Your account is approaching its included storage.* | Nothing is refused. The account keeps working past the included amount. |
+| Usage reaches **90%** of the storage ceiling | *Your account is close to its storage limit.* | At the limit, new data cannot be saved until you delete data or upgrade the plan. Existing data stays readable. |
+
+The warning shows as a notice above **Storage & meetings** under **Plan & Balance**, and is emailed once to the account's root, admin and billing users, the same people who get credit warnings. Suspended users and pending invitations are not emailed. The ceiling warning replaces the included-storage one and is sent as its own email.
+
+To clear a warning, delete data or move to a larger plan. A warning clears once usage falls below 70% of the included storage or 85% of the ceiling, so usage hovering at a threshold does not send repeat emails.
+
 ## Bring your own key
 
 You can supply your own provider key for **Anthropic**, **OpenAI** or **Gemini**, or point at a custom endpoint. Keys are set per account.
