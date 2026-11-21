@@ -9,6 +9,114 @@ month rather than by version. Where a change landed gradually over several weeks
 dated to the month it became generally available rather than to a single commit.
 </Note>
 
+<Update label="November 2026: Spaces" description="Space Home replaces Overview, cases and journeys, record history, and linked accounts with branding" tags={["Spaces", "Records", "Abbie", "API"]}>
+
+## Space Home and pages
+
+**Home** is now the landing view of a space. It is a page of cards that draw the space's own data, such as what needs you, what is coming up and recent files. Admins can arrange the cards with **Customise** and add more named card pages with **Add a page** under **Edit space**, **Pages and actions**. The old Overview panel and space dashboard are gone, and a space that had a Stats dashboard shows it as **Stats** cards on Home until Home is first saved. The tasks schedule view is now called the **Calendar** view.
+
+<CardGroup cols={2}>
+  <Card title="Home and cards" icon="house" href="/spaces/home-and-cards">
+    The default cards, customising a page and the Stats card.
+  </Card>
+  <Card title="Space menu and pages" icon="bars" href="/spaces/menu-and-pages">
+    Menu order, landing page and page URLs.
+  </Card>
+  <Card title="Spaces" icon="table-columns" href="/spaces/spaces">
+    What a space is and how it is organised.
+  </Card>
+  <Card title="Tasks" icon="circle-check" href="/spaces/tasks">
+    List, board and Calendar views.
+  </Card>
+</CardGroup>
+
+## Cases and journeys
+
+A **case** holds one piece of work for a client, with its own page, files and tasks. Each space declares its own case types, so names and stages are as configured for your space. A **journey** is a list of steps, each with an owner and buttons, that a client moves through in rounds. Each round shows its next step and who it is waiting on. Contacts and organisations, as configured for your space, have their own page too.
+
+<CardGroup cols={2}>
+  <Card title="Cases" icon="briefcase" href="/spaces/cases">
+    Case types, starting a case and refreshing it from a document.
+  </Card>
+  <Card title="Journeys" icon="route" href="/spaces/journeys">
+    Steps, owners, rounds and who is waiting.
+  </Card>
+  <Card title="Contacts and organisations" icon="address-book" href="/spaces/entities-contacts">
+    How people and organisations are held in a space.
+  </Card>
+</CardGroup>
+
+## Linked accounts and products
+
+A linked space shows the products an account offers. The distributor's **Quotes** tab lists every request with its stage, and **Policies** (or the name the product gives its record set) holds the records created once one is accepted. You follow whose move it is and see the outcome after a decision. The publisher sees what linked accounts send in the **Submissions** tab, next to **Linked accounts**. Invitations now show the publisher's logo, or its name when there is no logo, with an accent colour rule, and invitation links use the publisher's published address.
+
+<CardGroup cols={2}>
+  <Card title="Linked accounts and products" icon="link" href="/spaces/linked-accounts-and-products">
+    Requests, status, the Submissions inbox and branding.
+  </Card>
+  <Card title="Service desk" icon="headset" href="/spaces/service-desk">
+    Connect client accounts to one central board.
+  </Card>
+</CardGroup>
+
+## Record history and storage
+
+Each record set can keep a history: **Off**, **Change history** for every version, or **Time series** for chosen number fields. Roles you pick under **Who can edit history** can correct, hide and restore past versions, and only a root user or an admin can erase one permanently. How long history is kept follows the account's **Record and file history** setting. Record sets can be exported as a file.
+
+<CardGroup cols={2}>
+  <Card title="Records" icon="database" href="/spaces/records#record-history">
+    Record sets, exports and history.
+  </Card>
+  <Card title="Account settings" icon="gear" href="/essentials/account/account-settings">
+    Record and file history retention.
+  </Card>
+</CardGroup>
+
+## Abbie
+
+The chat page documents the **Files** panel, with **Save to space** and **Download all files**, and the links that open a conversation, or one stage of a run. Citations explain what each footnote links to. The Model pool tab lists the models in routing, and the skills library lists Abbie's built-in skills and how to enable them. Presentations and documents Abbie makes are covered under Document Generation.
+
+<CardGroup cols={2}>
+  <Card title="The chat surface" icon="messages" href="/abbie/chatting/chat-surface">
+    Transcript, message box and Files panel.
+  </Card>
+  <Card title="Deep links" icon="link" href="/abbie/chatting/deep-links">
+    Link to a conversation or a step of a run.
+  </Card>
+  <Card title="Citations" icon="quote-right" href="/abbie/chatting/citations">
+    What the footnotes link to.
+  </Card>
+  <Card title="Model pool" icon="microchip" href="/abbie/configuring/model-pool">
+    Providers and routing.
+  </Card>
+  <Card title="Skills" icon="wand-magic-sparkles" href="/abbie/teaching/skills-library">
+    Built-in skills and how to enable them.
+  </Card>
+  <Card title="Document Generation" icon="file-lines" href="/assistants/document-generation">
+    Documents, presentations and web apps.
+  </Card>
+</CardGroup>
+
+## API
+
+New endpoints manage a record's history: `GET /records/{config_id}/{id}/history` lists it, `DELETE` on the same path erases it, and `POST .../history/{version}/amend`, `hide`, `erase` and `restore` act on one version. `DELETE /records/config/{config_id}/history` erases the history of a deleted record set. `POST /records/export-records` exports a record set as a file. Task lists gain search by task ID and a `parents_only` filter, storage lists take `cursor` and `prefix`, and converting a document or presentation to PDF reuses a stored preview while the source is unchanged.
+
+## Breaking or behaviour changes
+
+- Overview is now Home. Links that use `?panel=overview` land on Home.
+- `DELETE /records/{config_id}/purge` returns `409` on a record set that keeps history.
+- Erasing record history needs a root user or an admin.
+- The per-set **Keep history for** setting is gone. History follows the account's retention setting.
+- Deleting a record set keeps its history. Creating a record set with the same id returns `409` until you call `DELETE /records/config/{config_id}/history`.
+- GLM 5.3 Flash is opt-in, so tick it again on the **Model pool** tab if you want Abbie to route to it. Gemini 3.8 Flash and Gemini 3.1 Pro (the preview model) no longer receive routed requests.
+
+## Also shipped
+
+- Message actions now accept markdown, and external links open in a new tab.
+- Previews of presentations and documents load once and are reused, instead of being rendered again on every open.
+
+</Update>
+
 <Update label="November 2026" description="An email platform, Microsoft 365 mail and files, sign-in without an account name, and local AI agents" tags={["Email", "Microsoft 365", "Security", "Flows", "Spaces", "Abbie", "Developers"]}>
 
 ## Email platform

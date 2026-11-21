@@ -1,0 +1,188 @@
+---
+title: "Journeys"
+description: "Walk a client or supplier through a list of steps, round by round, and see whose turn it is"
+icon: "route"
+---
+
+A **journey** is a form whose steps a client and your team work through together. Each step has an
+owner, a short hint, and one or more buttons. When your team finishes a step the work moves on, and
+the journey shows who it is waiting on.
+
+Use a journey for work that has a known order and goes back and forth: onboarding a new supplier,
+setting up a client project, a yearly check-in. For one-off to-dos, use a [task](/spaces/tasks).
+
+<Note>
+A journey is not a [form flow](/forms/form-flows). A flow cuts one form into sections that Abbie asks
+about in a conversation. A journey is a list of steps, each with an owner and buttons, that a
+specific client moves through over days or weeks.
+</Note>
+
+---
+
+## Rounds
+
+Each time you start a journey for a client you start a **round**. A client can have several rounds
+over time, one after another, but only one open round per journey. Every round shows:
+
+| Field | Meaning |
+|---|---|
+| **Next step** | The step the round is on now. |
+| **Waiting on** | Who has the step, and for how long, for example "Waiting on Sam · 3 days". Empty when the step names no one. |
+
+A step that is waiting on your team shows a **Your turn** pill. Home has a **Your turn** card for
+the rounds with you and a **Waiting on others** card for the rounds you have handed off. See
+[Home and cards](/spaces/home-and-cards).
+
+---
+
+## Build a journey
+
+You build a journey in the form editor, on the form of a record set. Reach the editor from
+**Manage Record Sets**, as described in [Building a form](/forms/building-a-form).
+
+<Steps>
+  <Step title="Open the Journey tab">
+    In the form editor header, switch from **Editor** to **Journey**. The tab is offered to
+    root users, administrators and developers only.
+  </Step>
+  <Step title="Make the form a journey">
+    A form with no journey says **This form has no journey**. Click **Make this form a journey**. It
+    starts with one step.
+  </Step>
+  <Step title="Add and order the steps">
+    The **Steps** column on the left lists the steps. Use **Add a step** (or **Add a step after
+    this one**), then move a step up or down, or remove it.
+  </Step>
+  <Step title="Set up each step">
+    Select a step and fill in its settings on the right. The middle shows a preview of a round on
+    that step.
+  </Step>
+  <Step title="Set how it starts, then save">
+    Under **Starting it**, give the journey a **Name** and choose what to **Suggest it for**. Then
+    **Save** the form.
+  </Step>
+</Steps>
+
+<Frame caption="The journey designer on the form editor's Journey tab: steps on the left, a preview, and the selected step's settings.">
+  <img src="/images/spaces/journey-designer.png" alt="The form editor on the Journey tab with a numbered step list, a preview of a round and step settings such as Title, Heading, Phase and Who does it" />
+</Frame>
+
+### A step's settings
+
+| Setting | What it does |
+|---|---|
+| **Title** | The step's name as people see it. |
+| **Heading** | A different heading for the step's screen. Defaults to the title. |
+| **Phase** | An optional group the step belongs to. |
+| **Who does it** | Who the step waits on, for example your team or the client. |
+| **Shown as** | The name shown in **Waiting on**. Defaults to who does it. |
+| **Hint** | A line of guidance on the step. |
+| **Button text** | The label of the button that finishes the step. Defaults to the last button. |
+| **Buttons** | What can be done on the step, pressed in order. The last one finishes the step. |
+| **Skills** | Optional skill ids hinted to Abbie on this step. |
+| **Advanced** | The step's raw settings. |
+
+### Starting it
+
+| Setting | What it does |
+|---|---|
+| **Name** | What **Start a journey** lists the journey as. |
+| **Suggest it for** | **No suggestion**, **A first round**, or **A later round, after one has finished**. The suggested journey is picked first when someone starts a journey in a client folder. |
+
+---
+
+## The Journey tab
+
+Once a space has a record set with a journey, a client's folder gets a journey tab. Its name is
+whatever the journey is called for your space; the default is **Journey**. It shows the client's
+rounds and, for an open round, the steps with the current one marked.
+
+<Frame caption="The Journey tab: the round's steps across the top and the current step's card on the right.">
+  <img src="/images/spaces/journey-tab.png" alt="A client's Journey tab with a stepper, a Review and sign step listing files awaiting approval, and a step card with Continue, Skip this step and End journey" />
+</Frame>
+
+---
+
+## Start a journey
+
+<Steps>
+  <Step title="Open the client list">
+    In the space, open the page that lists your clients (contacts or organisations, as configured
+    for your space) and click **Start a journey**.
+  </Step>
+  <Step title="Pick who">
+    Search for the client, or use **New** to add one. If your space has more than one journey,
+    choose which.
+  </Step>
+  <Step title="Start it">
+    Click **Start** followed by the journey's name. You land on the client's journey tab, on the new
+    round.
+  </Step>
+</Steps>
+
+<Frame caption="Start a journey: pick the client and the journey.">
+  <img src="/images/spaces/journey-start.png" alt="The Start a journey dialog with a client search, a list of clients, a choice of journeys and a Start button" />
+</Frame>
+
+<Note>
+If the client already has a round open on that journey, the dialog says **[name] already has a round
+open, at "[step]"** and offers **Open it**. Finish that round before starting another.
+</Note>
+
+---
+
+## Steps that involve many people
+
+Some clients have **members** filed under their folder: the people at a supplier, or the team on a
+project. A members step works with all of them.
+
+On a members step, the journey lists each member with a status pill, a **Search members** box and
+paging. For each member you can open their forms, see their answers, or fill a form in with them.
+
+Three actions run across every member:
+
+| Action | What it does |
+|---|---|
+| **Send to everyone** | Gives each member a task with the step's forms, creates a login for anyone without one, and invites them. Safe to run again. **Send again to everyone** repeats it; **Only people not sent to yet** skips those already sent to. |
+| Preview | Before sending, shows how many members it will reach, how many will get a new login, and how many have no email address. **Who gets what** lists each member. |
+| **Remind everyone waiting** | Sends a reminder to each member who has not finished. A member reminded in the last day is skipped. You can also use **Send [name] a reminder** on one member. |
+
+Sending runs in the background. Close the dialog and it carries on; if some members fail you can
+**Retry** them or **Carry on** an interrupted send. Failed members are listed under **Not sent**.
+
+---
+
+## Ask Abbie
+
+Abbie can explain a journey and change it for you. Ask her:
+
+- "What are the steps in the supplier onboarding journey, and who is each waiting on?"
+- "Reword step 2 and add a step after it for contract review."
+- "Set up a journey for onboarding a new client project: kickoff, access, first review."
+
+She proposes the change and waits for an administrator's approval before applying it. She shows what
+a round on a retired step will read as. Abbie does not start a round: use **Start a journey** for
+that. Step prompts and review areas are still edited in the form editor.
+
+---
+
+## The API
+
+Members steps are also available over the API, for staff:
+
+| Call | Use |
+|---|---|
+| `POST /records/member-rows` | Get or create a member's row in a record set. |
+| `POST /records/member-send` | Send, preview or remind every member under a folder, as a background job. |
+| `GET /records/member-send/{id}` | Read a job's progress and its failed members. |
+
+See the Records section of the API reference for the request and response fields.
+
+<CardGroup cols={2}>
+  <Card title="Building a form" icon="grid-2-plus" href="/forms/building-a-form">
+    The form editor a journey is built in.
+  </Card>
+  <Card title="Form flows" icon="diagram-project" href="/forms/form-flows">
+    The conversational alternative for one long form.
+  </Card>
+</CardGroup>

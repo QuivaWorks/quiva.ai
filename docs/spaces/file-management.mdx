@@ -1,31 +1,31 @@
 ---
 title: "File Management"
-description: "Folders, uploads, contact linking, sharing and document approvals inside a Space's Files & Folders panel"
+description: "Folders, uploads, contact linking, sharing and document approvals inside a Space's Files & folders panel"
 icon: "folder-tree"
 ---
 
 # File Management
 
-Every Space has a **Files & Folders** panel — the folder tree for that Space, starting at its
+Every Space has a **Files & folders** panel — the folder tree for that Space, starting at its
 root. You create folders inside it, upload into them, and open any folder to work inside it
 directly.
 
 <Note>
-See [Spaces Overview](/spaces/spaces) for how panels work in general. This page covers what the
-Files & Folders panel does and what opening a folder gives you.
+See [Spaces](/spaces/spaces) for how a Space is put together. This page covers what the
+Files & folders panel does and what opening a folder gives you.
 </Note>
 
 ## Opening a folder
 
-A folder is not just storage. Opening one — including the Space's own root — puts you on the
-same panel row a Space has at the top level, now scoped to that folder:
+A folder is not just storage. Opening one — including the Space's own root — puts you on
+the same row of tabs a Space has at the top level, now scoped to that folder. The tabs a Space
+shows are part of its setup, so yours may differ:
 
 <CardGroup cols={3}>
-  <Card title="Overview" icon="chart-simple">
-    A dashboard of this folder: counts and quick actions for its files, tasks, records, chats
-    and meetings.
+  <Card title="Home" icon="house">
+    Where you land. See below.
   </Card>
-  <Card title="Files & Folders" icon="folder">
+  <Card title="Files & folders" icon="folder">
     The files and subfolders inside this folder.
   </Card>
   <Card title="Tasks" icon="list-check">
@@ -42,20 +42,31 @@ same panel row a Space has at the top level, now scoped to that folder:
   </Card>
 </CardGroup>
 
-**Overview** is what you land on. Each of its five cards — Files & Folders, Tasks, Records,
-Meetings, Chats — shows a headline count, a short breakdown (file size, task status pills, a
-per-record-set tally), and the section's own quick action (upload, add a task, add a record,
-start a meeting, start a chat). Clicking a card's body switches to that panel; the action button
-skips straight to doing the thing.
+**Home** is what you land on. There is no separate dashboard for a folder. What Home shows
+depends on the folder:
+
+- At the **root** of the Space, it is the Space's own Home. See [Home and cards](/spaces/home-and-cards).
+- In a **contact folder**, it is that contact's Home, a page of cards you can customise.
+- In any other folder, it is a set of summary cards, one for each section — Files & folders,
+  Tasks, Records, Meetings, Chats. Each shows a headline count and the section's own quick action
+  (upload, add a task, add a record, start a meeting, start a chat). Clicking a card's body
+  switches to that tab; the action button skips straight to doing the thing.
+
+<Frame caption="A space Home: an Act now card, Today, a setup link and a list card.">
+  <img src="/images/spaces/space-home.png" alt="A space Home page with an Act now card listing clients and their next steps, a Today card and a list of requests to action" />
+</Frame>
 
 ## Uploading
 
-Inside Files & Folders, the **Add files** menu (the `⋮` button) offers:
+Inside Files & folders, the **Add files** menu (the `⋮` button) offers:
 
 - **Upload files** — the normal file picker.
 - **Write a file** — opens a rich-text editor in a modal. Name the file (an extension you type
   is kept; otherwise it's saved as Markdown) and it's written straight into the current folder —
   no local file to create first.
+
+The same menu also holds **Select from**, **Generate document**, **File mail here** and
+**New automation**, described [below](#bringing-files-in-from-elsewhere).
 
 You can also drag files onto the panel from anywhere — dropping them uploads into whichever
 folder you're currently viewing. A **New folder** button next to Add files creates a subfolder.
@@ -67,10 +78,10 @@ Add files or New folder, that's why.
 
 ## The folder card
 
-Every folder — including the root — shows a card at the top of the panel: its name, a
+Every plain folder — including the root — shows a card at the top of the panel: its name, a
 description you can edit in place, who created it and when, and its total size (recursive,
 including subfolders). Click the chevron to collapse it down to a single line when you want more
-room for the list below.
+room for the list below. A contact folder starts with the contact's identity row instead.
 
 ### Renaming a folder
 
@@ -94,16 +105,16 @@ linked to a task or record. You never name or arrange it yourself.
 
 That key is what ties everything about the contact together: every task filed against them, every
 file in their folder, every record, chat and meeting scoped to them share it. Open their folder
-and its Overview shows all of it in one place.
+and its Home shows all of it in one place.
 
 <Card title="Tasks: Folders and contacts" icon="list-check" href="/spaces/tasks#folders-and-contacts">
   How a task gets linked to a contact, and what happens when the link can't be made.
 </Card>
 
-A contact folder's card looks different from a plain one: it shows the person's name, their
-contact details, and their task progress instead of a description.
+A contact folder looks different from a plain one: it starts with the person's name and contact
+details instead of a description.
 
-### Adding a contact from Files & Folders
+### Adding a contact from Files & folders
 
 A folder-level button — labelled with whatever the Space calls one (for example "Client" or
 "Contact") — opens a menu with:
@@ -119,12 +130,14 @@ Creating one opens straight into their new folder.
 
 ## Bringing files in from elsewhere
 
-Two more entries in Add files:
+Four more entries in Add files:
 
-- **Select** — browse any Space you can reach and copy a file, or a whole folder, into the one
+- **Select from** — browse any Space you can reach and copy a file, or a whole folder, into the one
   you're viewing. Each file is copied server-side; nothing downloads through your browser.
 - **Generate document** — pick a document template, fill it in, and the result is written
   straight into the current folder.
+- **File mail here** — set up a rule that saves matching incoming mail into this folder.
+- **New automation** — start a new email automation for this folder.
 
 ## Sharing a file or folder
 
@@ -174,9 +187,9 @@ rather than from a task's checklist.
     The Document action kind: reading, signing and approving files from a task's checklist.
   </Card>
   <Card title="Scheduling" icon="calendar" href="/spaces/scheduling">
-    Due dates, the Schedule view, and recurring actions.
+    Due dates, the Calendar view, and recurring actions.
   </Card>
-  <Card title="Spaces Overview" icon="folder-tree" href="/spaces/spaces">
-    The panel model this page builds on.
+  <Card title="Spaces" icon="folder-tree" href="/spaces/spaces">
+    How a Space is put together: Home, pages and cards.
   </Card>
 </CardGroup>

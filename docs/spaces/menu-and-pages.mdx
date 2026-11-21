@@ -1,0 +1,147 @@
+---
+title: "Space menu and pages"
+description: "How the space menu is built, how to set the order and landing page in Edit space, record set pages, and the URLs that open a given page"
+icon: "bars"
+---
+
+## The space menu
+
+Every space has a menu down the left side, labelled **Space menu**. It lists the pages of the space, the **Folders** tree, and a block for your clients.
+
+<Frame caption="The space menu with Browse expanded: clients and Folders sit inside it.">
+  <img src="/images/spaces/space-menu.png" alt="A space menu listing Home, Browse (expanded to Clients and Folders), Tasks, Records, Chats and Meetings" />
+</Frame>
+
+| Part | What it does |
+|---|---|
+| Space name | Opens **Space settings** (Edit space). Only people who can edit the space can use it. |
+| Pages | One row per page, in the order set under **Pages and actions**. |
+| Clients block | Lists the clients (contacts or organisations, as configured for your space). Rows load as you scroll, with **Show more** for long lists, and a search box narrows them. |
+| **Folders** | The space's folder tree. The **+** button next to it is **New folder**. |
+| **Collapse menu** / **Expand menu** | Shrinks the menu to an icon strip, and back. |
+
+Rows with a caret expand in place. Click the caret to open or close a row, and click the name to open the page.
+
+<Note>
+When the space shows clients, **Files** is drawn as **Browse**, with **Folders** inside it. Rename the page under **Pages and actions** to keep your own name.
+</Note>
+
+### Which pages appear
+
+A space starts with a default set of pages. Each one shows only when it applies.
+
+| Page | Shown when |
+|---|---|
+| **Home** | Always. |
+| Contacts | The space has a contact record. Named as configured for your space. |
+| **Quotes**, **Policies** | The space offers them. |
+| **Files** | The Files & folders feature is on. |
+| **Tasks** | The Tasks module is on. |
+| **Records** | The Records module is on. |
+| **Chats** | The Chats module is on. |
+| **Meetings** | The Meetings module is on. |
+| **Linked accounts** | Linking is open, at the space root only. |
+| **Submissions** | The space receives submissions, at the space root only. |
+
+A page also disappears when its tab is listed under **Hidden tabs** in **General**, or when it is turned off in **Pages and actions**. Spaces that receive work from linked accounts show a smaller set; see [Linked accounts and products](/spaces/linked-accounts-and-products).
+
+## Pages and actions
+
+Open **Edit space** and choose **Pages and actions** to arrange the menu.
+
+<Frame caption="Edit space, Pages and actions: the page list in menu order, Landing page, Header actions and Features.">
+  <img src="/images/spaces/edit-space-pages.png" alt="The Pages and actions menu with Space pages and Client pages tabs, a list of pages with toggles and Edit buttons, and Add a page" />
+</Frame>
+
+<Steps>
+  <Step title="Open Edit space">
+    Click the space name in the menu (**Space settings**), then choose **Pages and actions**.
+  </Step>
+  <Step title="Set the order">
+    The **Pages** list is the menu order. Drag a row by its handle, or focus the handle and use the arrow keys.
+  </Step>
+  <Step title="Turn pages on or off">
+    The toggle on each row shows or hides the page in the menu. The feature itself stays on under **Features**.
+  </Step>
+  <Step title="Rename a page">
+    Click **Edit** on a row, type a name, and press Enter.
+  </Step>
+  <Step title="Pick the landing page">
+    Choose a page under **Landing page**. This is where the space opens. If that page is off or removed, the space opens on the first page shown.
+  </Step>
+</Steps>
+
+Each row shows its page type and a note:
+
+| Badge | Meaning |
+|---|---|
+| **Landing** | The page the space opens on. |
+| **Off** | The page is turned off and does not appear in the menu. |
+| **Filtered** | The page carries a saved filter. |
+
+### Add a page
+
+Click **Add a page** and pick a type. Pages you add can be removed with the bin button. The default pages can only be turned off.
+
+| Type | Opens |
+|---|---|
+| **Card page** | A page of cards you arrange yourself. You can add more than one. See [Home and cards](/spaces/home-and-cards). |
+| **Clients** | The client list. |
+| **Tasks** | The task views. |
+| **Files** | Files and folders. |
+| **Records** | Record sets and their records. |
+| **Chats** | Chats in the space. |
+| **Meetings** | Meetings in the space. |
+| **Linked accounts** | Accounts linked to this space. |
+| **Submissions** | The submissions inbox. |
+| **Quotes** | The requests list of a linked space. See [Linked accounts and products](/spaces/linked-accounts-and-products). |
+| **Policies** | The accepted records of a linked space. See [Linked accounts and products](/spaces/linked-accounts-and-products). |
+| **Journey** | The client's journey. Client pages only. |
+
+Every type except **Card page** can appear once, and a type is offered only when the space supports it. A space can hold up to 30 pages, and record set pages count towards that limit.
+
+### Client-level pages
+
+The same editor has a client-level view: the tabs inside every client. The order is the tab order, a page turned off leaves the tabs, and a client link opens the first client page shown, or Home when there is none. On a space with a contact record, switch from **Space pages** to **Client pages** to edit the tabs inside every client. A client that has a journey also gets a journey tab, named as configured for your space; the default is **Journey**.
+
+### Header actions
+
+**Pages and actions** also holds the buttons at the top of the space. Under **Header actions**, click **Add an action** to open a form or run a workflow. Each action sits as a button, a secondary button, in the **More menu**, or **Not shown**. Use the move up, move down and remove buttons to arrange them. A row marked **Needs a fix** was refused when you saved and shows what to correct. Client pages have their own **Client actions**.
+
+## Record set pages
+
+A record set page lists the records of one record set as its own page in the menu. It opens at:
+
+```
+?panel=record_set&page=recordset:<CONFIG_ID>
+```
+
+The page shows the records of that set in a list, with cards above or beside it for the figures, status breakdown, due-soon items and charts the set supports. Use **Customise** to rearrange the cards. A row opens the record. The page is named as saved, and shows **Records** when it has no name.
+
+Record set pages do not appear under **Add a page**. For the records themselves, see [Records](/spaces/records).
+
+## Deep links
+
+Add these to the space URL to open a page or a settings screen directly.
+
+| Parameter | Opens | Example |
+|---|---|---|
+| `?panel=` | A panel: `home`, `files`, `tasks`, `records`, `chats`, `meetings`, `entities`, `distribution`, `underwriting`, `quotes`, `policies`, `onboarding`, `record_set`, `schedule` | `?panel=tasks` |
+| `?page=` | A named page by its id, such as a card page or a record set page | `?panel=record_set&page=recordset:<CONFIG_ID>` |
+| `?edit=space&menu=` | **Edit space** on a given menu: `info`, `basic`, `pages`, `tasks`, `records`, `files`, `mail`. Add `&tab=` for a tab inside the menu. | `?edit=space&menu=pages` |
+
+<Note>
+Old links with `?panel=overview` still work and open **Home**.
+</Note>
+
+<CardGroup cols={3}>
+  <Card title="Home and cards" icon="grid-2" href="/spaces/home-and-cards">
+    Build the Home page and card pages.
+  </Card>
+  <Card title="Spaces" icon="folder-tree" href="/spaces/spaces">
+    What a space is and how to create one.
+  </Card>
+  <Card title="Records" icon="table" href="/spaces/records">
+    Record sets, records and their views.
+  </Card>
+</CardGroup>
